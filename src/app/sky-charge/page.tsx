@@ -156,27 +156,51 @@ function PodCard({ pod }: { pod: ChargingPod }) {
 
 /* ─── EARNINGS CHART (simulated) ─── */
 function EarningsChart() {
-  const data = [12, 18, 15, 25, 22, 30, 28, 35, 32, 40, 38, 45];
+  const months = ["Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara", "Oca", "Şub", "Mar"];
+  const data = [28.5, 34.2, 31.8, 42.6, 38.9, 52.3, 48.7, 61.4, 55.2, 72.8, 68.5, 84.3];
   const max = Math.max(...data);
+  const total = data.reduce((a, b) => a + b, 0);
+  const growth = ((data[11] - data[0]) / data[0] * 100).toFixed(0);
 
   return (
-    <div className="glass-card !rounded-xl p-5">
-      <div className="flex items-center justify-between mb-4">
+    <div className="glass-card !rounded-xl p-6">
+      <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-accent-cyan" />
           Aylık Kazanç Grafiği
         </h3>
         <span className="text-xs text-text-muted">Son 12 ay</span>
       </div>
-      <div className="flex items-end gap-2 h-40">
+
+      {/* Summary row */}
+      <div className="flex items-center gap-6 mb-5 text-sm">
+        <div>
+          <span className="text-text-muted text-xs">Toplam: </span>
+          <span className="font-bold text-accent-cyan tabular-nums">{total.toFixed(1)} MON</span>
+        </div>
+        <div>
+          <span className="text-text-muted text-xs">Büyüme: </span>
+          <span className="font-bold text-success tabular-nums">+{growth}%</span>
+        </div>
+        <div>
+          <span className="text-text-muted text-xs">Ort: </span>
+          <span className="font-bold tabular-nums">{(total / 12).toFixed(1)} MON</span>
+        </div>
+      </div>
+
+      <div className="flex items-end gap-1.5 h-52">
         {data.map((d, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div key={i} className="flex-1 flex flex-col items-center gap-1.5 group">
+            {/* Value on hover */}
+            <span className="text-[10px] font-bold text-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity tabular-nums">
+              {d.toFixed(0)}
+            </span>
             <div
-              className="w-full rounded-t-md bg-gradient-to-t from-accent-cyan/60 to-accent-violet/60 transition-all duration-500 hover:from-accent-cyan hover:to-accent-violet"
-              style={{ height: `${(d / max) * 100}%` }}
+              className="w-full rounded-t-lg bg-gradient-to-t from-blue-500/70 to-indigo-500/70 transition-all duration-500 group-hover:from-blue-500 group-hover:to-indigo-500 cursor-pointer relative"
+              style={{ height: `${(d / max) * 100}%`, minHeight: 8 }}
             />
-            <span className="text-[10px] text-text-muted">
-              {["O", "Ş", "M", "N", "M", "H", "T", "A", "E", "E", "K", "A"][i]}
+            <span className="text-[10px] text-text-muted font-medium">
+              {months[i]}
             </span>
           </div>
         ))}
@@ -206,7 +230,7 @@ export default function SkyChargePage() {
               <div className="flex items-center gap-2">
                 <Link href="/" className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-                    <Cpu className="w-4 h-4 text-[#0A0E1A]" />
+                    <Cpu className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-bold gradient-text">NeuralAir</span>
                 </Link>

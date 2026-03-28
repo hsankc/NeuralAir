@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import {
   Zap,
   Map,
@@ -16,6 +17,8 @@ import {
   Menu,
   X,
 } from "lucide-react";
+
+const WalletConnect = dynamic(() => import("@/components/WalletConnect"), { ssr: false });
 
 /* ─────────── HEADER ─────────── */
 function Header() {
@@ -48,11 +51,11 @@ function Header() {
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative w-10 h-10 rounded-xl gradient-bg flex items-center justify-center">
-              <Cpu className="w-5 h-5 text-[#0A0E1A]" />
-              <div className="absolute inset-0 rounded-xl gradient-bg opacity-50 blur-md group-hover:opacity-80 transition-opacity" />
+            <div className="relative w-10 h-10 rounded-xl bg-[#EDEDED] flex items-center justify-center">
+              <Cpu className="w-5 h-5 text-[#050505]" />
+              <div className="absolute inset-0 rounded-xl bg-white opacity-20 blur-md group-hover:opacity-40 transition-opacity" />
             </div>
-            <span className="text-xl font-bold gradient-text tracking-tight">
+            <span className="text-xl font-bold text-[#EDEDED] tracking-tight">
               NeuralAir
             </span>
           </Link>
@@ -70,8 +73,11 @@ function Header() {
             ))}
           </nav>
 
-          {/* CTA + Mobile toggle */}
+          {/* CTA + Wallet + Mobile toggle */}
           <div className="flex items-center gap-3">
+            <div className="hidden sm:block">
+              <WalletConnect />
+            </div>
             <Link
               href="/dashboard"
               className="hidden sm:inline-flex btn-primary text-sm !py-2.5 !px-5 rounded-lg"
@@ -115,29 +121,28 @@ function Header() {
 function HeroSection() {
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-grid">
-      {/* Radial glow */}
-      <div className="absolute inset-0 bg-radial-glow pointer-events-none" />
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-accent-cyan/5 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] bg-accent-violet/5 rounded-full blur-[120px] pointer-events-none" />
+      {/* Ambient background (obsidian style: very subtle) */}
+      <div className="absolute inset-0 bg-[#050505] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-[#111111] rounded-full blur-[150px] pointer-events-none" />
 
       {/* Content */}
       <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-xs font-medium text-accent-cyan mb-8 animate-fade-in-up">
-          <Radio className="w-3.5 h-3.5 animate-glow-pulse" />
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#27272A] bg-[#111111] text-xs font-medium text-[#EDEDED] mb-8 animate-fade-in-up">
+          <Radio className="w-3.5 h-3.5" />
           <span>Monad Blokzinciri Üzerinde Çalışıyor</span>
-          <span className="status-dot status-active" />
+          <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981] animate-pulse" />
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight mb-6 animate-fade-in-up animate-delay-100">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-black tracking-tight mb-6 animate-fade-in-up animate-delay-100 text-[#EDEDED]">
           Gökyüzünün Yeni{" "}
-          <span className="gradient-text-glow">Protokolü</span>
+          <span className="text-[#A1A1AA]">Protokolü</span>
         </h1>
 
-        <p className="text-lg sm:text-xl text-text-secondary max-w-2xl mx-auto mb-10 animate-fade-in-up animate-delay-200 leading-relaxed">
-          Otonom drone&apos;lar, merkeziyetsiz şarj ağı ve yapay zeka görev dağıtımı.
+        <p className="text-lg sm:text-xl text-[#A1A1AA] max-w-2xl mx-auto mb-10 animate-fade-in-up animate-delay-200 leading-relaxed">
+          Otonom drone'lar, merkeziyetsiz şarj ağı ve yapay zeka görev dağıtımı.
           <br className="hidden sm:block" />
-          <span className="text-accent-cyan font-medium">Monad&apos;ın 1 saniye altı finalitesi</span>{" "}
+          <span className="text-[#EDEDED] font-medium">Monad'ın 1 saniye altı finalitesi</span>{" "}
           ile gökyüzünü yönetin.
         </p>
 
@@ -154,22 +159,7 @@ function HeroSection() {
         </div>
       </div>
 
-      {/* 3D Drone Embed */}
-      <div className="relative z-10 w-full max-w-3xl mx-auto px-4 animate-fade-in-up animate-delay-400">
-        <div className="relative rounded-2xl overflow-hidden" style={{ paddingBottom: "56.25%" }}>
-          <iframe
-            title="Buster Drone"
-            frameBorder="0"
-            allowFullScreen
-            allow="autoplay; fullscreen; xr-spatial-tracking"
-            src="https://sketchfab.com/models/294e79652f494130ad2ab00a13fdbafd/embed?autospin=1&autostart=1&preload=1&transparent=1&ui_hint=0"
-            className="absolute inset-0 w-full h-full"
-            style={{ border: "none" }}
-          />
-        </div>
-        {/* Glow ring under drone */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-4 bg-accent-cyan/20 rounded-full blur-xl" />
-      </div>
+
 
       {/* Scroll indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-glow-pulse">
@@ -240,40 +230,40 @@ const features = [
     icon: Zap,
     title: "Sky-Charge DePIN",
     desc: "Pencere kenarı şarj podları ile merkeziyetsiz enerji ağı. Pod sahipleri MON kazanır.",
-    color: "text-warning",
-    gradient: "from-yellow-500/20 to-amber-500/10",
+    color: "text-[#EDEDED]",
+    gradient: "from-white/10 to-transparent",
     link: "/sky-charge",
   },
   {
     icon: ShoppingCart,
     title: "Görev Pazarı",
     desc: "Kargo, ziraat, yangın müdahalesi — akıllı kontrat escrowiyle güvenli ödeme.",
-    color: "text-success",
-    gradient: "from-emerald-500/20 to-green-500/10",
+    color: "text-[#EDEDED]",
+    gradient: "from-white/10 to-transparent",
     link: "/marketplace",
   },
   {
     icon: Map,
     title: "Canlı Gökyüzü Haritası",
-    desc: "Tüm drone&apos;ların anlık konum takibi. On-chain uçuş kara kutusu.",
-    color: "text-accent-cyan",
-    gradient: "from-cyan-500/20 to-sky-500/10",
+    desc: "Tüm drone'ların anlık konum takibi. On-chain uçuş kara kutusu.",
+    color: "text-[#EDEDED]",
+    gradient: "from-white/10 to-transparent",
     link: "/dashboard",
   },
   {
     icon: Gamepad2,
     title: "Blockchain Kontrol",
     desc: "Web arayüzünden on-chain drone yönlendirme. Monad'ın hızını kanıtla!",
-    color: "text-accent-violet",
-    gradient: "from-violet-500/20 to-purple-500/10",
+    color: "text-[#EDEDED]",
+    gradient: "from-white/10 to-transparent",
     link: "/control",
   },
   {
     icon: Brain,
     title: "AI Dispatcher",
     desc: '\"En yakın dronu gönder\" de, yapay zeka gerisini halleder.',
-    color: "text-pink-400",
-    gradient: "from-pink-500/20 to-rose-500/10",
+    color: "text-[#EDEDED]",
+    gradient: "from-white/10 to-transparent",
     link: "/dashboard",
   },
 ];
@@ -284,10 +274,10 @@ function FeaturesGrid() {
       <div className="absolute inset-0 bg-dots pointer-events-none opacity-50" />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Beş Temel <span className="gradient-text">Modül</span>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[#EDEDED]">
+            Beş Temel <span className="text-[#A1A1AA]">Modül</span>
           </h2>
-          <p className="text-text-secondary max-w-2xl mx-auto">
+          <p className="text-[#A1A1AA] max-w-2xl mx-auto">
             Havacılık, blockchain ve yapay zekanın kesiştiği tam entegre bir protokol.
           </p>
         </div>
@@ -346,23 +336,23 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="py-24 px-4 bg-bg-secondary/30">
+    <section className="py-24 px-4 bg-[#0A0A0A] border-y border-[#1A1A1A]">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-            Nasıl <span className="gradient-text">Çalışır?</span>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[#EDEDED]">
+            Nasıl <span className="text-[#A1A1AA]">Çalışır?</span>
           </h2>
         </div>
 
         <div className="grid md:grid-cols-4 gap-6 relative">
           {/* Connecting line */}
-          <div className="hidden md:block absolute top-12 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-accent-cyan via-accent-violet to-accent-cyan opacity-30" />
+          <div className="hidden md:block absolute top-12 left-[12.5%] right-[12.5%] h-px bg-[#27272A]" />
 
           {steps.map((s, i) => (
             <div key={s.num} className="relative text-center animate-fade-in-up" style={{ animationDelay: `${i * 150}ms` }}>
               {/* Number circle */}
-              <div className="w-24 h-24 rounded-full gradient-border flex items-center justify-center mx-auto mb-6 relative bg-bg-primary">
-                <span className="text-2xl font-black gradient-text">{s.num}</span>
+              <div className="w-24 h-24 rounded-full border border-[#27272A] bg-[#111111] flex items-center justify-center mx-auto mb-6 relative">
+                <span className="text-2xl font-black text-[#EDEDED]">{s.num}</span>
               </div>
               <h3 className="text-lg font-bold mb-2">{s.title}</h3>
               <p className="text-sm text-text-secondary">{s.desc}</p>
@@ -377,28 +367,27 @@ function HowItWorks() {
 /* ─────────── MONAD SHOWCASE ─────────── */
 function MonadShowcase() {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-grid pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-violet/5 rounded-full blur-[150px] pointer-events-none" />
+    <section className="py-24 px-4 relative overflow-hidden bg-[#050505]">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#111111] rounded-full blur-[150px] pointer-events-none" />
 
       <div className="max-w-5xl mx-auto relative z-10">
-        <div className="glass-card p-8 md:p-12">
+        <div className="glass-card p-8 md:p-12 border border-[#27272A] bg-[#0A0A0A]">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             {/* Left - Text */}
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-accent-violet/10 text-accent-violet text-xs font-medium mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#18181A] border border-[#27272A] text-[#EDEDED] text-xs font-medium mb-6">
                 <Shield className="w-3.5 h-3.5" />
                 Neden Monad?
               </div>
-              <h2 className="text-3xl font-bold mb-4">
+              <h2 className="text-3xl font-bold mb-4 text-[#EDEDED]">
                 Havacılıkta her{" "}
-                <span className="text-accent-cyan text-glow-cyan">milisaniye</span>{" "}
+                <span className="text-[#34D399]">milisaniye</span>{" "}
                 hayattır
               </h2>
-              <p className="text-text-secondary mb-6 leading-relaxed">
+              <p className="text-[#A1A1AA] mb-6 leading-relaxed">
                 Geleneksel zincirlerde bir drone komutu 15 saniye sürer — drone
-                çoktan duvara çarpmıştır. Monad&apos;ın paralel execution mimarisi,
-                aynı anda binlerce drone&apos;un on-chain kontrol edilmesini sağlar.
+                çoktan duvara çarpmıştır. Monad'ın paralel execution mimarisi,
+                aynı anda binlerce drone'un on-chain kontrol edilmesini sağlar.
               </p>
               <div className="space-y-3">
                 {[
@@ -408,38 +397,37 @@ function MonadShowcase() {
                   "Değiştirilemez uçuş kara kutusu",
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan" />
-                    <span className="text-sm">{item}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#EDEDED]" />
+                    <span className="text-sm text-[#D4D4D8]">{item}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Right - Latency comparison terminal */}
-            <div className="terminal">
-              <div className="terminal-header">
-                <div className="terminal-dot bg-danger" />
-                <div className="terminal-dot bg-warning" />
-                <div className="terminal-dot bg-success" />
-                <span className="text-xs text-text-muted ml-2">latency_comparison.sh</span>
+            <div className="terminal rounded-xl border border-[#27272A] bg-[#111111]">
+              <div className="terminal-header border-b border-[#27272A] bg-[#0A0A0A] p-3 flex px-4">
+                <div className="w-3 h-3 rounded-full bg-[#F87171] mr-2" />
+                <div className="w-3 h-3 rounded-full bg-[#FBBF24] mr-2" />
+                <div className="w-3 h-3 rounded-full bg-[#34D399] mr-2" />
+                <span className="text-xs text-[#A1A1AA] ml-2 font-mono">latency_comparison.sh</span>
               </div>
-              <div className="terminal-body text-sm space-y-2">
-                <div className="terminal-scanline" />
-                <div className="text-text-muted">$ drone_command --chain ethereum</div>
+              <div className="terminal-body text-sm space-y-3 p-4 font-mono">
+                <div className="text-[#A1A1AA]">$ drone_command --chain ethereum</div>
                 <div>
-                  <span className="text-danger">⏱ Finality:</span>{" "}
-                  <span className="text-text-primary">~15.000ms</span>
+                  <span className="text-[#F87171]">⏱ Finality:</span>{" "}
+                  <span className="text-[#EDEDED]">~15.000ms</span>
                 </div>
-                <div className="text-danger">✗ Drone: DUVARA_ÇARPTI</div>
+                <div className="text-[#F87171]">✗ Drone: DUVARA_ÇARPTI</div>
                 <div className="h-3" />
-                <div className="text-text-muted">$ drone_command --chain monad</div>
+                <div className="text-[#A1A1AA]">$ drone_command --chain monad</div>
                 <div>
-                  <span className="text-success">⏱ Finality:</span>{" "}
-                  <span className="text-text-primary">~400ms</span>
+                  <span className="text-[#34D399]">⏱ Finality:</span>{" "}
+                  <span className="text-[#EDEDED]">~400ms</span>
                 </div>
-                <div className="text-success">✓ Drone: HEDEFTE</div>
+                <div className="text-[#34D399]">✓ Drone: HEDEFTE</div>
                 <div className="h-3" />
-                <div className="text-accent-cyan animate-typing-cursor">
+                <div className="text-[#EDEDED] font-semibold animate-typing-cursor">
                   █ Monad — Gökyüzünün Blokzinciri
                 </div>
               </div>
@@ -458,7 +446,7 @@ function Footer() {
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-            <Cpu className="w-4 h-4 text-[#0A0E1A]" />
+            <Cpu className="w-4 h-4 text-white" />
           </div>
           <span className="font-bold gradient-text">NeuralAir</span>
           <span className="text-xs text-text-muted">SkyAgent Protocol v1.0</span>

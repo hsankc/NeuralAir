@@ -9,6 +9,7 @@ interface SkyMapProps {
   drones: DroneAgent[];
   pods: ChargingPod[];
   onDroneClick?: (drone: DroneAgent) => void;
+  selectedDroneId?: number;
 }
 
 // Custom drone icon SVG
@@ -41,7 +42,7 @@ function getDroneColor(type: string, status: string): string {
   }
 }
 
-export default function SkyMap({ drones, pods, onDroneClick }: SkyMapProps) {
+export default function SkyMap({ drones, pods, onDroneClick, selectedDroneId }: SkyMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const droneMarkersRef = useRef<Map<number, L.Marker>>(new Map());
@@ -58,7 +59,7 @@ export default function SkyMap({ drones, pods, onDroneClick }: SkyMapProps) {
       attributionControl: false,
     });
 
-    // Dark tile layer
+    // Dark/Neon tile layer
     L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
       maxZoom: 19,
     }).addTo(map);
@@ -69,8 +70,11 @@ export default function SkyMap({ drones, pods, onDroneClick }: SkyMapProps) {
     mapRef.current = map;
 
     return () => {
+      // Cleanup map and clear references so markers can be recreated if component remounts
       map.remove();
       mapRef.current = null;
+      droneMarkersRef.current.clear();
+      podMarkersRef.current.clear();
     };
   }, []);
 
@@ -90,14 +94,13 @@ export default function SkyMap({ drones, pods, onDroneClick }: SkyMapProps) {
 
         const marker = L.marker([pod.lat, pod.lng], { icon }).addTo(map);
         marker.bindPopup(
-          `<div style="font-family:Inter,sans-serif;color:#E2E8F0;background:#141B2D;padding:12px;border-radius:8px;min-width:180px;border:1px solid #1E3A5F">
-            <div style="font-weight:700;margin-bottom:6px;color:#FFD600">⚡ ${pod.name}</div>
-            <div style="font-size:12px;color:#94A3B8;margin-bottom:4px">Sahip: ${pod.owner}</div>
-            <div style="font-size:12px;color:#94A3B8;margin-bottom:4px">Ücret: ${pod.rate} MON/kWh</div>
-            <div style="font-size:12px;color:#94A3B8;margin-bottom:4px">Toplam Enerji: ${pod.totalEnergy} kWh</div>
-            <div style="font-size:12px;color:${pod.available ? "#00E676" : "#FF1744"}">${pod.available ? "✓ Müsait" : "✗ Dolu"}</div>
-          </div>`,
-          { className: "dark-popup" }
+          `<div style="font-family:Inter,sans-serif;color:#F8FAFC;background:rgba(18,23,34,0.9);padding:14px;border-radius:12px;min-width:180px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.5);backdrop-filter:blur(16px)">
+            <div style="font-weight:700;margin-bottom:8px;color:#F59E0B;font-size:14px;letter-spacing:0.5px">⚡ ${pod.name}</div>
+            <div style="font-size:12px;color:#94A3B8;margin-bottom:5px">Sahip: <span style="color:#F8FAFC">${pod.owner.slice(0,6)}...${pod.owner.slice(-4)}</span></div>
+            <div style="font-size:12px;color:#94A3B8;margin-bottom:5px">Ücret: <span style="color:#F8FAFC">${pod.rate} MON/kWh</span></div>
+            <div style="font-size:12px;color:#94A3B8;margin-bottom:6px">Enerji: <span style="color:#F8FAFC">${pod.totalEnergy} kWh</span></div>
+            <div style="font-size:12px;font-weight:600;color:${pod.available ? "#10B981" : "#EF4444"};padding-top:4px;border-top:1px solid rgba(255,255,255,0.05)">${pod.available ? "• Müsait" : "• Dolu"}</div>
+          </div>`
         );
 
         podMarkersRef.current.set(pod.id, marker);
@@ -135,14 +138,13 @@ export default function SkyMap({ drones, pods, onDroneClick }: SkyMapProps) {
       const marker = droneMarkersRef.current.get(drone.id)!;
       marker.unbindPopup();
       marker.bindPopup(
-        `<div style="font-family:Inter,sans-serif;color:#E2E8F0;background:#141B2D;padding:12px;border-radius:8px;min-width:200px;border:1px solid #1E3A5F">
-          <div style="font-weight:700;margin-bottom:6px;color:${color}">🛸 ${drone.name}</div>
-          <div style="font-size:12px;color:#94A3B8;margin-bottom:3px">Batarya: <span style="color:${drone.battery < 20 ? "#FF1744" : "#00E676"};font-weight:600">%${drone.battery.toFixed(1)}</span></div>
-          <div style="font-size:12px;color:#94A3B8;margin-bottom:3px">İrtifa: ${drone.altitude}m | Hız: ${drone.speed}km/s</div>
-          <div style="font-size:12px;color:#94A3B8;margin-bottom:3px">İtibar: ${drone.reputation}/100</div>
-          <div style="font-size:11px;color:#64748B;margin-top:4px">${drone.personality}</div>
-        </div>`,
-        { className: "dark-popup" }
+        `<div style="font-family:Inter,sans-serif;color:#F8FAFC;background:rgba(18,23,34,0.9);padding:14px;border-radius:12px;min-width:200px;border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 32px rgba(0,0,0,0.5);backdrop-filter:blur(16px)">
+          <div style="font-weight:700;margin-bottom:8px;color:${color};font-size:14px;letter-spacing:0.5px;display:flex;align-items:center;gap:6px">🛸 ${drone.name}</div>
+          <div style="font-size:12px;color:#94A3B8;margin-bottom:4px">Batarya: <span style="color:${drone.battery < 20 ? "#EF4444" : drone.battery < 50 ? "#F59E0B" : "#10B981"};font-weight:700">%${drone.battery.toFixed(0)}</span></div>
+          <div style="font-size:12px;color:#94A3B8;margin-bottom:4px">İrtifa: <span style="color:#F8FAFC">${drone.altitude}m</span> <span style="opacity:0.5">|</span> Hız: <span style="color:#F8FAFC">${drone.speed}km/s</span></div>
+          <div style="font-size:12px;color:#94A3B8;margin-bottom:8px">İtibar: <span style="color:#3B82F6">${drone.reputation}</span>/100</div>
+          <div style="font-size:11px;color:#64748B;padding-top:6px;border-top:1px solid rgba(255,255,255,0.05);line-height:1.4">${drone.personality.substring(0,60)}...</div>
+        </div>`
       );
 
       // Re-bind click handler to get updated drone reference
@@ -152,6 +154,18 @@ export default function SkyMap({ drones, pods, onDroneClick }: SkyMapProps) {
       });
     });
   }, [drones, onDroneClick]);
+
+  // Handle selected drone flyTo
+  useEffect(() => {
+    if (!mapRef.current || !selectedDroneId) return;
+    const drone = drones.find((d) => d.id === selectedDroneId);
+    if (drone) {
+      mapRef.current.flyTo([drone.lat, drone.lng], 14, {
+        animate: true,
+        duration: 1.5
+      });
+    }
+  }, [selectedDroneId, drones]);
 
   return (
     <div ref={mapContainerRef} className="w-full h-full" style={{ minHeight: 400 }} />

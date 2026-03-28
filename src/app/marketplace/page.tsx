@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
@@ -42,19 +42,19 @@ function typeIcon(t: MissionType) {
 
 function typeGradient(t: MissionType) {
   switch (t) {
-    case "cargo": return "from-cyan-500 to-blue-600";
-    case "agricultural": return "from-green-500 to-emerald-600";
-    case "fire": return "from-red-500 to-orange-600";
-    case "traffic": return "from-amber-500 to-yellow-600";
+    case "cargo": return "from-[#18181B] to-[#60A5FA]";
+    case "agricultural": return "from-[#18181B] to-[#34D399]";
+    case "fire": return "from-[#18181B] to-[#F87171]";
+    case "traffic": return "from-[#18181B] to-[#FBBF24]";
   }
 }
 
 function typeBadgeColor(t: MissionType) {
   switch (t) {
-    case "cargo": return "bg-accent-cyan/15 text-accent-cyan border-accent-cyan/30";
-    case "agricultural": return "bg-success/15 text-success border-success/30";
-    case "fire": return "bg-danger/15 text-danger border-danger/30";
-    case "traffic": return "bg-warning/15 text-warning border-warning/30";
+    case "cargo": return "bg-[#18181B] text-[#60A5FA] border-[#27272A]";
+    case "agricultural": return "bg-[#18181B] text-[#34D399] border-[#27272A]";
+    case "fire": return "bg-[#18181B] text-[#F87171] border-[#27272A]";
+    case "traffic": return "bg-[#18181B] text-[#FBBF24] border-[#27272A]";
   }
 }
 
@@ -108,47 +108,47 @@ function CreateMissionModal({ onClose }: { onClose: () => void }) {
             <button onClick={() => setStep(1)} className="text-xs text-accent-cyan flex items-center gap-1">
               <ArrowLeft className="w-3 h-3" /> Geri
             </button>
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="text-xs text-text-muted block mb-1">Görev Başlığı</label>
+                <label className="text-xs text-[#A1A1AA] block mb-1.5 ml-1">Görev Başlığı</label>
                 <input
                   type="text"
                   placeholder="Örn: Alsancak → Bornova Paket"
-                  className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-cyan transition-colors"
+                  className="w-full bg-[#111111] border border-[#27272A] hover:border-[#3F3F46] rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-[#EDEDED] transition-all text-[#EDEDED] placeholder-[#71717A]"
                 />
               </div>
               <div>
-                <label className="text-xs text-text-muted block mb-1">Açıklama</label>
+                <label className="text-xs text-[#A1A1AA] block mb-1.5 ml-1">Açıklama</label>
                 <textarea
                   placeholder="Görev detaylarını yazın..."
-                  rows={2}
-                  className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-cyan transition-colors resize-none"
+                  rows={3}
+                  className="w-full bg-[#111111] border border-[#27272A] hover:border-[#3F3F46] rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-[#EDEDED] transition-all resize-none text-[#EDEDED] placeholder-[#71717A]"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-text-muted block mb-1">Başlangıç (Lat, Lng)</label>
+                  <label className="text-xs text-[#A1A1AA] block mb-1.5 ml-1">Başlangıç Koordinatı</label>
                   <input
                     type="text"
                     placeholder="38.4350, 27.1420"
-                    className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-cyan transition-colors"
+                    className="w-full bg-[#111111] border border-[#27272A] hover:border-[#3F3F46] rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-[#EDEDED] transition-all text-[#EDEDED] placeholder-[#71717A]"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-text-muted block mb-1">Varış (Lat, Lng)</label>
+                  <label className="text-xs text-[#A1A1AA] block mb-1.5 ml-1">Varış Koordinatı</label>
                   <input
                     type="text"
                     placeholder="38.4700, 27.2200"
-                    className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-cyan transition-colors"
+                    className="w-full bg-[#111111] border border-[#27272A] hover:border-[#3F3F46] rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-[#EDEDED] transition-all text-[#EDEDED] placeholder-[#71717A]"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-xs text-text-muted block mb-1">Ödeme (MON)</label>
+                <label className="text-xs text-[#A1A1AA] block mb-1.5 ml-1">Ödeme (MON)</label>
                 <input
                   type="number"
                   placeholder="2.5"
-                  className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-cyan transition-colors"
+                  className="w-full bg-[#111111] border border-[#27272A] hover:border-[#3F3F46] rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-[#EDEDED] transition-all text-[#EDEDED] placeholder-[#71717A]"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -193,7 +193,7 @@ function CreateMissionModal({ onClose }: { onClose: () => void }) {
 }
 
 /* ─── MISSION CARD ─── */
-function MissionCard({ mission }: { mission: Mission }) {
+function MissionCard({ mission, onTake }: { mission: Mission; onTake?: (id: number) => void }) {
   const Icon = typeIcon(mission.type);
   const drone = mission.droneId
     ? initialDrones.find((d) => d.id === mission.droneId)
@@ -211,11 +211,11 @@ function MissionCard({ mission }: { mission: Mission }) {
               <Icon className="w-5 h-5" />
             </div>
             <div>
-              <span className={`text-xs px-2 py-0.5 rounded-full border ${typeBadgeColor(mission.type)}`}>
+              <span className={`text-xs px-2.5 py-0.5 rounded-full border ${typeBadgeColor(mission.type)}`}>
                 {missionTypeLabels[mission.type]}
               </span>
               {mission.priority && (
-                <span className="text-xs text-danger flex items-center gap-0.5 mt-0.5">
+                <span className="text-xs px-2.5 py-1 mt-1.5 rounded-full border border-[#521313] bg-[#2E0A0A] text-[#F87171] inline-flex items-center gap-1">
                   <AlertTriangle className="w-3 h-3" /> Öncelikli
                 </span>
               )}
@@ -241,23 +241,23 @@ function MissionCard({ mission }: { mission: Mission }) {
 
         <div className="flex items-center justify-between">
           <span
-            className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+            className={`text-[11px] font-semibold tracking-wide px-2.5 py-1 rounded-full border ${
               mission.status === "in-progress"
-                ? "bg-success/15 text-success"
+                ? "bg-[#062E1C] border-[#0A472A] text-[#34D399]"
                 : mission.status === "open"
-                ? "bg-warning/15 text-warning"
-                : "bg-white/10 text-text-muted"
+                ? "bg-[#2E1A05] border-[#4D2D0B] text-[#FBBF24]"
+                : "bg-white/5 border-white/10 text-text-muted"
             }`}
           >
             {missionStatusLabels[mission.status]}
           </span>
 
           {drone ? (
-            <span className="text-xs text-accent-cyan flex items-center gap-1">
+            <span className="text-xs text-[#60A5FA] flex items-center gap-1">
               <Navigation className="w-3 h-3" /> {drone.name}
             </span>
           ) : (
-            <button className="text-xs btn-primary !py-1.5 !px-3 rounded-lg">
+            <button onClick={() => onTake && onTake(mission.id)} className="text-xs btn-primary !py-1.5 !px-3 rounded-lg hover:scale-105">
               <span>Görevi Al</span>
             </button>
           )}
@@ -271,11 +271,51 @@ function MissionCard({ mission }: { mission: Mission }) {
 export default function MarketplacePage() {
   const [filter, setFilter] = useState<MissionType | "all">("all");
   const [showCreate, setShowCreate] = useState(false);
+  const [missions, setMissions] = useState<Mission[]>(initialMissions);
+
+  // Otomatik görev alma simulasyonu (Agent Simulation)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMissions((prev) => {
+        const openMissions = prev.filter((m) => m.status === "open");
+        if (openMissions.length === 0) return prev;
+        
+        // Rastgele bir açık görevi al
+        const randomMission = openMissions[Math.floor(Math.random() * openMissions.length)];
+        const droneId = initialDrones[Math.floor(Math.random() * initialDrones.length)].id;
+        
+        return prev.map((m) =>
+          m.id === randomMission.id
+            ? { ...m, status: "in-progress", droneId }
+            : m
+        );
+      });
+    }, 12000); // 12 saniyede bir otonom drone görev alır
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleTakeMission = (id: number) => {
+    setMissions((prev) =>
+      prev.map((m) =>
+        m.id === id
+          ? { ...m, status: "in-progress", droneId: initialDrones[Math.floor(Math.random() * initialDrones.length)].id }
+          : m
+      )
+    );
+    
+    // Simüle edilmiş görev tamamlanması
+    setTimeout(() => {
+      setMissions((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, status: "completed" } : m))
+      );
+    }, 8000);
+  };
 
   const filtered =
     filter === "all"
-      ? initialMissions
-      : initialMissions.filter((m) => m.type === filter);
+      ? missions.filter(m => m.status !== "completed")
+      : missions.filter((m) => m.type === filter && m.status !== "completed");
 
   const tabs: { key: MissionType | "all"; label: string; icon: any }[] = [
     { key: "all", label: "Tümü", icon: Filter },
@@ -298,7 +338,7 @@ export default function MarketplacePage() {
               <div className="flex items-center gap-2">
                 <Link href="/" className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-                    <Cpu className="w-4 h-4 text-[#0A0E1A]" />
+                    <Cpu className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-bold gradient-text">NeuralAir</span>
                 </Link>
@@ -325,10 +365,10 @@ export default function MarketplacePage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Açık Görevler", value: initialMissions.filter((m) => m.status === "open").length, color: "text-warning" },
-            { label: "Aktif Görevler", value: initialMissions.filter((m) => m.status === "in-progress").length, color: "text-success" },
-            { label: "Toplam Ödeme", value: `${initialMissions.reduce((a, m) => a + m.payment, 0).toFixed(1)} MON`, color: "text-accent-cyan" },
-            { label: "Ortalama Ödeme", value: `${(initialMissions.reduce((a, m) => a + m.payment, 0) / initialMissions.length).toFixed(1)} MON`, color: "text-accent-violet" },
+            { label: "Açık Görevler", value: missions.filter((m) => m.status === "open").length, color: "text-[#FBBF24]" },
+            { label: "Aktif Görevler", value: missions.filter((m) => m.status === "in-progress").length, color: "text-[#34D399]" },
+            { label: "Toplam Ödeme", value: `${missions.reduce((a, m) => a + m.payment, 0).toFixed(1)} MON`, color: "text-[#60A5FA]" },
+            { label: "Tamamlanan", value: missions.filter(m => m.status === "completed").length, color: "text-[#A78BFA]" },
           ].map((s) => (
             <div key={s.label} className="glass-card !rounded-xl p-4">
               <div className={`text-2xl font-bold tabular-nums ${s.color}`}>{s.value}</div>
@@ -355,10 +395,9 @@ export default function MarketplacePage() {
           ))}
         </div>
 
-        {/* Mission Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.map((m) => (
-            <MissionCard key={m.id} mission={m} />
+            <MissionCard key={m.id} mission={m} onTake={handleTakeMission} />
           ))}
         </div>
       </div>

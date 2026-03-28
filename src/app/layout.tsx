@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
+import { ClientProviders } from "./providers";
 
 export const metadata: Metadata = {
   title: "NeuralAir — SkyAgent Protocol | Otonom Drone Ağı",
@@ -23,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="tr" className="dark">
+    <html lang="tr">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
@@ -35,8 +37,14 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
+        {/* CesiumJS CSS */}
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/cesium/1.114.0/Widgets/widgets.min.css" rel="stylesheet" />
       </head>
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <ClientProviders>{children}</ClientProviders>
+        {/* CesiumJS Core Script */}
+        <Script src="https://cdnjs.cloudflare.com/ajax/libs/cesium/1.114.0/Cesium.js" strategy="beforeInteractive" />
+      </body>
     </html>
   );
 }

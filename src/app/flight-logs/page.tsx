@@ -66,7 +66,7 @@ export default function FlightLogsPage() {
               <div className="flex items-center gap-2">
                 <Link href="/" className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-                    <Cpu className="w-4 h-4 text-[#0A0E1A]" />
+                    <Cpu className="w-4 h-4 text-white" />
                   </div>
                   <span className="font-bold gradient-text">NeuralAir</span>
                 </Link>
