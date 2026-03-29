@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Wallet, LogOut, ChevronDown, ExternalLink, AlertCircle, Loader2 } from "lucide-react";
 import { useWallet } from "@/lib/web3/WalletContext";
 import { MONAD_TESTNET } from "@/lib/web3/config";
@@ -8,12 +8,28 @@ import { MONAD_TESTNET } from "@/lib/web3/config";
 export default function WalletConnect() {
   const { address, isConnected, isCorrectChain, isConnecting, balance, error, connect, disconnect, switchToMonad } = useWallet();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Click outside to close dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
 
   if (isConnecting) {
     return (
       <button 
-        onClick={connect}
-        className="flex items-center gap-2 px-4 py-2 rounded bg-white/5 border border-border text-sm text-text-secondary hover:bg-white/10 transition-colors"
+        disabled
+        className="flex items-center gap-2 px-4 py-2 rounded bg-white/5 border border-border text-sm text-text-secondary transition-colors"
       >
         <Loader2 className="w-4 h-4 animate-spin text-accent-cyan" />
         <span className="opacity-80">Bağlanıyor...</span>
@@ -23,7 +39,7 @@ export default function WalletConnect() {
 
   if (!isConnected) {
     return (
-      <div>
+      <div className="relative">
         <button
           onClick={connect}
           className="flex items-center gap-2 btn-primary !py-2 !px-4 text-sm rounded shadow-sm hover:shadow-md"
@@ -34,7 +50,7 @@ export default function WalletConnect() {
           </span>
         </button>
         {error && (
-          <div className="absolute top-full mt-2 right-0 bg-danger/10 border border-danger/30 rounded p-3 text-xs text-danger max-w-xs animate-fade-in-up shadow-sm">
+          <div className="absolute top-full mt-2 right-0 bg-danger/10 border border-danger/30 rounded p-3 text-xs text-danger max-w-xs animate-fade-in-up shadow-sm z-50">
             <AlertCircle className="w-3 h-3 inline mr-1" />
             {error}
           </div>
@@ -43,23 +59,23 @@ export default function WalletConnect() {
     );
   }
 
-  const shortAddr = `${address!.slice(0, 6)}...${address!.slice(-4)}`;
+  const shortAddr = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setDropdownOpen(!dropdownOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded bg-white/5 border border-border hover:border-accent-cyan/30 transition-colors text-sm shadow-sm"
+        className="flex items-center gap-2 px-3 py-2 rounded bg-[#111111] border border-[#27272A] hover:border-[#60A5FA]/50 transition-colors text-sm shadow-sm"
       >
         {/* Network indicator */}
-        <span className={`w-2 h-2 rounded-full ${isCorrectChain ? "bg-success shadow-[0_0_6px_#00E676]" : "bg-danger shadow-[0_0_6px_#FF1744]"}`} />
-        <span className="font-mono text-text-primary">{shortAddr}</span>
+        <span className={`w-2 h-2 rounded-full ${isCorrectChain ? "bg-[#34D399] shadow-[0_0_6px_#34D399]" : "bg-[#F87171] shadow-[0_0_6px_#F87171]"}`} />
+        <span className="font-mono text-[#EDEDED]">{shortAddr}</span>
         {balance && (
-          <span className="text-xs text-accent-cyan font-medium tabular-nums">
+          <span className="text-xs text-[#60A5FA] font-medium tabular-nums border-l border-[#27272A] pl-2 ml-1">
             {balance} MON
           </span>
         )}
-        <ChevronDown className={`w-3.5 h-3.5 text-text-muted transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-3.5 h-3.5 text-[#A1A1AA] transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
       </button>
 
       {/* Dropdown */}

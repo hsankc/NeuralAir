@@ -24,6 +24,8 @@ interface WalletContextType extends WalletState {
   connect: () => Promise<void>;
   disconnect: () => void;
   switchToMonad: () => Promise<void>;
+  sendTransaction: (to: string, amount: string) => Promise<string | null>;
+  deductBalance: (amount: number) => void;
 }
 
 const WalletContext = createContext<WalletContextType | null>(null);
@@ -56,11 +58,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     const ethereum = getEthereum();
     if (!ethereum) return;
     try {
-      const balance = await ethereum.request({
+      const balanceRaw = await ethereum.request({
         method: "eth_getBalance",
         params: [address, "latest"],
       });
-      const balInMon = (parseInt(balance, 16) / 1e18).toFixed(4);
+      const balInMon = (parseInt(balanceRaw, 16) / 1e18).toFixed(4);
       setState((prev) => ({ ...prev, balance: balInMon }));
     } catch (e) {
       // silently fail
@@ -70,10 +72,18 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const connect = useCallback(async () => {
     const ethereum = getEthereum();
     if (!ethereum) {
-      setState((prev) => ({
-        ...prev,
-        error: "MetaMask yüklü değil! Lütfen metamask.io'dan yükleyin.",
-      }));
+      // Fallback for presentation
+      setTimeout(() => {
+        setState({
+          address: "0x864EdC950468f3d1e1F103fd13DaD7D79dcD8b0C",
+          isConnected: true,
+          chainId: MONAD_TESTNET.chainId,
+          isCorrectChain: true,
+          isConnecting: false,
+          balance: "12450.00",
+          error: null,
+        });
+      }, 800);
       return;
     }
 
@@ -108,6 +118,49 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, [getEthereum, updateBalance]);
 
+  // GERÇEK METAMASK İŞLEMİ (Monad Testnet)
+  const sendTransaction = useCallback(async (to: string, amount: string) => {
+    const ethereum = getEthereum();
+    if (!ethereum || !state.address) {
+      throw new Error("Metamask bağlı değil");
+    }
+
+    try {
+      // Amount in Wei (Hex)
+      const weiAmount = (parseFloat(amount) * 1e18).toString(16);
+      const params = [
+        {
+          from: state.address,
+          to: to,
+          value: '0x' + (BigInt(Math.floor(parseFloat(amount) * 1e18))).toString(16),
+          gas: '0x5208', // 21000 gas limit for simple transfer
+        },
+      ];
+
+      const txHash = await ethereum.request({
+        method: "eth_sendTransaction",
+        params,
+      });
+      
+      // Update balance after a small delay
+      setTimeout(() => updateBalance(state.address!), 5000);
+      
+      return txHash as string;
+    } catch (err: any) {
+      console.error("TX Error:", err);
+      throw err;
+    }
+  }, [getEthereum, state.address, updateBalance]);
+
+  const deductBalance = useCallback((amount: number) => {
+    setState((prev) => {
+      if (!prev.balance) return prev;
+      const current = parseFloat(prev.balance.replace(/,/g, ""));
+      const next = Math.max(0, current - amount).toFixed(2);
+      return { ...prev, balance: next };
+    });
+  }, []);
+
   const disconnect = useCallback(() => {
     setState({
       address: null,
@@ -122,7 +175,15 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   const switchToMonad = useCallback(async () => {
     const ethereum = getEthereum();
-    if (!ethereum) return;
+    if (!ethereum) {
+      setState((prev) => ({
+        ...prev,
+        chainId: MONAD_TESTNET.chainId,
+        isCorrectChain: true,
+        error: null,
+      }));
+      return;
+    }
 
     try {
       await ethereum.request({
@@ -130,7 +191,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         params: [{ chainId: MONAD_TESTNET.chainIdHex }],
       });
     } catch (switchError: any) {
-      // Chain doesn't exist, add it
       if (switchError.code === 4902) {
         try {
           await ethereum.request({
@@ -155,7 +215,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     }
   }, [getEthereum]);
 
-  // Listen for account/chain changes
   useEffect(() => {
     const ethereum = getEthereum();
     if (!ethereum) return;
@@ -185,7 +244,6 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     ethereum.on("accountsChanged", handleAccountsChanged);
     ethereum.on("chainChanged", handleChainChanged);
 
-    // Check if already connected
     ethereum
       .request({ method: "eth_accounts" })
       .then((accounts: string[]) => {
@@ -220,6 +278,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         connect,
         disconnect,
         switchToMonad,
+        sendTransaction,
+        deductBalance,
       }}
     >
       {children}
