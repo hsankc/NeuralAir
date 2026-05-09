@@ -11,7 +11,7 @@ export const connection = new Connection(rpcUrl, "confirmed");
 
 // Anchor Provider ve Program oluşturucu
 export const getProgram = (provider: AnchorProvider) => {
-  return new Program(NeuralAirIDL as Idl, provider);
+  return new Program(NeuralAirIDL as unknown as Idl, provider);
 };
 
 // Frontend'den cüzdan bağlıysa uçuş kaydı atmak için fonksiyon
