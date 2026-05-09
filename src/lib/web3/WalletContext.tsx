@@ -8,7 +8,45 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { MONAD_TESTNET } from "./config";
+
+// ── Phantom window.solana tip tanımı ──
+interface PhantomProvider {
+  isPhantom: boolean;
+  publicKey: { toString: () => string } | null;
+  isConnected: boolean;
+  connect: (opts?: { onlyIfTrusted?: boolean }) => Promise<{ publicKey: { toString: () => string } }>;
+  disconnect: () => Promise<void>;
+  on: (event: string, callback: (...args: any[]) => void) => void;
+  off: (event: string, callback: (...args: any[]) => void) => void;
+}
+
+function getPhantom(): PhantomProvider | null {
+  if (typeof window === "undefined") return null;
+  const phantom = (window as any)?.phantom?.solana ?? (window as any)?.solana;
+  if (phantom?.isPhantom) return phantom as PhantomProvider;
+  return null;
+}
+
+// Solana Devnet bakiye çek
+async function fetchSolBalance(address: string): Promise<string> {
+  try {
+    const rpc = process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.devnet.solana.com";
+    const res = await fetch(rpc, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0", id: 1,
+        method: "getBalance",
+        params: [address],
+      }),
+    });
+    const data = await res.json();
+    const lamports = data?.result?.value ?? 0;
+    return (lamports / 1e9).toFixed(4);
+  } catch {
+    return "0.0000";
+  }
+}
 
 interface WalletState {
   address: string | null;
@@ -18,6 +56,7 @@ interface WalletState {
   isConnecting: boolean;
   balance: string | null;
   error: string | null;
+  walletType: "phantom" | "demo" | null;
 }
 
 interface WalletContextType extends WalletState {
@@ -40,248 +79,131 @@ export function WalletProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<WalletState>({
     address: null,
     isConnected: false,
-    chainId: null,
-    isCorrectChain: false,
+    chainId: 101,
+    isCorrectChain: true,
     isConnecting: false,
     balance: null,
     error: null,
+    walletType: null,
   });
 
-  const getEthereum = useCallback(() => {
-    if (typeof window !== "undefined" && (window as any).ethereum) {
-      return (window as any).ethereum;
-    }
-    return null;
-  }, []);
-
-  const updateBalance = useCallback(async (address: string) => {
-    const ethereum = getEthereum();
-    if (!ethereum) return;
-    try {
-      const balanceRaw = await ethereum.request({
-        method: "eth_getBalance",
-        params: [address, "latest"],
-      });
-      const balInMon = (parseInt(balanceRaw, 16) / 1e18).toFixed(4);
-      setState((prev) => ({ ...prev, balance: balInMon }));
-    } catch (e) {
-      // silently fail
-    }
-  }, [getEthereum]);
-
   const connect = useCallback(async () => {
-    const ethereum = getEthereum();
-    if (!ethereum) {
-      // Fallback for presentation
-      setTimeout(() => {
+    setState((prev) => ({ ...prev, isConnecting: true, error: null }));
+    const phantom = getPhantom();
+
+    // Kullanıcı manuel bağlan dediği için engeli kaldır
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("manuallyDisconnected");
+    }
+
+    if (phantom) {
+      try {
+        const resp = await phantom.connect();
+        const address = resp.publicKey.toString();
+        const balance = await fetchSolBalance(address);
         setState({
-          address: "0x864EdC950468f3d1e1F103fd13DaD7D79dcD8b0C",
+          address,
           isConnected: true,
-          chainId: MONAD_TESTNET.chainId,
+          chainId: 101,
           isCorrectChain: true,
           isConnecting: false,
-          balance: "12450.00",
+          balance: `${balance} SOL`,
           error: null,
+          walletType: "phantom",
         });
-      }, 800);
+      } catch (err: any) {
+        setState((prev) => ({
+          ...prev,
+          isConnecting: false,
+          error: err.message === "User rejected the request."
+            ? "Bağlantı iptal edildi"
+            : err.message || "Phantom bağlantı hatası",
+        }));
+      }
       return;
     }
 
-    setState((prev) => ({ ...prev, isConnecting: true, error: null }));
-
-    try {
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      });
-
-      const chainIdHex = await ethereum.request({ method: "eth_chainId" });
-      const chainId = parseInt(chainIdHex, 16);
-
-      const address = accounts[0];
+    // Phantom yüklü değilse demo mod
+    setTimeout(() => {
       setState({
-        address,
+        address: "DemoWa11et...SoLaNa",
         isConnected: true,
-        chainId,
-        isCorrectChain: chainId === MONAD_TESTNET.chainId,
+        chainId: 101,
+        isCorrectChain: true,
         isConnecting: false,
-        balance: null,
+        balance: "10.0000 SOL",
         error: null,
+        walletType: "demo",
       });
+    }, 600);
+  }, []);
 
-      updateBalance(address);
-    } catch (err: any) {
-      setState((prev) => ({
-        ...prev,
-        isConnecting: false,
-        error: err.message || "Bağlantı reddedildi",
-      }));
+  const disconnect = useCallback(async () => {
+    const phantom = getPhantom();
+    if (phantom && state.walletType === "phantom") {
+      await phantom.disconnect().catch(() => {});
     }
-  }, [getEthereum, updateBalance]);
-
-  // GERÇEK METAMASK İŞLEMİ (Monad Testnet)
-  const sendTransaction = useCallback(async (to: string, amount: string) => {
-    const ethereum = getEthereum();
-    if (!ethereum || !state.address) {
-      throw new Error("Metamask bağlı değil");
+    
+    // Manuel çıkış yapıldığını kaydet ki otomatik geri bağlanmasın
+    if (typeof window !== "undefined") {
+      localStorage.setItem("manuallyDisconnected", "true");
     }
 
-    try {
-      // Amount in Wei (Hex)
-      const weiAmount = (parseFloat(amount) * 1e18).toString(16);
-      const params = [
-        {
-          from: state.address,
-          to: to,
-          value: '0x' + (BigInt(Math.floor(parseFloat(amount) * 1e18))).toString(16),
-          gas: '0x5208', // 21000 gas limit for simple transfer
-        },
-      ];
+    setState({
+      address: null, isConnected: false, chainId: null,
+      isCorrectChain: true, isConnecting: false,
+      balance: null, error: null, walletType: null,
+    });
+  }, [state.walletType]);
 
-      const txHash = await ethereum.request({
-        method: "eth_sendTransaction",
-        params,
-      });
-      
-      // Update balance after a small delay
-      setTimeout(() => updateBalance(state.address!), 5000);
-      
-      return txHash as string;
-    } catch (err: any) {
-      console.error("TX Error:", err);
-      throw err;
-    }
-  }, [getEthereum, state.address, updateBalance]);
+  const switchToMonad = useCallback(async () => {
+    setState((prev) => ({ ...prev, isCorrectChain: true }));
+  }, []);
+
+  const sendTransaction = useCallback(async (to: string, amount: string): Promise<string | null> => {
+    // Demo modda fake TX
+    const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
+    return Array.from({ length: 44 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  }, []);
 
   const deductBalance = useCallback((amount: number) => {
     setState((prev) => {
       if (!prev.balance) return prev;
-      const current = parseFloat(prev.balance.replace(/,/g, ""));
-      const next = Math.max(0, current - amount).toFixed(2);
-      return { ...prev, balance: next };
+      const num = parseFloat(prev.balance.replace(" SOL", "").replace(/,/g, ""));
+      const next = Math.max(0, num - amount).toFixed(4);
+      return { ...prev, balance: `${next} SOL` };
     });
   }, []);
 
-  const disconnect = useCallback(() => {
-    setState({
-      address: null,
-      isConnected: false,
-      chainId: null,
-      isCorrectChain: false,
-      isConnecting: false,
-      balance: null,
-      error: null,
-    });
-  }, []);
-
-  const switchToMonad = useCallback(async () => {
-    const ethereum = getEthereum();
-    if (!ethereum) {
-      setState((prev) => ({
-        ...prev,
-        chainId: MONAD_TESTNET.chainId,
-        isCorrectChain: true,
-        error: null,
-      }));
-      return;
-    }
-
-    try {
-      await ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: MONAD_TESTNET.chainIdHex }],
-      });
-    } catch (switchError: any) {
-      if (switchError.code === 4902) {
-        try {
-          await ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: MONAD_TESTNET.chainIdHex,
-                chainName: MONAD_TESTNET.name,
-                nativeCurrency: MONAD_TESTNET.currency,
-                rpcUrls: [MONAD_TESTNET.rpcUrl],
-                blockExplorerUrls: [MONAD_TESTNET.explorerUrl],
-              },
-            ],
-          });
-        } catch (addError: any) {
-          setState((prev) => ({
-            ...prev,
-            error: addError.message || "Ağ eklenemedi",
-          }));
-        }
-      }
-    }
-  }, [getEthereum]);
-
+  // Phantom daha önce bağlıysa otomatik bağlan
   useEffect(() => {
-    const ethereum = getEthereum();
-    if (!ethereum) return;
+    const phantom = getPhantom();
+    if (!phantom) return;
+    
+    // Eğer kullanıcı manuel çıkış yaptıysa otomatik bağlanma
+    const isManuallyDisconnected = typeof window !== "undefined" && localStorage.getItem("manuallyDisconnected") === "true";
+    if (isManuallyDisconnected) return;
 
-    const handleAccountsChanged = (accounts: string[]) => {
-      if (accounts.length === 0) {
-        disconnect();
-      } else {
+    const handleDisconnect = () => disconnect();
+    phantom.on("disconnect", handleDisconnect);
+    phantom.connect({ onlyIfTrusted: true })
+      .then(async (resp) => {
+        const address = resp.publicKey.toString();
+        const balance = await fetchSolBalance(address);
         setState((prev) => ({
-          ...prev,
-          address: accounts[0],
-          isConnected: true,
+          ...prev, address, isConnected: true,
+          isConnecting: false, balance: `${balance} SOL`, walletType: "phantom",
         }));
-        updateBalance(accounts[0]);
-      }
-    };
-
-    const handleChainChanged = (chainIdHex: string) => {
-      const chainId = parseInt(chainIdHex, 16);
-      setState((prev) => ({
-        ...prev,
-        chainId,
-        isCorrectChain: chainId === MONAD_TESTNET.chainId,
-      }));
-    };
-
-    ethereum.on("accountsChanged", handleAccountsChanged);
-    ethereum.on("chainChanged", handleChainChanged);
-
-    ethereum
-      .request({ method: "eth_accounts" })
-      .then((accounts: string[]) => {
-        if (accounts.length > 0) {
-          ethereum.request({ method: "eth_chainId" }).then((chainIdHex: string) => {
-            const chainId = parseInt(chainIdHex, 16);
-            setState({
-              address: accounts[0],
-              isConnected: true,
-              chainId,
-              isCorrectChain: chainId === MONAD_TESTNET.chainId,
-              isConnecting: false,
-              balance: null,
-              error: null,
-            });
-            updateBalance(accounts[0]);
-          });
-        }
       })
       .catch(() => {});
-
-    return () => {
-      ethereum.removeListener("accountsChanged", handleAccountsChanged);
-      ethereum.removeListener("chainChanged", handleChainChanged);
-    };
-  }, [getEthereum, disconnect, updateBalance]);
+    return () => { phantom.off("disconnect", handleDisconnect); };
+  }, [disconnect]);
 
   return (
-    <WalletContext.Provider
-      value={{
-        ...state,
-        connect,
-        disconnect,
-        switchToMonad,
-        sendTransaction,
-        deductBalance,
-      }}
-    >
+    <WalletContext.Provider value={{
+      ...state, connect, disconnect,
+      switchToMonad, sendTransaction, deductBalance,
+    }}>
       {children}
     </WalletContext.Provider>
   );

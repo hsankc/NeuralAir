@@ -2,24 +2,58 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Radio, Crosshair, Cpu, MapPin, Navigation, TrendingUp } from "lucide-react";
+import { ArrowLeft, Radio, Crosshair, Cpu, MapPin, Navigation, TrendingUp, ChevronDown, Battery } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { initialDrones } from "@/lib/data";
+import { useLanguage, tx } from "@/lib/LanguageContext";
+import { t as i18n } from "@/lib/i18n";
 
 export default function ControlPage() {
+  const { locale } = useLanguage();
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const [txCount, setTxCount] = useState(0);
   const [logs, setLogs] = useState<{ time: string; msg: string; type: string }[]>([]);
-  const [altitude, setAltitude] = useState(250);
+  const [altitude, setAltitude] = useState(10);
   const [bearing, setBearing] = useState(0);
   const [coords, setCoords] = useState("38.4237, 27.1428");
   const [isStarted, setIsStarted] = useState(false);
+  const [selectedDroneId, setSelectedDroneId] = useState(1);
+  const [showDroneSelect, setShowDroneSelect] = useState(false);
+  const [droneBattery, setDroneBattery] = useState(87);
+  const [notification, setNotification] = useState<string | null>(null);
+
+  // Drone değiştiğinde kamerayı yeni drone'un konumuna götür
+  useEffect(() => {
+    const drone = initialDrones.find(d => d.id === selectedDroneId);
+    if (drone) {
+      targetCam.current = { lng: drone.lng, lat: drone.lat, alt: drone.altitude || 250, bearing: drone.heading || 0 };
+      setDroneBattery(Math.round(drone.battery));
+      setCoords(`${drone.lat.toFixed(5)}N, ${drone.lng.toFixed(5)}E`);
+      setAltitude(drone.altitude || 10);
+      setBearing(Math.round(drone.heading || 0));
+    }
+  }, [selectedDroneId]);
+
+  // Görev tamamlama eventlerini dinle
+  useEffect(() => {
+    const handler = ((e: CustomEvent) => {
+      const { droneName, missionTitle } = e.detail;
+      setNotification(`🎯 ${droneName} — "${missionTitle}" tamamlandı / completed!`);
+      appendLog(`[FLEET] ${droneName} → "${missionTitle}" TAMAMLANDI / COMPLETED`, "success");
+      setTimeout(() => setNotification(null), 5000);
+    }) as EventListener;
+    window.addEventListener("mission-complete", handler);
+    return () => window.removeEventListener("mission-complete", handler);
+  }, []);
 
   // Target & Current state refs (for physics/lerp)
-  const targetCam = useRef({ lng: 27.1428, lat: 38.4237, alt: 250, bearing: 0 });
-  const currentCam = useRef({ lng: 27.1428, lat: 38.4237, alt: 250, bearing: 0 });
+  const targetCam = useRef({ lng: 27.1428, lat: 38.4237, alt: 10, bearing: 0 });
+  const currentCam = useRef({ lng: 27.1428, lat: 38.4237, alt: 10, bearing: 0 });
   const keys = useRef<Record<string, boolean>>({});
+  const modeRef = useRef<"cinematic" | "sport">("sport");
+  const [uiMode, setUiMode] = useState<"cinematic" | "sport">("sport");
 
   const appendLog = (msg: string, type: string = "info") => {
     const time = new Date().toLocaleTimeString("tr-TR", { hour12: false });
@@ -43,8 +77,8 @@ export default function ControlPage() {
     mapRef.current = map;
 
     map.on("load", () => {
-      appendLog("Sky-Sync Protokolü Başlatıldı", "success");
-      appendLog("Monad Paralel EVM Güvenli Bağlantı", "success");
+      appendLog("Sky-Sync Protokolü Başlatıldı / Protocol Started", "success");
+      appendLog("Solana Devnet Güvenli Bağlantı / Secure Link", "success");
       
       // Cyberpunk 3D Bina Extrusion (Bina yüksekliklerini kullanarak gerçek 3D görünümü)
       map.addLayer({
@@ -100,9 +134,11 @@ export default function ControlPage() {
         let moving = false;
         let activeMoves: string[] = [];
 
-        const moveThrust = 0.00015;
-        const rotateThrust = 2.5;
-        const altThrust = 4.0;
+        const isSport = modeRef.current === "sport";
+        // Realistic speeds: 0.000003 (approx 70km/h) for Sport, 0.0000008 (approx 18km/h) for Cinematic
+        const moveThrust = isSport ? 0.000003 : 0.0000008;
+        const rotateThrust = isSport ? 1.0 : 0.3;
+        const altThrust = isSport ? 0.2 : 0.05;
         const rad = targetCam.current.bearing * (Math.PI / 180);
 
         if (keys.current["KeyW"] || keys.current["ArrowUp"]) {
@@ -178,9 +214,9 @@ export default function ControlPage() {
             if (now - (lastTxTimes[move] || 0) > TX_DEBOUNCE_MS) {
               lastTxTimes[move] = now;
               setTxCount((c) => c + 1);
-              appendLog(`[KUYRUKTA] Mission::${move}()`, "warning");
+              appendLog(`[KUYRUKTA / QUEUED] Mission::${move}()`, "warning");
               setTimeout(() => {
-                appendLog(`[ONAYLANDI] ${move}() kaydedildi. Tx: 0x${Math.random().toString(16).slice(2, 10)}...`, "success");
+                appendLog(`[ONAYLANDI / CONFIRMED] ${move}() kaydedildi / saved. Tx: 0x${Math.random().toString(16).slice(2, 10)}...`, "success");
               }, 400);
             }
           });
@@ -225,7 +261,7 @@ export default function ControlPage() {
       <div className="absolute inset-0 pointer-events-none z-10 bg-gradient-to-b from-accent-violet/15 via-transparent to-accent-cyan/15" />
 
       {/* HEADER */}
-      <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-start z-50 pointer-events-none">
+      <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-start z-[100] pointer-events-none">
         <div className="flex items-center gap-4 pointer-events-auto">
           <Link href="/dashboard" className="w-10 h-10 rounded-full bg-black/80 border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors">
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -234,15 +270,61 @@ export default function ControlPage() {
             <h1 className="text-2xl font-black text-white flex items-center gap-3">
               NEURALAIR <span className="text-accent-violet">:: SKY-SYNC</span>
             </h1>
-            <p className="text-[10px] tracking-[4px] text-accent-violet font-bold uppercase">True FPV Simulator</p>
+            <p className="text-[10px] tracking-[4px] text-accent-violet font-bold uppercase">{tx(i18n.control.trueFpv, locale)}</p>
           </div>
         </div>
-        <div className="text-right pointer-events-auto bg-black/80 border border-success/40 px-4 py-2 rounded-sm pr-10">
-            <div className="text-[10px] text-success/70 font-bold mb-1 uppercase tracking-widest">Bağlı Ajan</div>
-            <div className="flex items-center gap-2 justify-end">
-              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-              <span className="text-sm font-bold text-white uppercase">Ege-01</span>
-            </div>
+        <div className="relative pointer-events-auto">
+            <button
+              onClick={() => setShowDroneSelect(!showDroneSelect)}
+              className="bg-black/80 border border-success/40 px-4 py-2 rounded-sm text-right min-w-[200px]"
+            >
+              <div className="text-[10px] text-success/70 font-bold mb-1 uppercase tracking-widest">{tx(i18n.control.connectedAgent, locale)}</div>
+              <div className="flex items-center gap-2 justify-end">
+                <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+                <span className="text-sm font-bold text-white uppercase">
+                  {initialDrones.find(d => d.id === selectedDroneId)?.name || "Ege-01"}
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-text-muted transition-transform ${showDroneSelect ? "rotate-180" : ""}`} />
+              </div>
+              <div className="flex items-center gap-1.5 justify-end mt-1">
+                <Battery className={`w-3 h-3 ${droneBattery < 20 ? "text-danger" : droneBattery < 50 ? "text-warning" : "text-success"}`} />
+                <span className={`text-[10px] font-bold tabular-nums ${droneBattery < 20 ? "text-danger" : "text-success"}`}>%{droneBattery}</span>
+                <span className="text-[10px] text-text-muted ml-1">
+                  {initialDrones.find(d => d.id === selectedDroneId)?.specs.model}
+                </span>
+              </div>
+            </button>
+
+            {/* Dropdown */}
+            {showDroneSelect && (
+              <div className="absolute right-0 top-full mt-1 bg-black/95 border border-white/10 rounded-sm w-64 z-[70] shadow-2xl">
+                {initialDrones.map(d => (
+                  <button
+                    key={d.id}
+                    onClick={() => {
+                      setSelectedDroneId(d.id);
+                      setShowDroneSelect(false);
+                      setDroneBattery(Math.round(d.battery));
+                      // Kamerayı drone konumuna taşı
+                      targetCam.current.lat = d.lat;
+                      targetCam.current.lng = d.lng;
+                      targetCam.current.alt = d.altitude || 10;
+                      appendLog(`Ajan değiştirildi / Agent switched → ${d.name} (${d.specs.model})`, "success");
+                      appendLog(`Konum / Pos: ${d.lat.toFixed(4)}°N, ${d.lng.toFixed(4)}°E | İrtifa / Alt: ${d.altitude}m`, "info");
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all hover:bg-white/5 ${
+                      selectedDroneId === d.id ? "bg-success/10 border-l-2 border-l-success" : ""
+                    }`}
+                  >
+                    <span className={`w-2 h-2 rounded-full ${d.status === "in-flight" || d.status === "mission" ? "bg-success" : d.status === "charging" ? "bg-warning" : "bg-text-muted"}`} />
+                    <div className="flex-1">
+                      <div className="text-xs font-bold text-white">{d.name}</div>
+                      <div className="text-[10px] text-text-muted">{d.specs.model} • %{d.battery.toFixed(0)}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
         </div>
       </div>
 
@@ -250,7 +332,7 @@ export default function ControlPage() {
       <div className="absolute top-28 right-6 w-80 h-[450px] bg-black/85 border border-accent-violet/30 rounded-sm z-50 pointer-events-auto flex flex-col shadow-[0_0_30px_rgba(131,110,241,0.2)]">
         <div className="p-3 bg-accent-violet/20 border-b border-accent-violet/30 flex justify-between items-center">
           <span className="text-[10px] font-bold tracking-widest flex items-center gap-2">
-            <Radio className="w-3 h-3 text-white animate-pulse" /> MONAD TX STREAM
+            <Radio className="w-3 h-3 text-white animate-pulse" /> SOLANA TX STREAM
           </span>
           <span className="text-[8px] px-1.5 py-0.5 border border-accent-violet/50 rounded-sm">400ms FINALITY</span>
         </div>
@@ -272,7 +354,7 @@ export default function ControlPage() {
           <button 
             onClick={() => {
               setIsStarted(true);
-              appendLog("3D Cyberpunk Motoru Aktifleştirildi", "success");
+              appendLog("3D Cyberpunk Motoru Aktifleştirildi / Engine Activated", "success");
             }}
             className="group relative px-10 py-6 border border-accent-cyan/40 hover:border-accent-cyan transition-all"
           >
@@ -280,12 +362,12 @@ export default function ControlPage() {
             <div className="relative flex flex-col items-center gap-4">
               <Crosshair className="w-16 h-16 text-accent-cyan mb-2" />
               <div className="text-center">
-                <div className="text-2xl font-black text-white mb-2 tracking-tighter uppercase">3D UÇUŞU BAŞLATMAK İÇİN TIKLAYIN</div>
+                <div className="text-2xl font-black text-white mb-2 tracking-tighter uppercase">{tx(i18n.control.startFlight, locale)}</div>
                 <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-[10px] font-bold text-accent-cyan/80">
-                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">W/S</span> İleri / Geri</div>
-                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">A/D</span> Sola / Sağa</div>
-                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">Q/E</span> Dönüş</div>
-                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">ESC</span> Fareyi Bırak</div>
+                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">W/S</span> {tx(i18n.control.forwardBack, locale)}</div>
+                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">A/D</span> {tx(i18n.control.leftRight, locale)}</div>
+                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">Q/E</span> {tx(i18n.control.turn, locale)}</div>
+                  <div className="flex items-center gap-2 uppercase tracking-widest"><span className="px-1.5 py-0.5 bg-accent-cyan text-black">ESC</span> {tx(i18n.control.releaseMouse, locale)}</div>
                 </div>
               </div>
             </div>
@@ -305,19 +387,33 @@ export default function ControlPage() {
       <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end z-50 pointer-events-none flex-wrap gap-4">
         <div className="flex gap-4 pointer-events-auto">
           <div className="bg-black/85 border-l-4 border-success p-4 min-w-[150px]">
-            <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">Koordinatlar</div>
+            <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">{tx(i18n.control.coords, locale)}</div>
             <div className="text-xl font-black text-white">{coords}</div>
           </div>
           <div className="bg-black/85 border-l-4 border-accent-cyan p-4 min-w-[120px]">
-             <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">İrtifa</div>
+             <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">{tx(i18n.control.altitude, locale)}</div>
              <div className="text-xl font-black text-white">{altitude}m</div>
           </div>
           <div className="bg-black/85 border-l-4 border-accent-cyan p-4 min-w-[120px]">
-             <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">Açı (Yaw)</div>
+             <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">{tx(i18n.control.yaw, locale)}</div>
              <div className="text-xl font-black text-white">{bearing}°</div>
           </div>
           <div className="bg-black/85 border-l-4 border-accent-violet p-4 min-w-[120px]">
-             <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">TX Streamed</div>
+             <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">{tx(i18n.control.flightMode, locale)}</div>
+             <button 
+               onClick={() => {
+                 const newMode = uiMode === "sport" ? "cinematic" : "sport";
+                 setUiMode(newMode);
+                 modeRef.current = newMode;
+                 appendLog(`Uçuş Modu / Flight Mode: ${newMode.toUpperCase()}`, "info");
+               }}
+               className={`text-lg font-black uppercase transition-colors ${uiMode === "sport" ? "text-warning" : "text-success"}`}
+             >
+               {uiMode === "sport" ? tx(i18n.control.sport, locale) : tx(i18n.control.cinematic, locale)}
+             </button>
+          </div>
+          <div className="bg-black/85 border-l-4 border-accent-violet p-4 min-w-[120px]">
+             <div className="text-[10px] text-accent-violet font-bold mb-1 uppercase tracking-widest">{tx(i18n.control.streamed, locale)}</div>
              <div className="text-xl font-black text-white">{txCount}</div>
           </div>
         </div>

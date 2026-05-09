@@ -39,3 +39,29 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ═══ PRIVATE / INTERNAL — GitHub'a kesinlikle gitmeyecek dosyalar ═══
+
+# AI Coding Assistant config (jüri görürse "AI yazmış" der)
+CLAUDE.md
+AGENTS.md
+
+# Hackathon planlama / sunum notları (iç strateji belgeleri)
+HACKATHON_SUNUM.md
+neuralair_audit.md
+changelogs/
+
+# Eski hackathon kalıntıları (Monad/Solidity artıkları)
+Cloude kodları/
+Hackathon izmir/
+
+# Boş Anchor / Rust scaffold (derlenmez, amatör durur)
+Anchor.toml
+Cargo.toml
+programs/
+
+# DB şema dosyası (güvenlik — credential sızıntı riski)
+supabase_setup.sql
+
+# Donanım dokümantasyonu (README yeterli, ekstra MD gereksiz)
+HARDWARE.md

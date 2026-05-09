@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
   Clock,
@@ -18,8 +18,12 @@ import {
   Flame,
   Eye,
   ArrowUpRight,
+  Download,
+  Radio,
+  Activity,
 } from "lucide-react";
-import { initialFlightLogs, FlightLog, MissionType, missionTypeLabels } from "@/lib/data";
+import { initialFlightLogs, initialDrones, FlightLog, MissionType, missionTypeLabels } from "@/lib/data";
+import { useLanguage } from "@/lib/LanguageContext";
 
 function typeIcon(t: MissionType) {
   switch (t) {
@@ -39,13 +43,167 @@ function typeBadgeColor(t: MissionType) {
   }
 }
 
-/* ═══════ FLIGHT LOGS PAGE ═══════ */
+/* ─── LIVE FEED — Canlı agent aktivite logları ─── */
+function LiveAgentFeed() {
+  const { locale } = useLanguage();
+  const [feed, setFeed] = useState<{ time: string; agent: string; action: string; color: string }[]>([]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const agents = locale === "en" ? [
+      { name: "FleetAgent", actions: [
+        "Scanning for mission-drone matches...",
+        "New route calculated for Ege-01",
+        "Bayraklı-02 redirected for emergency response",
+        "Çeşme-03 agricultural op updated",
+      ], color: "text-accent-cyan" },
+      { name: "EmergencyAgent", actions: [
+        "Thermal anomaly scan: sector clear ✓",
+        "Battery levels verified",
+        "Emergency protocol on standby",
+        "Wind speeds within safe limits ✓",
+      ], color: "text-danger" },
+      { name: "ChargingAgent", actions: [
+        "Pod status updated (5/5 active)",
+        "Charging session micro-SOL calculation completed",
+        "Alsancak Hub energy report generated",
+      ], color: "text-warning" },
+    ] : [
+      { name: "FleetAgent", actions: [
+        "Görev-drone eşleştirme taraması yapılıyor...",
+        "Ege-01 için yeni rota hesaplandı",
+        "Bayraklı-02 acil müdahaleye yönlendirildi",
+        "Çeşme-03 ilaçlama operasyonu güncellendi",
+      ], color: "text-accent-cyan" },
+      { name: "EmergencyAgent", actions: [
+        "Termal anomali taraması: bölge temiz ✓",
+        "Batarya seviyeleri kontrol edildi",
+        "Acil durum protokolü bekleme modunda",
+        "Rüzgar hızı güvenli sınırlarda ✓",
+      ], color: "text-danger" },
+      { name: "ChargingAgent", actions: [
+        "Pod durumları güncellendi (5/5 aktif)",
+        "Şarj oturumu mikro-SOL hesaplaması yapıldı",
+        "Alsancak Hub enerji raporu oluşturuldu",
+      ], color: "text-warning" },
+    ];
+
+    const iv = setInterval(() => {
+      const agent = agents[Math.floor(Math.random() * agents.length)];
+      const action = agent.actions[Math.floor(Math.random() * agent.actions.length)];
+      const now = new Date().toLocaleTimeString("tr-TR");
+      setFeed(prev => [...prev.slice(-8), { time: now, agent: agent.name, action, color: agent.color }]);
+    }, 3000);
+
+    return () => clearInterval(iv);
+  }, [locale]);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [feed]);
+
+  return (
+    <div className="glass-card !rounded-xl overflow-hidden mb-8">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Activity className="w-4 h-4 text-accent-cyan" />
+          <span className="text-sm font-semibold">{locale === "en" ? "Agent Activity Feed" : "Agent Aktivite Akışı"}</span>
+        </div>
+        <span className="text-xs text-success flex items-center gap-1">
+          <Radio className="w-3 h-3" /> {locale === "en" ? "LIVE" : "CANLI"}
+        </span>
+      </div>
+      <div ref={scrollRef} className="p-4 max-h-[160px] overflow-y-auto no-scrollbar">
+        <div className="space-y-2">
+          {feed.length === 0 && (
+            <div className="text-xs text-text-muted text-center py-4">{locale === "en" ? "Listening to agent activity..." : "Agent aktivitesi dinleniyor..."}</div>
+          )}
+          {feed.map((f, i) => (
+            <div key={i} className="flex gap-2 text-xs leading-relaxed animate-fade-in-up">
+              <span className="text-text-muted shrink-0">[{f.time}]</span>
+              <span className={`shrink-0 font-semibold ${f.color}`}>{f.agent}</span>
+              <span className="text-text-muted">→</span>
+              <span className="text-text-secondary">{f.action}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function FlightLogsPage() {
+  const { locale } = useLanguage();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<MissionType | "all">("all");
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [logs, setLogs] = useState(initialFlightLogs);
 
-  const filtered = initialFlightLogs
+  // Simülasyon: her 15 saniyede bir yeni uçuş kaydı ekle
+  useEffect(() => {
+    const iv = setInterval(() => {
+      const drone = initialDrones[Math.floor(Math.random() * initialDrones.length)];
+      const types: MissionType[] = ["cargo", "agricultural", "fire", "traffic"];
+      const missionType = types[Math.floor(Math.random() * types.length)];
+      const newLog: FlightLog = {
+        id: Date.now(),
+        droneId: String(drone.id),
+        droneName: drone.name,
+        startLat: drone.lat + (Math.random() - 0.5) * 0.05,
+        startLng: drone.lng + (Math.random() - 0.5) * 0.05,
+        endLat: drone.lat + (Math.random() - 0.5) * 0.1,
+        endLng: drone.lng + (Math.random() - 0.5) * 0.1,
+        duration: Math.floor(Math.random() * 40 + 8),
+        energyUsed: parseFloat((Math.random() * 20 + 5).toFixed(1)),
+        missionType,
+        txHash: `${Math.random().toString(36).slice(2, 7)}...${Math.random().toString(36).slice(2, 6)}`,
+        timestamp: new Date(),
+      };
+      setLogs(prev => [newLog, ...prev].slice(0, 30));
+    }, 15000);
+    return () => clearInterval(iv);
+  }, []);
+
+  // Gerçek görev tamamlama eventlerini dinle
+  useEffect(() => {
+    const handler = ((e: CustomEvent) => {
+      const { droneId, droneName, missionTitle } = e.detail;
+      const drone = initialDrones.find(d => d.id === droneId);
+      if (!drone) return;
+      const completedLog: FlightLog = {
+        id: Date.now() + Math.random(),
+        droneId: String(droneId),
+        droneName,
+        startLat: drone.lat,
+        startLng: drone.lng,
+        endLat: drone.lat + (Math.random() - 0.5) * 0.08,
+        endLng: drone.lng + (Math.random() - 0.5) * 0.08,
+        duration: Math.floor(Math.random() * 30 + 10),
+        energyUsed: parseFloat((Math.random() * 15 + 5).toFixed(1)),
+        missionType: drone.type === "cargo" ? "cargo" : drone.type === "agricultural" ? "agricultural" : drone.type === "emergency" ? "fire" : "traffic",
+        txHash: `sol_${Math.random().toString(36).slice(2, 8)}...${Math.random().toString(36).slice(2, 6)}`,
+        timestamp: new Date(),
+      };
+      setLogs(prev => [completedLog, ...prev].slice(0, 30));
+    }) as EventListener;
+    window.addEventListener("mission-complete", handler);
+    return () => window.removeEventListener("mission-complete", handler);
+  }, []);
+
+  // CSV Export
+  const handleExport = () => {
+    const header = "ID,Drone,Tip,Süre(dk),Enerji(kWh),TX Hash,Zaman\n";
+    const rows = logs.map(l =>
+      `${l.id},${l.droneName},${l.missionType},${l.duration},${l.energyUsed},${l.txHash},${l.timestamp.toISOString()}`
+    ).join("\n");
+    const blob = new Blob([header + rows], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "neuralair_flight_logs.csv"; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const filtered = logs
     .filter((l) => filter === "all" || l.missionType === filter)
     .filter(
       (l) =>
@@ -73,26 +231,38 @@ export default function FlightLogsPage() {
                 <ChevronRight className="w-4 h-4 text-text-muted" />
                 <span className="text-sm font-medium flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-accent-cyan" />
-                  Uçuş Kayıtları (On-Chain)
+                  {locale === "en" ? "Flight Logs (On-Chain)" : "Uçuş Kayıtları (On-Chain)"}
                 </span>
               </div>
             </div>
-            <div className="text-xs text-text-muted flex items-center gap-2">
-              <span className="status-dot status-active" />
-              {initialFlightLogs.length} Kayıt Zincirde
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleExport}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/5 border border-border text-xs font-medium text-text-secondary hover:bg-white/10 hover:text-accent-cyan transition-all"
+              >
+                <Download className="w-3.5 h-3.5" />
+                CSV Export
+              </button>
+              <div className="text-xs text-text-muted flex items-center gap-2">
+                <span className="status-dot status-active" />
+                {logs.length} {locale === "en" ? "Records" : "Kayıt"}
+              </div>
             </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Live Agent Feed */}
+        <LiveAgentFeed />
+
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: "Toplam Uçuş", value: initialFlightLogs.length, color: "text-accent-cyan" },
-            { label: "Toplam Süre", value: `${initialFlightLogs.reduce((a, l) => a + l.duration, 0)} dk`, color: "text-accent-violet" },
-            { label: "Toplam Enerji", value: `${initialFlightLogs.reduce((a, l) => a + l.energyUsed, 0).toFixed(1)} kWh`, color: "text-warning" },
-            { label: "On-Chain TX", value: initialFlightLogs.length, color: "text-success" },
+            { label: locale === "en" ? "Total Flights" : "Toplam Uçuş", value: logs.length, color: "text-accent-cyan" },
+            { label: locale === "en" ? "Total Duration" : "Toplam Süre", value: `${logs.reduce((a, l) => a + l.duration, 0)} ${locale === "en" ? "min" : "dk"}`, color: "text-accent-violet" },
+            { label: locale === "en" ? "Total Energy" : "Toplam Enerji", value: `${logs.reduce((a, l) => a + l.energyUsed, 0).toFixed(1)} kWh`, color: "text-warning" },
+            { label: "On-Chain TX", value: logs.length, color: "text-success" },
           ].map((s) => (
             <div key={s.label} className="glass-card !rounded-xl p-4">
               <div className={`text-2xl font-bold tabular-nums ${s.color}`}>{s.value}</div>
@@ -109,7 +279,7 @@ export default function FlightLogsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Drone adı veya TX hash ara..."
+              placeholder={locale === "en" ? "Search drone name or TX hash..." : "Drone adı veya TX hash ara..."}
               className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-border rounded-lg text-sm focus:outline-none focus:border-accent-cyan transition-colors"
             />
           </div>
@@ -124,7 +294,7 @@ export default function FlightLogsPage() {
                     : "bg-white/5 text-text-secondary border border-transparent hover:bg-white/10"
                 }`}
               >
-                {t === "all" ? "Tümü" : missionTypeLabels[t]}
+                {t === "all" ? (locale === "en" ? "All" : "Tümü") : missionTypeLabels(locale)[t]}
               </button>
             ))}
           </div>
@@ -136,28 +306,29 @@ export default function FlightLogsPage() {
           <div className="hidden md:grid grid-cols-7 gap-4 px-5 py-3 text-xs font-medium text-text-muted border-b border-border bg-white/3">
             <div>ID</div>
             <div>Drone</div>
-            <div>Rota</div>
-            <div>Tip</div>
-            <div>Süre & Enerji</div>
+            <div>{locale === "en" ? "Route" : "Rota"}</div>
+            <div>{locale === "en" ? "Type" : "Tip"}</div>
+            <div>{locale === "en" ? "Duration & Energy" : "Süre & Enerji"}</div>
             <div>TX Hash</div>
-            <div>Zaman</div>
+            <div>{locale === "en" ? "Time" : "Zaman"}</div>
           </div>
 
           {/* Rows */}
           <div className="divide-y divide-border">
             {filtered.map((log) => {
               const Icon = typeIcon(log.missionType);
+              const isNew = Date.now() - log.timestamp.getTime() < 20000;
               return (
                 <div
                   key={log.id}
-                  className="hover:bg-white/3 transition-colors cursor-pointer"
+                  className={`hover:bg-white/3 transition-colors cursor-pointer ${isNew ? "bg-accent-cyan/[0.03] border-l-2 border-l-accent-cyan" : ""}`}
                   onClick={() => setExpanded(expanded === log.id ? null : log.id)}
                 >
                   {/* Desktop row */}
                   <div className="hidden md:grid grid-cols-7 gap-4 px-5 py-4 items-center text-sm">
-                    <div className="font-mono text-text-muted">#{log.id}</div>
+                    <div className="font-mono text-text-muted">#{String(log.id).slice(-4)}</div>
                     <div className="flex items-center gap-2">
-                      <Plane className="w-4 h-4 text-accent-cyan" />
+                      <Plane className={`w-4 h-4 ${isNew ? "text-accent-cyan animate-pulse" : "text-accent-cyan"}`} />
                       <span className="font-medium">{log.droneName}</span>
                     </div>
                     <div className="font-mono text-xs text-text-secondary">
@@ -165,11 +336,11 @@ export default function FlightLogsPage() {
                     </div>
                     <div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadgeColor(log.missionType)}`}>
-                        {missionTypeLabels[log.missionType]}
+                        {missionTypeLabels(locale)[log.missionType]}
                       </span>
                     </div>
                     <div className="text-xs text-text-secondary">
-                      {log.duration}dk / {log.energyUsed}kWh
+                      {log.duration}{locale === "en" ? "min" : "dk"} / {log.energyUsed}kWh
                     </div>
                     <div className="font-mono text-xs text-accent-cyan flex items-center gap-1">
                       {log.txHash}
@@ -188,11 +359,11 @@ export default function FlightLogsPage() {
                         <span className="font-medium">{log.droneName}</span>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadgeColor(log.missionType)}`}>
-                        {missionTypeLabels[log.missionType]}
+                        {missionTypeLabels(locale)[log.missionType]}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm text-text-muted">
-                      <span>{log.duration}dk / {log.energyUsed}kWh</span>
+                      <span>{log.duration}{locale === "en" ? "min" : "dk"} / {log.energyUsed}kWh</span>
                       <span className="font-mono text-xs text-accent-cyan">{log.txHash}</span>
                     </div>
                   </div>
@@ -202,24 +373,24 @@ export default function FlightLogsPage() {
                     <div className="px-5 pb-4 animate-fade-in-up">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-white/3 rounded-lg text-sm">
                         <div>
-                          <div className="text-xs text-text-muted mb-1">Kalkış</div>
+                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Takeoff" : "Kalkış"}</div>
                           <div className="font-mono text-xs">{log.startLat.toFixed(4)}°N, {log.startLng.toFixed(4)}°E</div>
                         </div>
                         <div>
-                          <div className="text-xs text-text-muted mb-1">Varış</div>
+                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Landing" : "Varış"}</div>
                           <div className="font-mono text-xs">{log.endLat.toFixed(4)}°N, {log.endLng.toFixed(4)}°E</div>
                         </div>
                         <div>
-                          <div className="text-xs text-text-muted mb-1">Süre</div>
-                          <div className="font-bold">{log.duration} dakika</div>
+                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Duration" : "Süre"}</div>
+                          <div className="font-bold">{log.duration} {locale === "en" ? "minutes" : "dakika"}</div>
                         </div>
                         <div>
-                          <div className="text-xs text-text-muted mb-1">Enerji</div>
+                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Energy" : "Enerji"}</div>
                           <div className="font-bold">{log.energyUsed} kWh</div>
                         </div>
                       </div>
                       <div className="mt-2 text-xs text-text-muted text-center">
-                        Bu veri Monad blokzincirine değiştirilemez şekilde yazılmıştır — Havacılık Kara Kutusu 🔒
+                        {locale === "en" ? "This data is immutably written to the Solana blockchain — Aviation Blackbox 🔒" : "Bu veri Solana blokzincirine değiştirilemez şekilde yazılmıştır — Havacılık Kara Kutusu 🔒"}
                       </div>
                     </div>
                   )}

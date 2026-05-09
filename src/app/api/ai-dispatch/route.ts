@@ -1,12 +1,11 @@
 import { NextRequest } from "next/server";
-import OpenAI from "openai";
-import { buildSystemPrompt, buildUserMessage, fallbackParse } from "@/lib/ai/dispatcher";
+import { buildSystemPrompt, buildUserMessage, buildDroneAgentPrompt, fallbackParse, fallbackDroneChat } from "@/lib/ai/dispatcher";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { message, droneContext } = await request.json();
 
     if (!message || typeof message !== "string") {
       return Response.json(
@@ -15,41 +14,88 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.OPENAI_API_KEY || "";
 
-    // If no API key, use fallback parser
-    if (!apiKey) {
-      const parsed = fallbackParse(message);
-      return Response.json({
-        success: true,
-        parsed,
-        source: "fallback",
-      });
-    }
+    // ═══ DRONE AGENT MODE: Bireysel drone ile sohbet ═══
+    if (droneContext) {
+      const systemPrompt = buildDroneAgentPrompt(droneContext);
 
-    try {
-      const openai = new OpenAI({ apiKey });
+      try {
+        const response = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: [
+              { role: "system", content: systemPrompt },
+              { role: "user", content: message }
+            ],
+            temperature: 0.6,
+            max_tokens: 300,
+          })
+        });
 
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          { role: "system", content: buildSystemPrompt() },
-          { role: "user", content: buildUserMessage(message) },
-        ],
-        temperature: 0.3,
-        max_tokens: 500,
-        response_format: { type: "json_object" },
-      });
+        const data = await response.json();
 
-      const content = completion.choices[0]?.message?.content;
+        if (!response.ok) {
+          throw new Error(data.error?.message || JSON.stringify(data));
+        }
 
-      if (!content) {
-        const parsed = fallbackParse(message);
+        const content = data.choices?.[0]?.message?.content;
+
+        if (!content) {
+          throw new Error("Empty response");
+        }
+
         return Response.json({
           success: true,
-          parsed,
-          source: "fallback",
+          parsed: { explanation: content, action: "droneChat", params: {}, confidence: 1 },
+          source: "gpt-drone-agent",
         });
+      } catch (aiError: any) {
+        // Fallback: Drone'un kendi verisiyle akıllı cevap üret
+        const fallbackResponse = fallbackDroneChat(message, droneContext);
+        return Response.json({
+          success: true,
+          parsed: { explanation: fallbackResponse, action: "droneChat", params: {}, confidence: 0.9 },
+          source: "fallback-drone",
+        });
+      }
+    }
+
+    // ═══ FLEET DISPATCHER MODE: Genel filo yönetimi ═══
+    try {
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: buildSystemPrompt() },
+            { role: "user", content: buildUserMessage(message) }
+          ],
+          temperature: 0.3,
+          max_tokens: 500,
+          response_format: { type: "json_object" }
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error?.message || JSON.stringify(data));
+      }
+
+      const content = data.choices?.[0]?.message?.content;
+
+      if (!content) {
+        throw new Error("Empty response from OpenAI");
       }
 
       const parsed = JSON.parse(content);
@@ -58,10 +104,8 @@ export async function POST(request: NextRequest) {
         success: true,
         parsed,
         source: "gpt",
-        usage: completion.usage,
       });
     } catch (aiError: any) {
-      // If OpenAI fails, use fallback
       console.error("OpenAI error, using fallback:", aiError.message);
       const parsed = fallbackParse(message);
       return Response.json({

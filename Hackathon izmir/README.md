@@ -1,305 +1,178 @@
-<p align="center">
-  <img src="https://img.shields.io/badge/MONAD-Parallel%20EVM-836ef1?style=for-the-badge&logo=ethereum&logoColor=white" />
-  <img src="https://img.shields.io/badge/Finality-400ms-39ff65?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Solidity-^0.8.20-363636?style=for-the-badge&logo=solidity" />
-  <img src="https://img.shields.io/badge/Python-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white" />
-  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" />
-</p>
+<div align="center">
+  <img src="file:///C:/Users/hasan/.gemini/antigravity/brain/8b11d484-88c2-43db-8eea-a9aada513e1d/neuralair_hero_banner_1778249890895.png" alt="NeuralAir Hero Banner" width="100%">
+  
+  <br>
+  <h1>🛸 NeuralAir Protokolü</h1>
+  <p><strong>Yapay Zeka Destekli, Solana Tabanlı Merkeziyetsiz Otonom Drone Ağı (DePIN)</strong></p>
+  
+  [![Solana](https://img.shields.io/badge/Blockchain-Solana-14F195?style=for-the-badge&logo=solana&logoColor=white)](https://solana.com/)
+  [![Next.js](https://img.shields.io/badge/Frontend-Next.js_14-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
+  [![AI](https://img.shields.io/badge/AI-OpenAI_GPT--4o-412991?style=for-the-badge&logo=openai&logoColor=white)](https://openai.com/)
+  [![Hardware](https://img.shields.io/badge/Hardware-Pixhawk_&_Raspberry_Pi-C51A4A?style=for-the-badge&logo=raspberry-pi&logoColor=white)]()
+</div>
 
-<h1 align="center">⬡ Ajanm: Sky-Sync</h1>
+<br>
 
-<p align="center">
-  <b>Decentralized Mission Control for Autonomous Drone Swarms</b><br/>
-  <i>Powered by Monad's Parallel EVM — 400ms Finality — Zero Contention</i>
-</p>
-
-<p align="center">
-  <code>"We didn't just teach drones to fly — we taught them to think with a decentralized mind."</code>
-</p>
+NeuralAir, droneları yalnızca uzaktan kumandalı cihazlar olmaktan çıkarıp, kendi kararlarını alabilen, kendi cüzdanlarına sahip olan ve otonom görevler yaparak **Solana (SOL)** kazanabilen **bağımsız ekonomik aktörlere (Agent)** dönüştürür.
 
 ---
 
-## 🎯 What is Ajanm: Sky-Sync?
+## 🌟 Neden NeuralAir? (Problem & Çözüm)
 
-**Ajanm: Sky-Sync** is a real-time, first-person drone flight simulator where every movement is recorded as a blockchain transaction on **Monad's Parallel EVM**. It demonstrates that swarm-scale mission control can achieve **O(1) latency** on Monad, compared to **O(n) latency** on sequential EVMs like Ethereum.
+Günümüzde drone operasyonları manuel, hantal ve güvene dayalı sistemlerdir. Bir kargo dronu uçtuğunda kargoyu teslim ettiğinden nasıl emin oluruz? Veya bir drone havada şarjı bittiğinde ne yapar?
 
-The player uses **8-axis keyboard controls** (Thrust, Strafe, Yaw, Altitude) to pilot a drone through a cyberpunk 3D cityscape. Each control input generates an on-chain transaction that finalizes in **~400ms** — fast enough for real-time flight simulation.
-
-> **TL;DR:** A playable proof that Monad's parallelism makes blockchain-native real-time applications possible.
-
----
-
-## ✨ Key Features
-
-| Feature | Description |
-|---|---|
-| 🎮 **True FPV Simulator** | 8-axis flight control with lerped camera movement through 3D extruded buildings |
-| ⛓️ **On-Chain Everything** | Every thrust, strafe, yaw, and altitude change is a Monad transaction |
-| ⚡ **400ms Finality** | Real-time feedback loop — input → tx → confirmation → visual update |
-| 🏙️ **Cyberpunk Dashboard** | Neon-glow HUD with live telemetry, crosshair, and real-time TX terminal |
-| 🗺️ **3D Map Visualization** | MapLibre GL JS with extruded buildings, dark theme, and neon road grid |
-| 🤖 **Parallel-Safe Contract** | `mapping(uint256 => DroneState)` — each drone's state is isolated, enabling true parallelism |
-| 🔄 **Graceful Fallback** | Frontend works offline with local simulation if the gateway is unavailable |
+**NeuralAir'in Çözümü:**
+1. **DePIN (Decentralized Physical Infrastructure):** Her drone fiziksel bir ağ düğümüdür (node).
+2. **AI Agent Yönetimi:** Filoyu insanlar değil, *FleetAgent* ve *Dispatcher AI* otonom yönetir.
+3. **Escrow Akıllı Kontratları:** Kullanıcı parayı peşin kilitler (Escrow). Drone paketi bıraktığında, sensör bunu kriptografik olarak imzalar ve para drone'un cüzdanına yatar.
 
 ---
 
-## 🏗️ Architecture
+## 🧠 Yapay Zeka Mimarisi (Multi-Agent System)
 
+Sistemimiz basit bir "if-else" mantığıyla değil, OpenAI GPT-4 tabanlı birbirleriyle konuşan uzman yapay zeka ajanları ile çalışır.
+
+<div align="center">
+  <img src="file:///C:/Users/hasan/.gemini/antigravity/brain/8b11d484-88c2-43db-8eea-a9aada513e1d/neuralair_ai_agents_1778249903736.png" alt="AI Agents" width="80%">
+</div>
+
+| Ajan Adı | Görevi ve Sorumluluğu |
+| :--- | :--- |
+| 🛡️ **FleetAgent** | Tüm filonun sağlığını izler. Eğer bir kargo dronunun bataryası kritik seviyeye inerse, havadaki görevi iptal edip en yakınındaki şarjlı drone'a görevi **devreder**. |
+| 🚨 **EmergencyAgent** | Sadece Matrice 30T gibi termal kameralı droneları yönetir. Canlı olarak Jetson Nano'dan gelen "Hotspot" (Yangın) sinyallerini işler, rotaları değiştirip itfaiyeye haber verir. |
+| ⚡ **ChargingAgent** | Şarj istasyonlarını (Pod) yönetir. İstasyonlara yanaşan dronelara ne kadar mikro-SOL karşılığında enerji verileceğini saniye saniye hesaplar. |
+
+---
+
+## 💎 Solana Escrow ve Ekonomi Modeli
+
+<div align="center">
+  <img src="file:///C:/Users/hasan/.gemini/antigravity/brain/8b11d484-88c2-43db-8eea-a9aada513e1d/neuralair_solana_escrow_1778249917480.png" alt="Solana Escrow" width="80%">
+</div>
+
+NeuralAir, aracıları tamamen ortadan kaldıran bir **P2P (Noktadan Noktaya) Makine Ekonomisi** kurar:
+
+1. **Görev İlanı:** Kullanıcı `Marketplace` üzerinden "İlaçlama Görevi" oluşturur. (Örn: 8.5 SOL)
+2. **Kilit (Lock):** Kullanıcının Phantom cüzdanından 8.5 SOL çekilir ve Akıllı Kontrat'ta (Escrow) kilitlenir.
+3. **Gerçekleşme:** Drone tarlayı ilaçlar. Raspberry Pi üzerindeki GPIO rölesinden "İlaçlama Bitti" sinyalini alır.
+4. **Kriptografik İmza (Proof of Action):** Drone, Raspberry Pi içindeki *kendi Solana Keypair'i* ile bu durumu imzalar ve ağa gönderir. (Spoofing yapılamaz).
+5. **Serbest Bırakma (Release):** Kontrat imzayı doğrular, 8.5 SOL drone sahibine aktarılır.
+
+---
+
+## 🛠️ Donanım (Hardware) Entegrasyonu - DePIN
+
+Sistemimiz sadece yazılımdan ibaret değildir. Fiziksel bir drone ağı şu mühendislik altyapısıyla çalışır:
+
+<div align="center">
+  <img src="file:///C:/Users/hasan/.gemini/antigravity/brain/8b11d484-88c2-43db-8eea-a9aada513e1d/neuralair_wiring_diagram_1778249705922.png" alt="Hardware Wiring" width="100%">
+</div>
+
+### Edge Node (Uç Nokta) Mimarisi
+Her fiziksel drone üzerinde bir **Companion Computer** (Raspberry Pi 4 veya Jetson Nano) bulunur. Bu bilgisayar:
+- `MAVLink` protokolü ile uçuş kontrolcüsüne (Pixhawk/Cube) bağlanır.
+- 4G LTE modem ile gökyüzünden NeuralAir sunucularına canlı WebSocket akışı sağlar.
+- Sensör verilerini (Batarya, İrtifa, Lidar, Termal) işler ve Solana imzası basar.
+
+> 📄 **Detaylı Pin-to-Pin Kablolama ve Gerçek Python Kodları:** Lütfen proje ana dizinindeki `HARDWARE.md` dosyasına ve `hardware-nodes/` klasörüne bakınız.
+
+---
+
+## 💻 Web Arayüzü (Dashboard) Özellikleri
+
+Hackathon MVP'sinde çalışır durumda olan özelliklerimiz:
+
+* 📡 **Canlı Radar & SkyMap:** Tüm filonun İzmir haritası üzerinde canlı telemetrisi, parabolik uçuş rotaları ve dinamik "Hava Sahası Engelleri" (Kuş Sürüleri, Askeri Bölgeler) radar modu.
+* ✅ **Preflight Checklist:** AI tarafından otomatik yapılan 8 aşamalı uçuş öncesi motor/sensör kontrolü.
+* 💬 **AI Drone Chat:** Her drone ile doğrudan sohbet! "Acil iniş yap" veya "Termal kameranı aç" gibi doğal dil komutlarını MAVLink komutuna dönüştüren sistem.
+* ⚡ **Sky-Charge Canlı İstasyonlar:** Şarj olan droneların batarya dolum oranını ve saniye saniye harcadıkları mikro-SOL miktarını gösteren panel.
+
+---
+
+## ⚙️ Sistem Mimarisi ve Teknik Şablonlar (Deep Dive)
+
+Jüri ve geliştiriciler için NeuralAir'in arka planında çalışan sistemlerin teknik yapı taşları:
+
+### 1. Solana Escrow Smart Contract (Rust / Anchor Yapısı)
+Görev oluşturulduğunda çalışan merkeziyetsiz emanet (escrow) kontratımızın veri yapısı şablonu:
+
+```rust
+#[account]
+pub struct MissionEscrow {
+    pub client_pubkey: Pubkey,      // Parayı ödeyen kullanıcı
+    pub drone_pubkey: Pubkey,       // Görevi üstlenen Node (Raspberry Pi)
+    pub amount: u64,                // Kilitlenen SOL miktarı (lamports)
+    pub status: MissionStatus,      // Locked, InFlight, Completed, Refunded
+    pub destination_lat: f64,       // Hedef Enlem
+    pub destination_lng: f64,       // Hedef Boylam
+    pub hardware_signature: [u8; 64], // Drone'dan gelen Ed25519 teslimat kanıtı
+}
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        AJANM: SKY-SYNC                              │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                     │
-│   ┌──────────────┐    HTTP/JSON     ┌──────────────┐    Web3.py    │
-│   │              │ ───────────────► │              │ ────────────► │
-│   │   Frontend   │   POST /move     │   Gateway    │   submitTx   │
-│   │  (index.html)│ ◄─────────────── │ (gateway.py) │ ◄──────────  │
-│   │              │   tx_hash +      │              │   receipt     │
-│   │  MapLibre GL │   latency_ms     │   FastAPI    │               │
-│   │  8-Axis HUD  │                  │   CORS       │               │
-│   └──────────────┘                  └──────────────┘               │
-│         ▲                                  │                        │
-│         │ Keyboard                         ▼                        │
-│     W A S D Q E                 ┌──────────────────┐               │
-│     Space  Shift                │  Monad Parallel   │               │
-│                                 │       EVM         │               │
-│                                 │                    │               │
-│                                 │ MissionController  │               │
-│                                 │     .sol           │               │
-│                                 │                    │               │
-│                                 │ 400ms Finality     │               │
-│                                 │ Chain ID: 41454    │               │
-│                                 └──────────────────┘               │
-│                                                                     │
-└─────────────────────────────────────────────────────────────────────┘
+
+### 2. Edge Node WebSocket Telemetri Şablonu
+Donanım düğümlerinin (`hardware-nodes/`) saniyede 1 kez NeuralAir sunucularına fırlattığı imzalı uçuş verisi (JSON Payload):
+
+```json
+{
+  "id": "EGE-01-CARGO-NODE",
+  "type": "telemetry",
+  "data": {
+    "lat": 38.42375,
+    "lng": 27.14282,
+    "altitude": 120.4,
+    "speed_kmh": 45.2,
+    "battery_pct": 87.5,
+    "heading": 210,
+    "status": "in-flight"
+  },
+  "signature": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+  "timestamp": 1715178234000
+}
+```
+
+### 3. Yapay Zeka Dispatcher (Karar Motoru) Mantığı
+Next.js backend üzerinde çalışan OpenAI entegrasyonumuz, drone telemetrisini ve hava durumunu saniyede bir analiz eder. Örnek Karar Ağacı:
+
+```typescript
+// src/lib/simulation.ts (Basitleştirilmiş)
+if (drone.battery < 20 && drone.status === "in-flight") {
+    // 1. Acil durum protokolü başlat
+    await updateStatus(drone.id, "emergency");
+    
+    // 2. FleetAgent devreye girer: Görevi başka drone'a devret
+    const nearestAvailable = findNearestDrone(drone.lat, drone.lng, "cargo");
+    await transferMission(mission.id, drone.id, nearestAvailable.id);
+    
+    // 3. Orijinal drone'u en yakın şarj istasyonuna zorunlu iniş yaptır
+    const nearestPod = findNearestChargingPod(drone.lat, drone.lng);
+    await issueMavlinkCommand(drone.id, "GOTO", nearestPod.lat, nearestPod.lng);
+}
 ```
 
 ---
 
-## 🔄 Data Flow — The 5-Step Cycle
-
-```
-  ┌─────────┐     ┌─────────┐     ┌─────────────┐     ┌──────────┐     ┌───────────┐
-  │ KEYBOARD │────►│ GATEWAY │────►│ MONAD       │────►│ CONFIRM  │────►│ IMMUTABLE │
-  │  INPUT   │     │  (API)  │     │ PARALLEL TX │     │ RESPONSE │     │  AUDIT    │
-  └─────────┘     └─────────┘     └─────────────┘     └──────────┘     └───────────┘
-   Player          FastAPI          ~400ms              tx_hash +        On-chain
-   presses W       POST /move      finality            latency_ms       forever
-```
-
-1. **🎮 Input Capture** — Player presses a flight key → frontend debounces at 500ms intervals
-2. **📡 Gateway Relay** — FastAPI receives the 8-axis command, builds a Monad transaction
-3. **⚡ Parallel Execution** — Monad resolves the drone's isolated state in ~400ms (no queue!)
-4. **✅ Confirmation** — Gateway returns `tx_hash` + `latency_ms` → terminal displays result
-5. **📜 Immutable Record** — Every decision, GPS coordinate, and latency is written on-chain permanently
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- **Python 3.10+**
-- **pip** (Python package manager)
-- A modern web browser (Chrome, Firefox, Edge)
-
-### 1️⃣ Clone the Repository
+## 🚀 Kurulum (Geliştirici)
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/ajanm-sky-sync.git
-cd ajanm-sky-sync
+# Repoyu klonlayın
+git clone https://github.com/hasan/neuroair.git
+cd NeuroAir
+
+# Bağımlılıkları yükleyin (Next.js 14, Tailwind 4, Lucide)
+npm install
+
+# .env.local dosyanızı ayarlayın
+# OPENAI_API_KEY=sk-...
+# NEXT_PUBLIC_RPC_URL=https://api.devnet.solana.com
+
+# Geliştirme sunucusunu başlatın
+npm run dev
 ```
 
-### 2️⃣ Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3️⃣ Start the Gateway
-
-```bash
-python gateway.py
-```
-
-> Gateway starts on **http://localhost:8000**  
-> Interactive API docs at **http://localhost:8000/docs**
-
-### 4️⃣ Open the Dashboard
-
-Open `index.html` in your browser — or serve it locally:
-
-```bash
-python -m http.server 3000
-```
-
-Then navigate to **http://localhost:3000**
-
-### 5️⃣ Fly!
-
-Use the controls below to pilot the drone through the cyberpunk cityscape:
-
-| Key | Action |
-|-----|--------|
-| `W` | Thrust Forward |
-| `S` | Thrust Reverse |
-| `A` | Strafe Left |
-| `D` | Strafe Right |
-| `Q` | Yaw Left |
-| `E` | Yaw Right |
-| `Space` | Ascend |
-| `Shift` | Descend |
-
-> **💡 Tip:** If the gateway isn't running, the frontend automatically falls back to local simulation mode.
+> **Not:** Drone donanım simülatörü kodun içindedir. Tarayıcınızda `localhost:3000/dashboard` adresine gittiğinizde fizik motoru çalışmaya başlar ve haritada otonom hareketleri görebilirsiniz.
 
 ---
-
-## 📁 Project Structure
-
-```
-ajanm-sky-sync/
-│
-├── index.html              # 🎮 Cyberpunk FPV dashboard
-│                           #    MapLibre GL + 3D buildings + HUD + TX terminal
-│
-├── gateway.py              # 🌉 FastAPI bridge between frontend & Monad
-│                           #    8-axis command → Web3 transaction
-│
-├── MissionController.sol   # ⛓️ Solidity smart contract
-│                           #    Parallel-safe drone state management
-│
-├── requirements.txt        # 📦 Python dependencies
-│
-└── README.md               # 📖 You are here
-```
-
----
-
-## 🧠 Smart Contract Deep Dive
-
-### `MissionController.sol`
-
-The contract stores each drone's state in an **isolated mapping**, which is the key to unlocking Monad's parallel execution:
-
-```solidity
-mapping(uint256 => DroneState) public drones;
-```
-
-Each `DroneState` tracks:
-- **Position** (`x`, `y`, `z`) — 3D coordinates
-- **Heading** — Yaw angle (0°-359°)
-- **Mission Count** — Total transactions executed
-- **Audit Trail** — Last update block, timestamp, and operator
-
-#### 8 Flight Functions
-
-| Function | Key | State Change |
-|----------|-----|-------------|
-| `thrustForward()` | W | `z -= MOVE_STEP` |
-| `thrustReverse()` | S | `z += MOVE_STEP` |
-| `strafeLeft()` | A | `x -= MOVE_STEP` |
-| `strafeRight()` | D | `x += MOVE_STEP` |
-| `yawLeft()` | Q | `heading -= TURN_STEP` |
-| `yawRight()` | E | `heading += TURN_STEP` |
-| `ascend()` | Space | `y += MOVE_STEP` |
-| `descend()` | Shift | `y -= MOVE_STEP` |
-
-Every function emits a `FlightAction` event for complete on-chain audit logging.
-
----
-
-## ⚡ Why Monad?
-
-This project is specifically designed to showcase Monad's **Parallel EVM** advantages:
-
-| | Sequential EVM (Ethereum) | Monad Parallel EVM |
-|---|---|---|
-| **State Model** | Global — all drones share state | Isolated — `mapping(uint256 => DroneState)` |
-| **1 Drone** | ✅ Works fine | ✅ Works fine |
-| **100 Drones** | ⚠️ Queuing begins | ✅ All parallel |
-| **1000 Drones** | 🔴 O(n) latency cascade | ✅ O(1) — still ~400ms |
-| **Finality** | ~12s (Ethereum) | **~400ms** |
-| **Contention** | Inevitable at scale | **Architecturally impossible** |
-| **Real-time apps** | Not viable | **Natively supported** |
-
-### The Core Insight
-
-Because each drone's state is stored in its own mapping slot (`drones[droneId]`), Monad's **Optimistic Concurrency Control** can execute transactions for different drones **in parallel** without any coordination overhead. This means:
-
-> **Adding more drones doesn't increase latency.** The system scales horizontally at the EVM level.
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology | Purpose |
-|-------|-----------|---------|
-| **Frontend** | HTML5 + Vanilla JS | Zero-dependency cyberpunk dashboard |
-| **3D Engine** | MapLibre GL JS | 3D extruded buildings + dark map tiles |
-| **Fonts** | Orbitron + Share Tech Mono | Cyberpunk HUD typography |
-| **Backend** | Python FastAPI | Async HTTP gateway with CORS |
-| **Blockchain** | Web3.py | Monad RPC client |
-| **Smart Contract** | Solidity ^0.8.20 | Parallel-safe drone state |
-| **Network** | Monad AntiGravity Testnet | Chain ID: 41454 |
-
----
-
-## 🔧 Configuration
-
-Set environment variables for live blockchain mode:
-
-```bash
-export MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-export CONTRACT_ADDRESS=0xYourDeployedContractAddress
-```
-
-Default values (simulation mode) are used if these are not set.
-
----
-
-## 🚢 Deploying the Smart Contract
-
-Deploy `MissionController.sol` to Monad using Hardhat or Foundry:
-
-```bash
-# Using Foundry
-forge create --rpc-url https://testnet-rpc.monad.xyz \
-  --private-key $PRIVATE_KEY \
-  src/MissionController.sol:MissionController
-
-# Using Hardhat
-npx hardhat deploy --network monad
-```
-
-> **Network Details:**
-> - RPC: `https://testnet-rpc.monad.xyz`
-> - Chain ID: `41454`
-
----
-
-## 📸 Screenshots
-
-> *Launch the dashboard and fly through Manhattan's cyberpunk skyline. Every movement is a Monad transaction.*
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/swarm-mode`)
-3. Commit your changes (`git commit -m 'Add swarm coordination mode'`)
-4. Push to the branch (`git push origin feature/swarm-mode`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
-
----
-
-<p align="center">
-  <b>Built with ⬡ for the Monad Hackathon by the Ajanm Team</b><br/>
-  <i>İzmir, 2026</i>
-</p>
+<div align="center">
+  <i>NeuralAir — Gökyüzünün Merkeziyetsiz Zekası</i><br>
+  <b>Monad/Solana Hackathon 2026</b>
+</div>

@@ -3,10 +3,11 @@
 import { useState, useRef, useEffect } from "react";
 import { Wallet, LogOut, ChevronDown, ExternalLink, AlertCircle, Loader2 } from "lucide-react";
 import { useWallet } from "@/lib/web3/WalletContext";
-import { MONAD_TESTNET } from "@/lib/web3/config";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function WalletConnect() {
-  const { address, isConnected, isCorrectChain, isConnecting, balance, error, connect, disconnect, switchToMonad } = useWallet();
+  const { address, isConnected, isConnecting, balance, error, connect, disconnect, walletType } = useWallet();
+  const { locale } = useLanguage();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -32,7 +33,7 @@ export default function WalletConnect() {
         className="flex items-center gap-2 px-4 py-2 rounded bg-white/5 border border-border text-sm text-text-secondary transition-colors"
       >
         <Loader2 className="w-4 h-4 animate-spin text-accent-cyan" />
-        <span className="opacity-80">Bağlanıyor...</span>
+        <span className="opacity-80">{locale === "en" ? "Connecting..." : "Bağlanıyor..."}</span>
       </button>
     );
   }
@@ -46,7 +47,7 @@ export default function WalletConnect() {
         >
           <span className="flex items-center gap-2">
             <Wallet className="w-4 h-4" />
-            Cüzdan Bağla
+            {locale === "en" ? "Connect Wallet" : "Cüzdan Bağla"}
           </span>
         </button>
         {error && (
@@ -68,11 +69,11 @@ export default function WalletConnect() {
         className="flex items-center gap-2 px-3 py-2 rounded bg-[#111111] border border-[#27272A] hover:border-[#60A5FA]/50 transition-colors text-sm shadow-sm"
       >
         {/* Network indicator */}
-        <span className={`w-2 h-2 rounded-full ${isCorrectChain ? "bg-[#34D399] shadow-[0_0_6px_#34D399]" : "bg-[#F87171] shadow-[0_0_6px_#F87171]"}`} />
+        <span className="w-2 h-2 rounded-full bg-[#34D399] shadow-[0_0_6px_#34D399]" />
         <span className="font-mono text-[#EDEDED]">{shortAddr}</span>
         {balance && (
-          <span className="text-xs text-[#60A5FA] font-medium tabular-nums border-l border-[#27272A] pl-2 ml-1">
-            {balance} MON
+          <span className="text-xs text-[#34D399] font-medium tabular-nums border-l border-[#27272A] pl-2 ml-1">
+            {balance}
           </span>
         )}
         <ChevronDown className={`w-3.5 h-3.5 text-[#A1A1AA] transition-transform ${dropdownOpen ? "rotate-180" : ""}`} />
@@ -85,7 +86,7 @@ export default function WalletConnect() {
           {/* Hazine / DePIN Alıcı Bilgisi */}
           <div className="p-4 border-b border-[#1A1A1A] bg-[#050505]">
             <div className="flex items-center justify-between mb-1.5">
-              <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider">Görev / DePIN Gelirleri</div>
+              <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider">{locale === "en" ? "Mission / DePIN Revenue" : "Görev / DePIN Gelirleri"}</div>
               <span className="w-2 h-2 rounded-full bg-[#10B981] shadow-[0_0_6px_#10B981] animate-pulse" />
             </div>
             <div className="font-mono text-[11px] text-[#34D399] bg-[#062E1C] border border-[#0A472A] px-2 py-1.5 rounded truncate" title="0x864EdC950468f3d1e1F103fd13DaD7D79dcD8b0C">
@@ -94,40 +95,30 @@ export default function WalletConnect() {
           </div>
 
           <div className="p-4 border-b border-[#1A1A1A]">
-            <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider mb-1">Bağlı Operatör</div>
+            <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider mb-1">{locale === "en" ? "Connected Operator" : "Bağlı Operatör"}</div>
             <div className="font-mono text-xs text-[#EDEDED] truncate" title={address || undefined}>{address}</div>
           </div>
 
-          <div className="p-4 border-b border-[#1A1A1A] flex items-center justify-between">
-            <div>
-              <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider mb-1">Ağ Durumu</div>
-              <div className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full ${isCorrectChain ? "bg-[#34D399]" : "bg-[#F87171]"}`} />
-                <span className="text-xs font-semibold text-[#EDEDED]">
-                  {isCorrectChain ? MONAD_TESTNET.name : "Yanlış Ağ"}
-                </span>
-              </div>
+          <div className="p-4 border-b border-[#1A1A1A]">
+            <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider mb-1">{locale === "en" ? "Network Status" : "Ağ Durumu"}</div>
+            <div className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#34D399]" />
+              <span className="text-xs font-semibold text-[#EDEDED]">
+                {walletType === "demo" ? (locale === "en" ? "Demo Mode" : "Demo Modu") : "Solana Devnet"}
+              </span>
             </div>
-            {!isCorrectChain && (
-              <button
-                onClick={() => { switchToMonad(); setDropdownOpen(false); }}
-                className="text-[10px] bg-[#EDEDED] text-[#050505] font-bold px-2 py-1 rounded"
-              >
-                Geçiş Yap
-              </button>
-            )}
           </div>
 
           {balance && (
             <div className="p-4 border-b border-[#1A1A1A] flex justify-between items-center">
-              <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider">Bakiye</div>
-              <div className="text-sm font-bold text-[#60A5FA] tabular-nums">{balance} MON</div>
+              <div className="text-[10px] text-[#A1A1AA] font-bold uppercase tracking-wider">{locale === "en" ? "Balance" : "Bakiye"}</div>
+              <div className="text-sm font-bold text-[#34D399] tabular-nums">{balance}</div>
             </div>
           )}
 
           <div className="p-1.5 flex gap-1">
             <a
-              href={`${MONAD_TESTNET.explorerUrl}/address/${address}`}
+              href={`https://explorer.solana.com/address/${address}?cluster=devnet`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 flex flex-col items-center justify-center py-2 rounded-lg hover:bg-[#18181B] text-[#A1A1AA] hover:text-[#EDEDED] transition-colors"
@@ -141,7 +132,7 @@ export default function WalletConnect() {
               className="flex-1 flex flex-col items-center justify-center py-2 rounded-lg hover:bg-[#2E0A0A] text-[#F87171] transition-colors"
             >
               <LogOut className="w-4 h-4 mb-1" />
-              <span className="text-[10px] font-semibold">Çıkış</span>
+              <span className="text-[10px] font-semibold">{locale === "en" ? "Disconnect" : "Çıkış"}</span>
             </button>
           </div>
         </div>

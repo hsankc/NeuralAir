@@ -1,31 +1,24 @@
-// Monad Testnet Chain Configuration
-export const MONAD_TESTNET = {
-  chainId: 10143,
-  chainIdHex: "0x27AF",
-  name: "Monad Testnet",
-  rpcUrl: process.env.NEXT_PUBLIC_MONAD_RPC_URL || "https://testnet-rpc.monad.xyz",
-  explorerUrl: process.env.NEXT_PUBLIC_MONAD_EXPLORER_URL || "https://testnet.monadexplorer.com",
+// Solana Network Configuration
+export const SOLANA_NETWORK = {
+  name: "Solana Devnet",
+  rpcUrl: process.env.NEXT_PUBLIC_SOLANA_RPC || "https://api.devnet.solana.com",
+  explorerUrl: "https://explorer.solana.com",
+  cluster: "devnet",
   currency: {
-    name: "MON",
-    symbol: "MON",
-    decimals: 18,
+    name: "SOL",
+    symbol: "SOL",
+    decimals: 9,
   },
 } as const;
 
-// Contract addresses (to be updated after deployment)
-export const CONTRACTS = {
-  registry: "0x0000000000000000000000000000000000000000",
-  missionEscrow: "0x0000000000000000000000000000000000000000",
-  skyCharge: "0x0000000000000000000000000000000000000000",
-  flightLogger: "0x0000000000000000000000000000000000000000",
-  droneControl: "0x0000000000000000000000000000000000000000",
-  governance: "0x0000000000000000000000000000000000000000",
-} as const;
+// Geriye dönük uyumluluk (eski import'ları kırmamak için)
+export const MONAD_TESTNET = SOLANA_NETWORK;
 
+// Solana Devnet Explorer linkleri
 export function getExplorerTxUrl(txHash: string): string {
-  return `${MONAD_TESTNET.explorerUrl}/tx/${txHash}`;
+  return `${SOLANA_NETWORK.explorerUrl}/tx/${txHash}?cluster=devnet`;
 }
 
 export function getExplorerAddressUrl(address: string): string {
-  return `${MONAD_TESTNET.explorerUrl}/address/${address}`;
+  return `${SOLANA_NETWORK.explorerUrl}/address/${address}?cluster=devnet`;
 }

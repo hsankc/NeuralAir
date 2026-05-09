@@ -6,11 +6,11 @@ import { ClientProviders } from "./providers";
 export const metadata: Metadata = {
   title: "NeuralAir — SkyAgent Protocol | Otonom Drone Ağı",
   description:
-    "Monad blokzinciri üzerinde merkeziyetsiz otonom havacılık ağı. DePIN şarj, AI görev dağıtımı, gerçek zamanlı drone takibi ve on-chain uçuş kontrol.",
+    "Solana blokzinciri üzerinde merkeziyetsiz otonom havacılık ağı. DePIN şarj, AI görev dağıtımı, gerçek zamanlı drone takibi ve on-chain uçuş kontrol.",
   keywords: [
     "drone",
     "blockchain",
-    "Monad",
+    "Solana",
     "DePIN",
     "AI",
     "otonom uçuş",
