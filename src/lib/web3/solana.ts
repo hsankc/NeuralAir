@@ -1,5 +1,5 @@
 import { Connection, PublicKey, Transaction, SystemProgram, Keypair } from "@solana/web3.js";
-import { Program, AnchorProvider, Idl } from "@coral-xyz/anchor";
+import { Program, AnchorProvider, Idl, BN } from "@coral-xyz/anchor";
 import { NeuralAirIDL } from "./idl";
 
 // Program ID (declare_id ile aynı olmalı)
@@ -39,7 +39,7 @@ export async function recordFlightOnChain(
 
   try {
     const tx = await program.methods
-      .recordFlight(droneId, gpsData, new (window as any).anchor.BN(flightTime))
+      .recordFlight(droneId, gpsData, new BN(flightTime))
       .accounts({
         flightRecord: flightRecordKeypair.publicKey,
         operator: wallet.publicKey,
