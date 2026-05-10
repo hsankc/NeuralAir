@@ -22,7 +22,6 @@ import {
   Plane,
 } from "lucide-react";
 import { initialPods, initialDrones, ChargingPod } from "@/lib/data";
-import { useLanguage } from "@/lib/LanguageContext";
 
 /* ─── LIVE CHARGING SESSION ─── */
 interface ChargingSession {
@@ -37,7 +36,6 @@ interface ChargingSession {
 }
 
 function LiveChargingPanel() {
-  const { locale } = useLanguage();
   const [sessions, setSessions] = useState<ChargingSession[]>([]);
   const [totalMicroSol, setTotalMicroSol] = useState(0);
   const [agentLog, setAgentLog] = useState<{ time: string; msg: string; color: string }[]>([]);
@@ -52,12 +50,14 @@ function LiveChargingPanel() {
         startTime: new Date(), solEarned: 0, energyDelivered: 0, batteryProgress: 23,
       },
     ];
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessions(initialSessions);
 
     const now = new Date().toLocaleTimeString("tr-TR");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setAgentLog([{
       time: now,
-      msg: "[ChargingAgent] Ege-01 → Alsancak Hub bağlantısı kuruldu. Şarj başladı.",
+      msg: "[ChargingAgent] Ege-01 → Alsancak Hub connection established. Charging started.",
       color: "text-warning"
     }]);
   }, []);
@@ -90,7 +90,7 @@ function LiveChargingPanel() {
         const now = new Date().toLocaleTimeString("tr-TR");
         setAgentLog(prev => [...prev.slice(-8), {
           time: now,
-          msg: `[ChargingAgent] ${s.droneName} şarjı tamamlandı! %100 → Görev bekleniyor. Pod: ${s.podName} kazandı: ${s.solEarned.toFixed(6)} SOL`,
+          msg: `[ChargingAgent] ${s.droneName} charge complete! 100% → Awaiting mission. Pod: ${s.podName} earned: ${s.solEarned.toFixed(6)} SOL`,
           color: "text-success"
         }]);
       }
@@ -101,14 +101,14 @@ function LiveChargingPanel() {
   useEffect(() => {
     const iv = setInterval(() => {
       const messages = [
-        "[ChargingAgent] Pod durumları taranıyor... 5/5 çevrimiçi ✓",
-        "[ChargingAgent] Enerji akışı: stabil. Voltaj: nominal ✓",
-        "[ChargingAgent] Mikro-SOL ödemesi Solana Devnet'e gönderildi",
-        "[ChargingAgent] Hücre sıcaklıkları güvenli aralıkta (28-35°C)",
-        "[EmergencyAgent] Batarya kritik drone taranıyor... sonuç: yok ✓",
-        "[FleetAgent] Şarjı tamamlanan drone'lar kontrol ediliyor...",
-        "[ChargingAgent] Ağ bant genişliği: optimal. Gecikme: <50ms",
-        "[FleetAgent] 15 drone filo durumu senkronize ediliyor...",
+        "[ChargingAgent] Scanning pod statuses... 5/5 online ✓",
+        "[ChargingAgent] Energy flow: stable. Voltage: nominal ✓",
+        "[ChargingAgent] Micro-SOL payment sent to Solana Devnet",
+        "[ChargingAgent] Cell temps in safe range (28-35°C)",
+        "[EmergencyAgent] Scanning for critical battery drones... result: none ✓",
+        "[FleetAgent] Checking fully charged drones...",
+        "[ChargingAgent] Network bandwidth: optimal. Latency: <50ms",
+        "[FleetAgent] Synchronizing fleet status for 15 drones...",
       ];
       const msg = messages[Math.floor(Math.random() * messages.length)];
       const now = new Date().toLocaleTimeString("tr-TR");
@@ -124,7 +124,7 @@ function LiveChargingPanel() {
       const now = new Date().toLocaleTimeString("tr-TR");
       setAgentLog(prev => [...prev.slice(-12), {
         time: now,
-        msg: `[FleetSync] ✅ ${droneName} → "${missionTitle}" görevi tamamlandı. Şarj podu atanıyor...`,
+        msg: `[FleetSync] ✅ ${droneName} → Mission "${missionTitle}" complete. Assigning charging pod...`,
         color: "text-success"
       }]);
       // 3 saniye sonra şarj oturumu başlat
@@ -144,7 +144,7 @@ function LiveChargingPanel() {
         const nowAfter = new Date().toLocaleTimeString("tr-TR");
         setAgentLog(prev => [...prev.slice(-12), {
           time: nowAfter,
-          msg: `[ChargingAgent] ${droneName} → ${podName} bağlantısı kuruldu. Şarj başladı.`,
+          msg: `[ChargingAgent] ${droneName} → ${podName} connection established. Charging started.`,
           color: "text-warning"
         }]);
       }, 3000);
@@ -164,22 +164,22 @@ function LiveChargingPanel() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Zap className="w-5 h-5 text-warning" />
-            <span className="font-bold text-lg">{locale === "en" ? "Live Charging Sessions" : "Canlı Şarj Oturumları"}</span>
+            <span className="font-bold text-lg">Live Charging Sessions</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-success flex items-center gap-1">
-              <Radio className="w-3 h-3 animate-pulse" /> CANLI
+              <Radio className="w-3 h-3 animate-pulse" /> LIVE
             </span>
           </div>
         </div>
 
         {/* Mikro SOL Toplam */}
         <div className="bg-black/40 rounded-xl p-4 mb-4 border border-warning/10">
-          <div className="text-xs text-text-muted mb-1 uppercase tracking-wider font-medium">{locale === "en" ? "Total Micro-SOL Revenue (This Session)" : "Toplam Mikro-SOL Geliri (Bu Oturum)"}</div>
+          <div className="text-xs text-text-muted mb-1 uppercase tracking-wider font-medium">Total Micro-SOL Revenue (This Session)</div>
           <div className="text-3xl font-black text-warning tabular-nums font-mono tracking-tight">
             +{totalMicroSol.toFixed(8)} <span className="text-lg text-text-muted">SOL</span>
           </div>
-          <div className="text-[10px] text-text-muted mt-1">{locale === "en" ? "Every 2 seconds +0.000012 SOL → Sent to pod owner" : "Her 2 saniyede +0.000012 SOL → Pod sahibine aktarılıyor"}</div>
+          <div className="text-[10px] text-text-muted mt-1">Every 2 seconds +0.000012 SOL → Sent to pod owner</div>
         </div>
 
         {/* Aktif Oturumlar */}
@@ -192,7 +192,7 @@ function LiveChargingPanel() {
                 </div>
                 <div>
                   <div className="font-semibold text-sm">{s.droneName} ↔ {s.podName}</div>
-                  <div className="text-[10px] text-text-muted">{locale === "en" ? "Session start:" : "Oturum başlangıcı:"} {s.startTime.toLocaleTimeString("tr-TR")}</div>
+                  <div className="text-[10px] text-text-muted">Session start: {s.startTime.toLocaleTimeString("tr-TR")}</div>
                 </div>
               </div>
               <div className="text-right">
@@ -227,7 +227,7 @@ function LiveChargingPanel() {
             <span className="text-sm font-semibold">ChargingAgent Terminal</span>
           </div>
           <span className="text-xs text-success flex items-center gap-1">
-            <Radio className="w-3 h-3" /> CANLI
+            <Radio className="w-3 h-3" /> LIVE
           </span>
         </div>
         <div ref={scrollRef} className="p-4 max-h-[180px] overflow-y-auto no-scrollbar">
@@ -247,7 +247,6 @@ function LiveChargingPanel() {
 
 /* ─── REGISTER POD MODAL ─── */
 function RegisterPodModal({ onClose }: { onClose: () => void }) {
-  const { locale } = useLanguage();
   const [submitted, setSubmitted] = useState(false);
 
   if (submitted) {
@@ -257,15 +256,15 @@ function RegisterPodModal({ onClose }: { onClose: () => void }) {
           <div className="w-16 h-16 rounded-full bg-success/20 flex items-center justify-center mx-auto">
             <CheckCircle2 className="w-8 h-8 text-success" />
           </div>
-          <h3 className="text-lg font-bold">Pod Kaydedildi!</h3>
+          <h3 className="text-lg font-bold">Pod Registered!</h3>
           <p className="text-sm text-text-secondary">
-            Şarj podunuz blokzincire kaydedildi ve artık drone&apos;lar tarafından kullanılabilir.
+            Your charging pod is registered on the blockchain and available for drones.
           </p>
           <div className="bg-white/5 rounded-lg p-3 text-xs font-mono text-text-muted">
             TX: 0xd4e2...f8a1 | Pod NFT #49
           </div>
           <button onClick={onClose} className="btn-secondary !py-2 text-sm rounded-lg">
-            Kapat
+            Close
           </button>
         </div>
       </div>
@@ -276,7 +275,7 @@ function RegisterPodModal({ onClose }: { onClose: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="glass-card !rounded-2xl w-full max-w-md p-6 animate-fade-in-up">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">Yeni Pod Kaydet</h2>
+          <h2 className="text-xl font-bold">Register New Pod</h2>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary">
             <X className="w-5 h-5" />
           </button>
@@ -284,16 +283,16 @@ function RegisterPodModal({ onClose }: { onClose: () => void }) {
 
         <div className="space-y-4">
           <div>
-            <label className="text-xs text-text-muted block mb-1">Pod Adı</label>
+            <label className="text-xs text-text-muted block mb-1">Pod Name</label>
             <input
               type="text"
-              placeholder="Örn: Balkon Şarj İstasyonu"
+              placeholder="e.g. Balcony Charging Station"
               className="w-full bg-white/5 border border-border rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-accent-cyan transition-colors"
             />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs text-text-muted block mb-1">Enlem (Lat)</label>
+              <label className="text-xs text-text-muted block mb-1">Latitude</label>
               <input
                 type="text"
                 placeholder="38.4350"
@@ -301,7 +300,7 @@ function RegisterPodModal({ onClose }: { onClose: () => void }) {
               />
             </div>
             <div>
-              <label className="text-xs text-text-muted block mb-1">Boylam (Lng)</label>
+              <label className="text-xs text-text-muted block mb-1">Longitude</label>
               <input
                 type="text"
                 placeholder="27.1420"
@@ -310,7 +309,7 @@ function RegisterPodModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <div>
-            <label className="text-xs text-text-muted block mb-1">Şarj Ücreti (SOL/kWh)</label>
+            <label className="text-xs text-text-muted block mb-1">Charging Rate (SOL/kWh)</label>
             <input
               type="number"
               placeholder="0.05"
@@ -323,7 +322,7 @@ function RegisterPodModal({ onClose }: { onClose: () => void }) {
             className="w-full btn-primary !py-3 rounded-xl"
           >
             <span className="flex items-center justify-center gap-2">
-              {locale === "en" ? "Register Pod On-Chain" : "Pod'u Zincire Kaydet"} <Zap className="w-4 h-4" />
+              Register Pod On-Chain <Zap className="w-4 h-4" />
             </span>
           </button>
         </div>
@@ -334,7 +333,6 @@ function RegisterPodModal({ onClose }: { onClose: () => void }) {
 
 /* ─── POD CARD ─── */
 function PodCard({ pod, activeSessions }: { pod: ChargingPod; activeSessions: number }) {
-  const { locale } = useLanguage();
   return (
     <div className="glass-card !rounded-xl overflow-hidden group">
       <div className={`h-1 bg-gradient-to-r ${activeSessions > 0 ? "from-success to-emerald-500 animate-pulse" : "from-yellow-500 to-amber-500"}`} />
@@ -354,23 +352,23 @@ function PodCard({ pod, activeSessions }: { pod: ChargingPod; activeSessions: nu
           <span className={`text-xs px-2 py-1 rounded-full ${
             activeSessions > 0 ? "bg-success/15 text-success" : pod.available ? "bg-warning/15 text-warning" : "bg-danger/15 text-danger"
           }`}>
-            {activeSessions > 0 ? `${activeSessions} ${locale === "en" ? "Charging" : "Şarj Aktif"}` : pod.available ? (locale === "en" ? "Available" : "Müsait") : (locale === "en" ? "Busy" : "Dolu")}
+            {activeSessions > 0 ? `${activeSessions} Charging` : pod.available ? "Available" : "Busy"}
           </span>
         </div>
 
         <div className="grid grid-cols-3 gap-3 text-center mt-4">
           <div className="bg-white/5 rounded-lg p-3">
-            <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Rate" : "Ücret"}</div>
+            <div className="text-xs text-text-muted mb-1">Rate</div>
             <div className="text-sm font-bold text-accent-cyan tabular-nums">{pod.rate} SOL</div>
             <div className="text-[10px] text-text-muted">per kWh</div>
           </div>
           <div className="bg-white/5 rounded-lg p-3">
-            <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Energy" : "Enerji"}</div>
+            <div className="text-xs text-text-muted mb-1">Energy</div>
             <div className="text-sm font-bold text-success tabular-nums">{pod.totalEnergy}</div>
             <div className="text-[10px] text-text-muted">kWh</div>
           </div>
           <div className="bg-white/5 rounded-lg p-3">
-            <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Earned" : "Kazanç"}</div>
+            <div className="text-xs text-text-muted mb-1">Earned</div>
             <div className="text-sm font-bold text-warning tabular-nums">{pod.totalEarned}</div>
             <div className="text-[10px] text-text-muted">SOL</div>
           </div>
@@ -387,10 +385,7 @@ function PodCard({ pod, activeSessions }: { pod: ChargingPod; activeSessions: nu
 
 /* ─── EARNINGS CHART (simulated) ─── */
 function EarningsChart() {
-  const { locale } = useLanguage();
-  const months = locale === "en" 
-    ? ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"]
-    : ["Nis", "May", "Haz", "Tem", "Ağu", "Eyl", "Eki", "Kas", "Ara", "Oca", "Şub", "Mar"];
+  const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
   const data = [28.5, 34.2, 31.8, 42.6, 38.9, 52.3, 48.7, 61.4, 55.2, 72.8, 68.5, 84.3];
   const max = Math.max(...data);
   const total = data.reduce((a, b) => a + b, 0);
@@ -401,23 +396,23 @@ function EarningsChart() {
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-semibold flex items-center gap-2">
           <BarChart3 className="w-4 h-4 text-accent-cyan" />
-          {locale === "en" ? "Monthly Earnings Chart" : "Aylık Kazanç Grafiği"}
+          Monthly Earnings Chart
         </h3>
-        <span className="text-xs text-text-muted">{locale === "en" ? "Last 12 months" : "Son 12 ay"}</span>
+        <span className="text-xs text-text-muted">Last 12 months</span>
       </div>
 
       {/* Summary row */}
       <div className="flex items-center gap-6 mb-5 text-sm">
         <div>
-          <span className="text-text-muted text-xs">{locale === "en" ? "Total: " : "Toplam: "}</span>
+          <span className="text-text-muted text-xs">Total: </span>
           <span className="font-bold text-accent-cyan tabular-nums">{total.toFixed(1)} SOL</span>
         </div>
         <div>
-          <span className="text-text-muted text-xs">{locale === "en" ? "Growth: " : "Büyüme: "}</span>
+          <span className="text-text-muted text-xs">Growth: </span>
           <span className="font-bold text-success tabular-nums">+{growth}%</span>
         </div>
         <div>
-          <span className="text-text-muted text-xs">{locale === "en" ? "Avg: " : "Ort: "}</span>
+          <span className="text-text-muted text-xs">Avg: </span>
           <span className="font-bold tabular-nums">{(total / 12).toFixed(1)} SOL</span>
         </div>
       </div>
@@ -445,7 +440,6 @@ function EarningsChart() {
 
 /* ═══════ SKY-CHARGE PAGE ═══════ */
 export default function SkyChargePage() {
-  const { locale } = useLanguage();
   const [showRegister, setShowRegister] = useState(false);
 
   const totalEnergy = initialPods.reduce((a, p) => a + p.totalEnergy, 0);
@@ -478,7 +472,7 @@ export default function SkyChargePage() {
             </div>
             <button onClick={() => setShowRegister(true)} className="btn-primary !py-2 !px-4 text-sm rounded-lg">
               <span className="flex items-center gap-2">
-                <Plus className="w-4 h-4" /> {locale === "en" ? "Register Pod" : "Pod Kaydet"}
+                <Plus className="w-4 h-4" /> Register Pod
               </span>
             </button>
           </div>
@@ -489,10 +483,10 @@ export default function SkyChargePage() {
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { icon: Zap, label: locale === "en" ? "Total Pods" : "Toplam Pod", value: initialPods.length, color: "text-warning" },
-            { icon: Battery, label: locale === "en" ? "Available" : "Müsait", value: activePods, color: "text-success" },
-            { icon: TrendingUp, label: locale === "en" ? "Total Energy" : "Toplam Enerji", value: `${totalEnergy.toLocaleString()} kWh`, color: "text-accent-cyan" },
-            { icon: DollarSign, label: locale === "en" ? "Total Earned" : "Toplam Kazanç", value: `${totalEarned.toFixed(1)} SOL`, color: "text-accent-violet" },
+            { icon: Zap, label: "Total Pods", value: initialPods.length, color: "text-warning" },
+            { icon: Battery, label: "Available", value: activePods, color: "text-success" },
+            { icon: TrendingUp, label: "Total Energy", value: `${totalEnergy.toLocaleString()} kWh`, color: "text-accent-cyan" },
+            { icon: DollarSign, label: "Total Earned", value: `${totalEarned.toFixed(1)} SOL`, color: "text-accent-violet" },
           ].map((s) => (
             <div key={s.label} className="glass-card !rounded-xl p-4 flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center ${s.color}`}>
@@ -516,7 +510,7 @@ export default function SkyChargePage() {
 
         {/* Pods Grid */}
         <div className="mb-6">
-          <h2 className="text-xl font-bold mb-4">{locale === "en" ? "Registered Charging Pods" : "Kayıtlı Şarj Podları"}</h2>
+          <h2 className="text-xl font-bold mb-4">Registered Charging Pods</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {initialPods.map((p) => (
               <PodCard key={p.id} pod={p} activeSessions={p.id === 1 ? 1 : 0} />

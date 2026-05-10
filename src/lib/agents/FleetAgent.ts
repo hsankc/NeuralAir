@@ -39,6 +39,7 @@ function typeFit(droneType: DroneAgent["type"], missionType: string): number {
 
 // ── Fallback Karar Motoru (GPT olmadan) ──
 function fallbackDecide(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   openMissions: any[],
   availableDrones: DroneAgent[]
 ): { droneId: number; missionId: number; reason: string } | null {
@@ -72,6 +73,7 @@ function fallbackDecide(
 
 // ── GPT Karar Motoru (API key varsa) ──
 async function gptDecide(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   openMissions: any[],
   availableDrones: DroneAgent[]
 ): Promise<{ droneId: number; missionId: number; reason: string } | null> {
@@ -182,8 +184,8 @@ export const FleetAgent = {
       const fakeTx = generateSolanaTxHash();
       emit("FleetAgent", "info", `⛓️ Escrow TX: ${fakeTx}`);
 
-    } catch (err: any) {
-      emit("FleetAgent", "error", `❌ FleetAgent hatası / error: ${err.message}`);
+    } catch (err: unknown) {
+      emit("FleetAgent", "error", `❌ FleetAgent hatası / error: ${(err as Error).message}`);
     }
   },
 };

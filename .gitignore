@@ -65,3 +65,6 @@ supabase_setup.sql
 
 # DonanÄ±m dokÃ¼mantasyonu (README yeterli, ekstra MD gereksiz)
 HARDWARE.md
+
+# Arþiv klasörleri
+docs/archive/

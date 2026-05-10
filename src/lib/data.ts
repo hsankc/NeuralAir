@@ -90,120 +90,120 @@ export const initialDrones: DroneAgent[] = [
     id: 1, name: "Ege-01", type: "cargo",
     lat: 38.4237, lng: 27.1428, altitude: 20, battery: 87, speed: 45, heading: 45,
     status: "in-flight", reputation: 92, missionId: 1,
-    personality: "Hızlı & güvenilir kargo teslimatçısı — İzmir şehir içi ekspres",
+    personality: "Fast & reliable cargo delivery — Izmir urban express",
     specs: {
       model: "Matrice 350 RTK", manufacturer: "DJI",
       maxSpeed: 82, maxAltitude: 7000, batteryCapacity: 5880,
       weightEmpty: 6470, maxPayload: 2700, maxFlightTime: 55, chargeTime: 52,
-      pricePerKm: 0.12, license: "SHT-İHA2",
-      sensors: ["RTK GPS", "FPV Kamera", "CSM Radar", "ADS-B"],
+      pricePerKm: 0.12, license: "SHT-IHA2",
+      sensors: ["RTK GPS", "FPV Camera", "CSM Radar", "ADS-B"],
     },
   },
   {
-    id: 2, name: "Bayraklı-02", type: "emergency",
+    id: 2, name: "Bayrakli-02", type: "emergency",
     lat: 38.4600, lng: 27.1650, altitude: 180, battery: 95, speed: 60, heading: 315,
     status: "in-flight", reputation: 99, missionId: 4,
-    personality: "Acil müdahale — yangın tespiti ve arama kurtarma uzmanı",
+    personality: "Emergency response — fire detection and SAR specialist",
     specs: {
       model: "Matrice 30T", manufacturer: "DJI",
       maxSpeed: 82, maxAltitude: 7000, batteryCapacity: 3850,
       weightEmpty: 3770, maxPayload: 230, maxFlightTime: 41, chargeTime: 35,
-      pricePerKm: 0.15, license: "SHT-İHA2",
-      sensors: ["Termal 640×512", "Zoom 48MP", "Lazer Mesafe", "Hoparlör", "Spotlight"],
+      pricePerKm: 0.15, license: "SHT-IHA2",
+      sensors: ["Thermal 640×512", "Zoom 48MP", "Laser Range", "Speaker", "Spotlight"],
     },
   },
   {
-    id: 3, name: "Çeşme-03", type: "agricultural",
+    id: 3, name: "Cesme-03", type: "agricultural",
     lat: 38.3230, lng: 26.3050, altitude: 40, battery: 72, speed: 35, heading: 200,
     status: "mission", reputation: 90, missionId: 5,
-    personality: "Bağ & bahçe uzmanı — hassas ilaçlama ve sulama",
+    personality: "Vineyard & orchard specialist — precision spraying and irrigation",
     specs: {
       model: "Agras T40", manufacturer: "DJI",
       maxSpeed: 54, maxAltitude: 3000, batteryCapacity: 30000,
       weightEmpty: 28500, maxPayload: 50000, maxFlightTime: 21, chargeTime: 12,
-      pricePerKm: 0.25, license: "SHT-İHA2",
-      sensors: ["Phased Array Radar", "Çift Atomizer", "Terrain Follow", "RTK"],
+      pricePerKm: 0.25, license: "SHT-IHA2",
+      sensors: ["Phased Array Radar", "Dual Atomizer", "Terrain Follow", "RTK"],
     },
   },
   {
     id: 4, name: "Urla-04", type: "cargo",
     lat: 38.3220, lng: 26.7650, altitude: 110, battery: 43, speed: 40, heading: 350,
     status: "in-flight", reputation: 82, missionId: 2,
-    personality: "Uzun mesafe VTOL kurye — kırsal teslimat uzmanı",
+    personality: "Long-range VTOL courier — rural delivery specialist",
     specs: {
       model: "Dragonfish Standard", manufacturer: "Autel Robotics",
       maxSpeed: 108, maxAltitude: 5000, batteryCapacity: 9800,
       weightEmpty: 7500, maxPayload: 1000, maxFlightTime: 158, chargeTime: 70,
-      pricePerKm: 0.10, license: "SHT-İHA2",
-      sensors: ["50MP Wide", "Zoom 640", "Termal", "VTOL Hybrid", "ADS-B"],
+      pricePerKm: 0.10, license: "SHT-IHA2",
+      sensors: ["50MP Wide", "Zoom 640", "Thermal", "VTOL Hybrid", "ADS-B"],
     },
   },
   {
     id: 5, name: "Sentinel-05", type: "emergency",
     lat: 38.5000, lng: 27.0200, altitude: 300, battery: 98, speed: 0, heading: 225,
     status: "in-flight", reputation: 100, missionId: null,
-    personality: "7/24 yangın nöbetçisi — termal izleme ve erken uyarı",
+    personality: "24/7 fire watch — thermal monitoring and early warning",
     specs: {
       model: "Matrice 350 RTK", manufacturer: "DJI",
       maxSpeed: 82, maxAltitude: 7000, batteryCapacity: 5880,
       weightEmpty: 6470, maxPayload: 2700, maxFlightTime: 55, chargeTime: 52,
-      pricePerKm: 0.15, license: "SHT-İHA2",
-      sensors: ["Zenmuse H20N", "Gece Görüş", "Termal 640", "Lazer 1200m", "Hoparlör"],
+      pricePerKm: 0.15, license: "SHT-IHA2",
+      sensors: ["Zenmuse H20N", "Night Vision", "Thermal 640", "Laser 1200m", "Speaker"],
     },
   },
 
-  // ── BEKLEMEDE / BOŞ (idle) — Görev atanmayı bekliyor ──
+  // ── IDLE / STANDBY ──
   {
     id: 6, name: "Konak-06", type: "cargo",
     lat: 38.4185, lng: 27.1290, altitude: 80, battery: 76, speed: 35, heading: 45,
     status: "in-flight", reputation: 88, missionId: 6,
-    personality: "Kompakt şehir içi kurye — dar sokak ve balkon teslimatı uzmanı",
+    personality: "Compact urban courier — narrow street and balcony delivery expert",
     specs: {
       model: "Mini 4 Pro", manufacturer: "DJI",
       maxSpeed: 57, maxAltitude: 4000, batteryCapacity: 3850,
       weightEmpty: 249, maxPayload: 500, maxFlightTime: 45, chargeTime: 56,
-      pricePerKm: 0.08, license: "SHT-İHA0",
-      sensors: ["APAS 5.0", "4K Kamera", "GPS L1+L5", "Downward Vision"],
+      pricePerKm: 0.08, license: "SHT-IHA0",
+      sensors: ["APAS 5.0", "4K Camera", "GPS L1+L5", "Downward Vision"],
     },
   },
   {
     id: 7, name: "Bornova-07", type: "cargo",
     lat: 38.4690, lng: 27.2150, altitude: 45, battery: 65, speed: 25, heading: 120,
     status: "mission", reputation: 85, missionId: 7,
-    personality: "Üniversite kampüsü teslimat dronu — Ege Üniversitesi bölgesi",
+    personality: "University campus delivery drone — Ege University area",
     specs: {
       model: "Air 3", manufacturer: "DJI",
       maxSpeed: 75, maxAltitude: 6000, batteryCapacity: 4241,
       weightEmpty: 720, maxPayload: 800, maxFlightTime: 46, chargeTime: 60,
-      pricePerKm: 0.09, license: "SHT-İHA0",
+      pricePerKm: 0.09, license: "SHT-IHA0",
       sensors: ["Dual Camera", "APAS 5.0", "ADS-B", "RTK GPS"],
     },
   },
   {
-    id: 8, name: "Karşıyaka-08", type: "surveillance",
+    id: 8, name: "Karsiyaka-08", type: "surveillance",
     lat: 38.4560, lng: 27.1100, altitude: 110, battery: 82, speed: 60, heading: 270,
     status: "in-flight", reputation: 95, missionId: null,
-    personality: "Sahil güvenlik gözetleme — Karşıyaka kordon hattı izleme uzmanı",
+    personality: "Coast guard surveillance — Karsiyaka coast line monitoring",
     specs: {
       model: "Mavic 3 Enterprise", manufacturer: "DJI",
       maxSpeed: 75, maxAltitude: 6000, batteryCapacity: 5000,
       weightEmpty: 920, maxPayload: 0, maxFlightTime: 45, chargeTime: 60,
-      pricePerKm: 0.11, license: "SHT-İHA1",
-      sensors: ["56× Zoom", "Termal 640×512", "RTK", "Hoparlör", "Spotlight"],
+      pricePerKm: 0.11, license: "SHT-IHA1",
+      sensors: ["56× Zoom", "Thermal 640×512", "RTK", "Speaker", "Spotlight"],
     },
   },
 
-  // ── ŞARJ EDİLİYOR (charging) ──
+  // ── CHARGING ──
   {
-    id: 9, name: "Narlıdere-09", type: "cargo",
+    id: 9, name: "Narlidere-09", type: "cargo",
     lat: 38.3910, lng: 27.0580, altitude: 0, battery: 35, speed: 0, heading: 0,
     status: "charging", reputation: 78, missionId: null,
-    personality: "Ağır yük taşıyıcı — endüstriyel malzeme ve inşaat teslimatı",
+    personality: "Heavy lifter — industrial materials and construction delivery",
     specs: {
       model: "FlyCart 30", manufacturer: "DJI",
       maxSpeed: 67, maxAltitude: 6000, batteryCapacity: 17668,
       weightEmpty: 42000, maxPayload: 30000, maxFlightTime: 18, chargeTime: 25,
-      pricePerKm: 0.35, license: "SHT-İHA2",
+      pricePerKm: 0.35, license: "SHT-IHA2",
       sensors: ["RTK GPS", "Obstacle Sensing 360°", "ADS-B", "Parachute"],
     },
   },
@@ -211,80 +211,80 @@ export const initialDrones: DroneAgent[] = [
     id: 10, name: "Gaziemir-10", type: "emergency",
     lat: 38.3180, lng: 27.1350, altitude: 0, battery: 22, speed: 0, heading: 0,
     status: "charging", reputation: 91, missionId: null,
-    personality: "Havalimanı çevresi acil müdahale — yangın ve kaza tespiti",
+    personality: "Airport perimeter emergency response — accident detection",
     specs: {
       model: "EVO II Dual 640T V3", manufacturer: "Autel Robotics",
       maxSpeed: 72, maxAltitude: 7000, batteryCapacity: 7100,
       weightEmpty: 1350, maxPayload: 0, maxFlightTime: 42, chargeTime: 55,
-      pricePerKm: 0.14, license: "SHT-İHA1",
-      sensors: ["Termal 640×512", "8K Kamera", "PDAF", "Obstacle Avoidance 360°"],
+      pricePerKm: 0.14, license: "SHT-IHA1",
+      sensors: ["Thermal 640×512", "8K Camera", "PDAF", "Obstacle Avoidance 360°"],
     },
   },
   {
     id: 11, name: "Menemen-11", type: "agricultural",
     lat: 38.6100, lng: 27.0690, altitude: 0, battery: 55, speed: 0, heading: 0,
     status: "charging", reputation: 86, missionId: null,
-    personality: "Ova tarım uzmanı — Menemen ovaları geniş alan ilaçlama & ekim",
+    personality: "Plain agriculture expert — large scale spraying & seeding",
     specs: {
       model: "Agras T25", manufacturer: "DJI",
       maxSpeed: 46, maxAltitude: 3000, batteryCapacity: 24000,
       weightEmpty: 21500, maxPayload: 25000, maxFlightTime: 17, chargeTime: 10,
-      pricePerKm: 0.22, license: "SHT-İHA2",
-      sensors: ["Phased Array Radar", "Santrifüj Atomizer", "Terrain Follow", "RTK"],
+      pricePerKm: 0.22, license: "SHT-IHA2",
+      sensors: ["Phased Array Radar", "Centrifugal Atomizer", "Terrain Follow", "RTK"],
     },
   },
 
-  // ── BEKLEMEDE / BOŞ (idle) — Farklı kategoriler ──
+  // ── IDLE / MISC ──
   {
-    id: 12, name: "Balçova-12", type: "surveillance",
+    id: 12, name: "Balcova-12", type: "surveillance",
     lat: 38.3880, lng: 27.0410, altitude: 90, battery: 88, speed: 40, heading: 135,
     status: "in-flight", reputation: 93, missionId: 8,
-    personality: "Trafik izleme uzmanı — otoyol ve kavşak analizi, plaka tespiti",
+    personality: "Traffic monitoring — highway intersection analysis, plate detection",
     specs: {
       model: "Matrice 30", manufacturer: "DJI",
       maxSpeed: 82, maxAltitude: 7000, batteryCapacity: 3850,
       weightEmpty: 3770, maxPayload: 230, maxFlightTime: 41, chargeTime: 35,
-      pricePerKm: 0.13, license: "SHT-İHA2",
-      sensors: ["Zoom 48MP", "FPV Kamera", "Lazer Mesafe 1200m", "ADS-B"],
+      pricePerKm: 0.13, license: "SHT-IHA2",
+      sensors: ["Zoom 48MP", "FPV Camera", "Laser Range 1200m", "ADS-B"],
     },
   },
   {
-    id: 13, name: "Güzelbahçe-13", type: "agricultural",
+    id: 13, name: "Guzelbahce-13", type: "agricultural",
     lat: 38.3730, lng: 26.8780, altitude: 0, battery: 98, speed: 0, heading: 0,
     status: "idle", reputation: 87, missionId: null,
-    personality: "Zeytinlik ve narenciye uzmanı — hassas gübreleme ve harita çıkarma",
+    personality: "Olive grove & citrus expert — precision fertilization and mapping",
     specs: {
       model: "Agras T40", manufacturer: "DJI",
       maxSpeed: 54, maxAltitude: 3000, batteryCapacity: 30000,
       weightEmpty: 28500, maxPayload: 50000, maxFlightTime: 21, chargeTime: 12,
-      pricePerKm: 0.25, license: "SHT-İHA2",
-      sensors: ["Phased Array Radar", "Çift Atomizer", "Terrain Follow", "RTK", "Multispektral"],
+      pricePerKm: 0.25, license: "SHT-IHA2",
+      sensors: ["Phased Array Radar", "Dual Atomizer", "Terrain Follow", "RTK", "Multispectral"],
     },
   },
   {
-    id: 14, name: "Foça-14", type: "surveillance",
+    id: 14, name: "Foca-14", type: "surveillance",
     lat: 38.6690, lng: 26.7530, altitude: 0, battery: 92, speed: 0, heading: 0,
     status: "idle", reputation: 96, missionId: null,
-    personality: "Deniz ve kıyı gözetleme — kaçak yapı, balıkçılık denetimi",
+    personality: "Coastal surveillance — illegal structure and fishery inspection",
     specs: {
       model: "Mavic 3T", manufacturer: "DJI",
       maxSpeed: 75, maxAltitude: 6000, batteryCapacity: 5000,
       weightEmpty: 920, maxPayload: 0, maxFlightTime: 45, chargeTime: 60,
-      pricePerKm: 0.12, license: "SHT-İHA1",
-      sensors: ["48MP Wide", "Termal 640×512", "56× Zoom", "RTK", "ADS-B"],
+      pricePerKm: 0.12, license: "SHT-IHA1",
+      sensors: ["48MP Wide", "Thermal 640×512", "56× Zoom", "RTK", "ADS-B"],
     },
   },
   {
-    id: 15, name: "Torbalı-15", type: "cargo",
+    id: 15, name: "Torbali-15", type: "cargo",
     lat: 38.1560, lng: 27.3580, altitude: 0, battery: 88, speed: 0, heading: 0,
     status: "idle", reputation: 80, missionId: null,
-    personality: "Kırsal lojistik — çiftlik-pazar arası organik ürün taşıyıcı",
+    personality: "Rural logistics — farm-to-market organic goods transport",
     specs: {
       model: "Dragonfish Standard", manufacturer: "Autel Robotics",
       maxSpeed: 108, maxAltitude: 5000, batteryCapacity: 9800,
       weightEmpty: 7500, maxPayload: 1000, maxFlightTime: 158, chargeTime: 70,
-      pricePerKm: 0.10, license: "SHT-İHA2",
-      sensors: ["50MP Wide", "Zoom 640", "Termal", "VTOL Hybrid", "ADS-B"],
+      pricePerKm: 0.10, license: "SHT-IHA2",
+      sensors: ["50MP Wide", "Zoom 640", "Thermal", "VTOL Hybrid", "ADS-B"],
     },
   },
 ];
@@ -300,11 +300,11 @@ export const initialPods: ChargingPod[] = [
 
 // ── GÖREVLER ──
 export const initialMissions: Mission[] = [
-  { id: 1, type: "cargo", title: "Alsancak → Bornova Paket", description: "3.2kg e-ticaret paketi teslimatı", fromLat: 38.4350, fromLng: 27.1420, toLat: 38.4700, toLng: 27.2200, payment: 2.5, status: "in-progress", droneId: 1, createdAt: new Date(), priority: false },
-  { id: 2, type: "cargo", title: "Urla → Karşıyaka İlaç", description: "Acil ilaç teslimatı — eczane siparişi", fromLat: 38.3220, fromLng: 26.7650, toLat: 38.4560, toLng: 27.1100, payment: 5.8, status: "in-progress", droneId: 4, createdAt: new Date(), priority: true },
-  { id: 3, type: "cargo", title: "Torbalı → Buca Express", description: "Taze meyve-sebze express teslimat", fromLat: 38.1500, fromLng: 27.3600, toLat: 38.3800, toLng: 27.1800, payment: 5.2, status: "open", droneId: null, createdAt: new Date(), priority: false },
-  { id: 4, type: "fire", title: "Yamanlar Yangın Müdahalesi", description: "Orman yangını tespiti ve su ikmal koordinasyonu", fromLat: 38.5200, fromLng: 27.1000, toLat: 38.5400, toLng: 27.0800, payment: 15, status: "in-progress", droneId: 2, createdAt: new Date(), priority: true },
-  { id: 5, type: "agricultural", title: "Çeşme Bağ İlaçlama", description: "25 dönüm üzüm bağı zararlı ilaçlama", fromLat: 38.3230, fromLng: 26.3050, toLat: 38.3280, toLng: 26.3150, payment: 8.5, status: "in-progress", droneId: 3, createdAt: new Date(), priority: false },
+  { id: 1, type: "cargo", title: "Alsancak → Bornova Package", description: "3.2kg e-commerce delivery", fromLat: 38.4350, fromLng: 27.1420, toLat: 38.4700, toLng: 27.2200, payment: 2.5, status: "in-progress", droneId: 1, createdAt: new Date(), priority: false },
+  { id: 2, type: "cargo", title: "Urla → Karsiyaka Meds", description: "Emergency medical delivery — pharmacy order", fromLat: 38.3220, fromLng: 26.7650, toLat: 38.4560, toLng: 27.1100, payment: 5.8, status: "in-progress", droneId: 4, createdAt: new Date(), priority: true },
+  { id: 3, type: "cargo", title: "Torbali → Buca Express", description: "Fresh produce express delivery", fromLat: 38.1500, fromLng: 27.3600, toLat: 38.3800, toLng: 27.1800, payment: 5.2, status: "open", droneId: null, createdAt: new Date(), priority: false },
+  { id: 4, type: "fire", title: "Yamanlar Fire Response", description: "Forest fire detection and water supply coordination", fromLat: 38.5200, fromLng: 27.1000, toLat: 38.5400, toLng: 27.0800, payment: 15, status: "in-progress", droneId: 2, createdAt: new Date(), priority: true },
+  { id: 5, type: "agricultural", title: "Cesme Vineyard Spraying", description: "Pest control spraying for 25 acre vineyard", fromLat: 38.3230, fromLng: 26.3050, toLat: 38.3280, toLng: 26.3150, payment: 8.5, status: "in-progress", droneId: 3, createdAt: new Date(), priority: false },
 ];
 
 // ── UÇUŞ KAYITLARI ──
@@ -329,58 +329,35 @@ export function randomTxHash(): string {
   return h;
 }
 
-// ── Drone tipi → Türkçe etiket ──
-export const droneTypeLabels = (locale: string = "tr"): Record<DroneType, string> => locale === "en" ? {
+export const droneTypeLabels = (locale: string = "en"): Record<DroneType, string> => ({
   cargo: "Cargo",
   agricultural: "Agriculture",
   surveillance: "Surveillance",
   emergency: "Emergency",
-} : {
-  cargo: "Kargo",
-  agricultural: "Ziraat",
-  surveillance: "Gözetleme",
-  emergency: "Acil Durum",
-};
+});
 
-export const missionTypeLabels = (locale: string = "tr"): Record<MissionType, string> => locale === "en" ? {
+export const missionTypeLabels = (locale: string = "en"): Record<MissionType, string> => ({
   cargo: "Cargo Delivery",
   agricultural: "Agriculture Op",
   fire: "Fire Response",
   traffic: "Traffic Monitor",
-} : {
-  cargo: "Kargo Teslimatı",
-  agricultural: "Ziraat Operasyonu",
-  fire: "Yangın Müdahalesi",
-  traffic: "Trafik İzleme",
-};
+});
 
-export const statusLabels = (locale: string = "tr"): Record<DroneStatus, string> => locale === "en" ? {
+export const statusLabels = (locale: string = "en"): Record<DroneStatus, string> => ({
   idle: "Standby",
   "in-flight": "In Flight",
   charging: "Charging",
   emergency: "Emergency",
   mission: "On Mission",
-} : {
-  idle: "Beklemede",
-  "in-flight": "Uçuşta",
-  charging: "Şarjda",
-  emergency: "Acil Durum",
-  mission: "Görevde",
-};
+});
 
-export const missionStatusLabels = (locale: string = "tr"): Record<string, string> => locale === "en" ? {
+export const missionStatusLabels = (locale: string = "en"): Record<string, string> => ({
   open: "Open",
   accepted: "Accepted",
   "in-progress": "In Progress",
   completed: "Completed",
   cancelled: "Cancelled",
-} : {
-  open: "Açık",
-  accepted: "Kabul Edildi",
-  "in-progress": "Devam Ediyor",
-  completed: "Tamamlandı",
-  cancelled: "İptal Edildi",
-};
+});
 
 // ═══ HAVA SAHASI ENGELLERİ ═══
 export type ObstacleType = "bird_flock" | "balloon" | "drone_traffic" | "no_fly_zone" | "weather" | "paraglider";
@@ -403,12 +380,12 @@ export interface AirspaceObstacle {
 }
 
 export const obstacleTypeLabels: Record<ObstacleType, string> = {
-  bird_flock: "Kuş Sürüsü",
-  balloon: "Uçan Balon",
-  drone_traffic: "Drone Trafiği",
-  no_fly_zone: "Uçuş Yasak Bölge",
-  weather: "Kötü Hava",
-  paraglider: "Yamaç Paraşütü",
+  bird_flock: "Bird Flock",
+  balloon: "Hot Air Balloon",
+  drone_traffic: "Drone Traffic",
+  no_fly_zone: "No Fly Zone",
+  weather: "Severe Weather",
+  paraglider: "Paraglider",
 };
 
 export const obstacleIcons: Record<ObstacleType, string> = {
@@ -422,45 +399,45 @@ export const obstacleIcons: Record<ObstacleType, string> = {
 
 export const initialObstacles: AirspaceObstacle[] = [
   {
-    id: 101, type: "bird_flock", name: "Flamingo Sürüsü",
+    id: 101, type: "bird_flock", name: "Flamingo Flock",
     lat: 38.4450, lng: 27.1300, radius: 300, altitude: 80, altitudeMax: 200,
     severity: "medium", moving: true, speedKmh: 25, heading: 180,
-    description: "~200 flamingo, güneye göç ediyor. İzmir Körfezi üzerinde.",
+    description: "~200 flamingos migrating south. Over Izmir Bay.",
   },
   {
-    id: 102, type: "balloon", name: "Reklam Balonu",
+    id: 102, type: "balloon", name: "Advertising Balloon",
     lat: 38.4200, lng: 27.1500, radius: 50, altitude: 150, altitudeMax: 200,
     severity: "low", moving: false, speedKmh: 0, heading: 0,
-    description: "Konak meydanı üzerinde bağlı reklam balonu. Sabit konum.",
+    description: "Tethered balloon over Konak square. Fixed position.",
   },
   {
-    id: 103, type: "drone_traffic", name: "Bilinmeyen Drone",
+    id: 103, type: "drone_traffic", name: "Unknown Drone",
     lat: 38.4530, lng: 27.1800, radius: 100, altitude: 120, altitudeMax: 150,
     severity: "medium", moving: true, speedKmh: 40, heading: 90,
-    description: "Kayıtsız drone tespit edildi — IFF yanıt yok. Bornova bölgesi.",
+    description: "Unregistered drone detected — no IFF response. Bornova area.",
   },
   {
-    id: 104, type: "no_fly_zone", name: "Askeri Bölge",
+    id: 104, type: "no_fly_zone", name: "Military Zone",
     lat: 38.4700, lng: 27.0100, radius: 800, altitude: 0, altitudeMax: 5000,
     severity: "high", moving: false, speedKmh: 0, heading: 0,
-    description: "NATO İzmir Karargahı — kalıcı uçuş yasak bölgesi.",
+    description: "NATO Izmir HQ — permanent no fly zone.",
   },
   {
-    id: 105, type: "weather", name: "Rüzgar Burcu",
+    id: 105, type: "weather", name: "High Winds",
     lat: 38.3900, lng: 27.0800, radius: 500, altitude: 0, altitudeMax: 300,
     severity: "medium", moving: true, speedKmh: 15, heading: 270,
-    description: "Güçlü batı rüzgarı > 45km/s. Hafif drone'lar için tehlikeli.",
+    description: "Strong westerly winds > 45km/h. Dangerous for light drones.",
   },
   {
-    id: 106, type: "paraglider", name: "Yamaç Paraşütçüsü",
+    id: 106, type: "paraglider", name: "Paraglider",
     lat: 38.3500, lng: 26.4000, radius: 200, altitude: 200, altitudeMax: 600,
     severity: "low", moving: true, speedKmh: 30, heading: 150,
-    description: "Çeşme kıyısında yamaç paraşütçüsü tespit edildi.",
+    description: "Paraglider activity detected off Cesme coast.",
   },
   {
-    id: 107, type: "bird_flock", name: "Martı Kolonyası",
+    id: 107, type: "bird_flock", name: "Seagull Colony",
     lat: 38.4100, lng: 27.1350, radius: 200, altitude: 30, altitudeMax: 100,
     severity: "low", moving: true, speedKmh: 15, heading: 45,
-    description: "Alsancak limanı civarında yoğun martı popülasyonu.",
+    description: "Dense seagull population around Alsancak port.",
   },
 ];

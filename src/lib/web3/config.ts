@@ -11,8 +11,7 @@ export const SOLANA_NETWORK = {
   },
 } as const;
 
-// Geriye dönük uyumluluk (eski import'ları kırmamak için)
-export const MONAD_TESTNET = SOLANA_NETWORK;
+
 
 // Solana Devnet Explorer linkleri
 export function getExplorerTxUrl(txHash: string): string {

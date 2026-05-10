@@ -44,8 +44,9 @@ import {
 } from "@/lib/data";
 import { FlightSimulator } from "@/lib/simulation";
 import { pickRandomMission, generateInitialOpenMissions, missionToDroneType } from "@/lib/missions";
-import { useLanguage, tx } from "@/lib/LanguageContext";
-import { t } from "@/lib/i18n";
+
+const locale = "en";
+const tx = (val: unknown) => String(val);
 
 const SkyMap = dynamic(() => import("@/components/SkyMap"), { ssr: false });
 const WalletConnect = dynamic(() => import("@/components/WalletConnect"), { ssr: false });
@@ -570,16 +571,15 @@ function logLevelColor(l: string) {
 
 /* ─── NETWORK STATS ─── */
 function NetworkStats({ drones }: { drones: DroneAgent[] }) {
-  const { locale } = useLanguage();
-  const active = drones.filter((d) => d.status === "in-flight" || d.status === "mission").length;
+    const active = drones.filter((d) => d.status === "in-flight" || d.status === "mission").length;
   const charging = drones.filter((d) => d.status === "charging").length;
   const avgBattery = Math.round(drones.reduce((a, d) => a + d.battery, 0) / drones.length);
 
   const stats = [
-    { icon: Plane, label: tx(t.dash.activeFlight, locale), value: active, color: "text-accent-cyan" },
-    { icon: Zap, label: tx(t.dash.charging, locale), value: charging, color: "text-warning" },
-    { icon: Battery, label: tx(t.dash.avgBattery, locale), value: `%${avgBattery}`, color: "text-success" },
-    { icon: TrendingUp, label: tx(t.dash.missionLabel, locale), value: initialMissions.filter((m) => m.status === "in-progress").length, color: "text-accent-violet" },
+    { icon: Plane, label: "Active Flights", value: active, color: "text-accent-cyan" },
+    { icon: Zap, label: "Charging", value: charging, color: "text-warning" },
+    { icon: Battery, label: "Avg Battery", value: `%${avgBattery}`, color: "text-success" },
+    { icon: TrendingUp, label: "Completed Missions", value: initialMissions.filter((m) => m.status === "in-progress").length, color: "text-accent-violet" },
   ];
 
   return (
@@ -601,13 +601,12 @@ function NetworkStats({ drones }: { drones: DroneAgent[] }) {
 
 /* ─── SIDEBAR NAV ─── */
 function DashboardNav() {
-  const { locale } = useLanguage();
-  const links = [
-    { href: "/dashboard", label: tx(t.dash.navDashboard, locale), icon: Activity, active: true },
-    { href: "/marketplace", label: tx(t.dash.navMarketplace, locale), icon: MapIcon },
-    { href: "/sky-charge", label: tx(t.dash.navSkyCharge, locale), icon: Zap },
-    { href: "/control", label: tx(t.dash.navControl, locale), icon: Crosshair },
-    { href: "/flight-logs", label: tx(t.dash.navFlightLogs, locale), icon: Clock },
+    const links = [
+    { href: "/dashboard", label: "Dashboard", icon: Activity, active: true },
+    { href: "/marketplace", label: "Marketplace", icon: MapIcon },
+    { href: "/sky-charge", label: "Sky-Charge", icon: Zap },
+    { href: "/control", label: "Control Panel", icon: Crosshair },
+    { href: "/flight-logs", label: "Flight Logs", icon: Clock },
   ];
 
   return (
@@ -846,7 +845,7 @@ function DroneChat({ drone }: { drone: DroneAgent }) {
 
 /* ─── DRONE PANEL ─── */
 function DronePanel({ drone, onClose }: { drone: DroneAgent; onClose: () => void }) {
-  const { locale } = useLanguage();
+  
   const [activeTab, setActiveTab] = useState<"info" | "checklist" | "chat">("info");
 
   return (
@@ -1026,11 +1025,11 @@ function AgentTerminal({
 
 /* ─── MISSION FEED ─── */
 function MissionFeed() {
-  const { locale } = useLanguage();
+  
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold text-sm">{tx(t.dash.activeMissions, locale)}</h3>
+        <h3 className="font-semibold text-sm">Active Missions</h3>
         <Link href="/marketplace" className="text-xs text-accent-cyan hover:underline flex items-center gap-1">
           Tümü <ChevronRight className="w-3 h-3" />
         </Link>
@@ -1077,7 +1076,7 @@ function FleetList({
   selectedDroneId: number | null;
   onSelect: (drone: DroneAgent) => void;
 }) {
-  const { locale } = useLanguage();
+  
   const [open, setOpen] = useState(true);
 
   return (
@@ -1086,7 +1085,7 @@ function FleetList({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-1 py-3 mb-2 text-lg font-bold text-[#EDEDED] uppercase tracking-wide hover:text-white transition-colors"
       >
-        <span>{tx(t.dash.fleet, locale)} ({drones.length})</span>
+        <span>{""} ({drones.length})</span>
         <ChevronDown className={`w-5 h-5 text-[#A1A1AA] transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
 
@@ -1134,7 +1133,7 @@ function FleetList({
 
 /* ─── WEATHER WIDGET ─── */
 function WeatherWidget() {
-  const { locale } = useLanguage();
+  
   const conditions = locale === "en"
     ? ["Clear", "Partly Cloudy", "Windy", "Light Rain"]
     : ["Açık", "Parçalı Bulutlu", "Rüzgarlı", "Hafif Yağmur"];
@@ -1157,7 +1156,7 @@ function WeatherWidget() {
         <Wind className="w-5 h-5 text-accent-cyan" />
         <div>
           <div className="text-sm font-medium">{weather.condition}</div>
-          <div className="text-xs text-text-muted">{tx(t.dash.weather, locale)}</div>
+          <div className="text-xs text-text-muted">{""}</div>
         </div>
       </div>
       <div className="flex items-center gap-4 text-sm">
@@ -1178,7 +1177,7 @@ function WeatherWidget() {
 export default function DashboardPage() {
   const { drones, liveMissions } = useDroneSimulator();
   const logs = useTerminalLogs(drones);
-  const { locale, toggle } = useLanguage();
+  const toggle = () => {};
   const [selectedDroneId, setSelectedDroneId] = useState<number | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filterType, setFilterType] = useState<DroneType | "all">("all");
@@ -1226,7 +1225,7 @@ export default function DashboardPage() {
           <h2 className="text-xl font-bold text-[#EDEDED]">NeuralAir SkyAgent</h2>
           <div className="flex items-center gap-2 text-sm text-[#71717A]">
             <div className="w-1.5 h-1.5 rounded-full bg-[#14F195] animate-pulse" />
-            {locale === "en" ? "Synchronizing fleet..." : "Filo senkronize ediliyor..."}
+            "Synchronizing fleet..."
           </div>
         </div>
         <div className="w-48 h-1 bg-white/10 rounded-full overflow-hidden">
@@ -1278,14 +1277,12 @@ export default function DashboardPage() {
             </button>
             <h1 className="text-sm font-semibold flex items-center gap-2">
               <Activity className="w-4 h-4 text-accent-cyan" />
-              {tx(t.dash.title, locale)}
+              NeuralAir Dashboard
             </h1>
           </div>
           <div className="flex items-center gap-3">
             <button onClick={toggle} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/[0.1] text-xs font-bold tracking-wider hover:bg-white/[0.1] transition-all">
-              <span className={locale === "tr" ? "text-[#14F195]" : "text-[#A1A1AA]"}>TR</span>
-              <span className="text-[#52525B]">|</span>
-              <span className={locale === "en" ? "text-[#14F195]" : "text-[#A1A1AA]"}>EN</span>
+              <span className={"text-[#14F195]"}>EN</span>
             </button>
             <WalletConnect />
           </div>
@@ -1301,7 +1298,7 @@ export default function DashboardPage() {
               <div className="p-3 border-b border-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <h3 className="text-sm font-semibold flex items-center gap-2">
                   <MapIcon className="w-4 h-4 text-accent-cyan" />
-                  {tx(t.dash.liveMap, locale)}
+                  Live Operation Map
                 </h3>
                 <div className="flex items-center gap-3 text-xs flex-wrap">
                   <select 
@@ -1309,7 +1306,7 @@ export default function DashboardPage() {
                     onChange={(e) => setFilterType(e.target.value as any)}
                     className="bg-black/50 border border-white/10 rounded-md px-2 py-1.5 text-text-secondary focus:outline-none focus:border-accent-cyan cursor-pointer"
                   >
-                    <option value="all">{tx(t.dash.allFleet, locale)}</option>
+                    <option value="all">All Fleet</option>
                     <option value="cargo">Kargo Dronları</option>
                     <option value="emergency">Acil Durum</option>
                     <option value="agricultural">Ziraat</option>
@@ -1320,11 +1317,11 @@ export default function DashboardPage() {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-colors ${showRadar ? "bg-accent-violet/20 text-accent-violet border border-accent-violet/30" : "bg-black/50 text-text-muted border border-white/10"}`}
                   >
                     <Radio className={`w-3 h-3 ${showRadar ? "animate-pulse" : ""}`} /> 
-                    {tx(t.dash.radarMode, locale)}
+                    Radar Mode
                   </button>
 
                   <div className="flex items-center gap-2 ml-2">
-                    <span className="text-text-muted">{drones.length} {tx(t.dash.droneActive, locale)}</span>
+                    <span className="text-text-muted">{drones.length} Drones Active</span>
                     <span className="status-dot status-active" />
                   </div>
                 </div>

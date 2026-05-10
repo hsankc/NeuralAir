@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           parsed: { explanation: content, action: "droneChat", params: {}, confidence: 1 },
           source: "gpt-drone-agent",
         });
-      } catch (aiError: any) {
+      } catch (aiError) {
         // Fallback: Drone'un kendi verisiyle akıllı cevap üret
         const fallbackResponse = fallbackDroneChat(message, droneContext);
         return Response.json({
@@ -105,19 +105,19 @@ export async function POST(request: NextRequest) {
         parsed,
         source: "gpt",
       });
-    } catch (aiError: any) {
-      console.error("OpenAI error, using fallback:", aiError.message);
+    } catch (aiError: unknown) {
+      console.error("OpenAI error, using fallback:", (aiError as Error).message);
       const parsed = fallbackParse(message);
       return Response.json({
         success: true,
         parsed,
         source: "fallback",
-        aiError: aiError.message,
+        aiError: (aiError as Error).message,
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return Response.json(
-      { error: error.message || "Internal server error" },
+      { error: (error as Error).message || "Internal server error" },
       { status: 500 }
     );
   }

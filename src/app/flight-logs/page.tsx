@@ -23,7 +23,6 @@ import {
   Activity,
 } from "lucide-react";
 import { initialFlightLogs, initialDrones, FlightLog, MissionType, missionTypeLabels } from "@/lib/data";
-import { useLanguage } from "@/lib/LanguageContext";
 
 function typeIcon(t: MissionType) {
   switch (t) {
@@ -45,12 +44,11 @@ function typeBadgeColor(t: MissionType) {
 
 /* ─── LIVE FEED — Canlı agent aktivite logları ─── */
 function LiveAgentFeed() {
-  const { locale } = useLanguage();
   const [feed, setFeed] = useState<{ time: string; agent: string; action: string; color: string }[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const agents = locale === "en" ? [
+    const agents = [
       { name: "FleetAgent", actions: [
         "Scanning for mission-drone matches...",
         "New route calculated for Ege-01",
@@ -68,24 +66,6 @@ function LiveAgentFeed() {
         "Charging session micro-SOL calculation completed",
         "Alsancak Hub energy report generated",
       ], color: "text-warning" },
-    ] : [
-      { name: "FleetAgent", actions: [
-        "Görev-drone eşleştirme taraması yapılıyor...",
-        "Ege-01 için yeni rota hesaplandı",
-        "Bayraklı-02 acil müdahaleye yönlendirildi",
-        "Çeşme-03 ilaçlama operasyonu güncellendi",
-      ], color: "text-accent-cyan" },
-      { name: "EmergencyAgent", actions: [
-        "Termal anomali taraması: bölge temiz ✓",
-        "Batarya seviyeleri kontrol edildi",
-        "Acil durum protokolü bekleme modunda",
-        "Rüzgar hızı güvenli sınırlarda ✓",
-      ], color: "text-danger" },
-      { name: "ChargingAgent", actions: [
-        "Pod durumları güncellendi (5/5 aktif)",
-        "Şarj oturumu mikro-SOL hesaplaması yapıldı",
-        "Alsancak Hub enerji raporu oluşturuldu",
-      ], color: "text-warning" },
     ];
 
     const iv = setInterval(() => {
@@ -96,7 +76,7 @@ function LiveAgentFeed() {
     }, 3000);
 
     return () => clearInterval(iv);
-  }, [locale]);
+  }, []);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -107,16 +87,16 @@ function LiveAgentFeed() {
       <div className="px-4 py-3 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-accent-cyan" />
-          <span className="text-sm font-semibold">{locale === "en" ? "Agent Activity Feed" : "Agent Aktivite Akışı"}</span>
+          <span className="text-sm font-semibold">Agent Activity Feed</span>
         </div>
         <span className="text-xs text-success flex items-center gap-1">
-          <Radio className="w-3 h-3" /> {locale === "en" ? "LIVE" : "CANLI"}
+          <Radio className="w-3 h-3" /> LIVE
         </span>
       </div>
       <div ref={scrollRef} className="p-4 max-h-[160px] overflow-y-auto no-scrollbar">
         <div className="space-y-2">
           {feed.length === 0 && (
-            <div className="text-xs text-text-muted text-center py-4">{locale === "en" ? "Listening to agent activity..." : "Agent aktivitesi dinleniyor..."}</div>
+            <div className="text-xs text-text-muted text-center py-4">Listening to agent activity...</div>
           )}
           {feed.map((f, i) => (
             <div key={i} className="flex gap-2 text-xs leading-relaxed animate-fade-in-up">
@@ -133,7 +113,6 @@ function LiveAgentFeed() {
 }
 
 export default function FlightLogsPage() {
-  const { locale } = useLanguage();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<MissionType | "all">("all");
   const [expanded, setExpanded] = useState<number | null>(null);
@@ -231,7 +210,7 @@ export default function FlightLogsPage() {
                 <ChevronRight className="w-4 h-4 text-text-muted" />
                 <span className="text-sm font-medium flex items-center gap-1.5">
                   <Clock className="w-4 h-4 text-accent-cyan" />
-                  {locale === "en" ? "Flight Logs (On-Chain)" : "Uçuş Kayıtları (On-Chain)"}
+                  Flight Logs (On-Chain)
                 </span>
               </div>
             </div>
@@ -245,7 +224,7 @@ export default function FlightLogsPage() {
               </button>
               <div className="text-xs text-text-muted flex items-center gap-2">
                 <span className="status-dot status-active" />
-                {logs.length} {locale === "en" ? "Records" : "Kayıt"}
+                {logs.length} Records
               </div>
             </div>
           </div>
@@ -259,9 +238,9 @@ export default function FlightLogsPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: locale === "en" ? "Total Flights" : "Toplam Uçuş", value: logs.length, color: "text-accent-cyan" },
-            { label: locale === "en" ? "Total Duration" : "Toplam Süre", value: `${logs.reduce((a, l) => a + l.duration, 0)} ${locale === "en" ? "min" : "dk"}`, color: "text-accent-violet" },
-            { label: locale === "en" ? "Total Energy" : "Toplam Enerji", value: `${logs.reduce((a, l) => a + l.energyUsed, 0).toFixed(1)} kWh`, color: "text-warning" },
+            { label: "Total Flights", value: logs.length, color: "text-accent-cyan" },
+            { label: "Total Duration", value: `${logs.reduce((a, l) => a + l.duration, 0)} min`, color: "text-accent-violet" },
+            { label: "Total Energy", value: `${logs.reduce((a, l) => a + l.energyUsed, 0).toFixed(1)} kWh`, color: "text-warning" },
             { label: "On-Chain TX", value: logs.length, color: "text-success" },
           ].map((s) => (
             <div key={s.label} className="glass-card !rounded-xl p-4">
@@ -279,7 +258,7 @@ export default function FlightLogsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder={locale === "en" ? "Search drone name or TX hash..." : "Drone adı veya TX hash ara..."}
+              placeholder="Search drone name or TX hash..."
               className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-border rounded-lg text-sm focus:outline-none focus:border-accent-cyan transition-colors"
             />
           </div>
@@ -294,7 +273,7 @@ export default function FlightLogsPage() {
                     : "bg-white/5 text-text-secondary border border-transparent hover:bg-white/10"
                 }`}
               >
-                {t === "all" ? (locale === "en" ? "All" : "Tümü") : missionTypeLabels(locale)[t]}
+                {t === "all" ? "All" : missionTypeLabels("en")[t]}
               </button>
             ))}
           </div>
@@ -306,11 +285,11 @@ export default function FlightLogsPage() {
           <div className="hidden md:grid grid-cols-7 gap-4 px-5 py-3 text-xs font-medium text-text-muted border-b border-border bg-white/3">
             <div>ID</div>
             <div>Drone</div>
-            <div>{locale === "en" ? "Route" : "Rota"}</div>
-            <div>{locale === "en" ? "Type" : "Tip"}</div>
-            <div>{locale === "en" ? "Duration & Energy" : "Süre & Enerji"}</div>
+            <div>Route</div>
+            <div>Type</div>
+            <div>Duration & Energy</div>
             <div>TX Hash</div>
-            <div>{locale === "en" ? "Time" : "Zaman"}</div>
+            <div>Time</div>
           </div>
 
           {/* Rows */}
@@ -336,11 +315,11 @@ export default function FlightLogsPage() {
                     </div>
                     <div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadgeColor(log.missionType)}`}>
-                        {missionTypeLabels(locale)[log.missionType]}
+                        {missionTypeLabels("en")[log.missionType]}
                       </span>
                     </div>
                     <div className="text-xs text-text-secondary">
-                      {log.duration}{locale === "en" ? "min" : "dk"} / {log.energyUsed}kWh
+                      {log.duration}min / {log.energyUsed}kWh
                     </div>
                     <div className="font-mono text-xs text-accent-cyan flex items-center gap-1">
                       {log.txHash}
@@ -359,11 +338,11 @@ export default function FlightLogsPage() {
                         <span className="font-medium">{log.droneName}</span>
                       </div>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${typeBadgeColor(log.missionType)}`}>
-                        {missionTypeLabels(locale)[log.missionType]}
+                        {missionTypeLabels("en")[log.missionType]}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm text-text-muted">
-                      <span>{log.duration}{locale === "en" ? "min" : "dk"} / {log.energyUsed}kWh</span>
+                      <span>{log.duration}min / {log.energyUsed}kWh</span>
                       <span className="font-mono text-xs text-accent-cyan">{log.txHash}</span>
                     </div>
                   </div>
@@ -373,24 +352,24 @@ export default function FlightLogsPage() {
                     <div className="px-5 pb-4 animate-fade-in-up">
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 p-4 bg-white/3 rounded-lg text-sm">
                         <div>
-                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Takeoff" : "Kalkış"}</div>
+                          <div className="text-xs text-text-muted mb-1">Takeoff</div>
                           <div className="font-mono text-xs">{log.startLat.toFixed(4)}°N, {log.startLng.toFixed(4)}°E</div>
                         </div>
                         <div>
-                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Landing" : "Varış"}</div>
+                          <div className="text-xs text-text-muted mb-1">Landing</div>
                           <div className="font-mono text-xs">{log.endLat.toFixed(4)}°N, {log.endLng.toFixed(4)}°E</div>
                         </div>
                         <div>
-                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Duration" : "Süre"}</div>
-                          <div className="font-bold">{log.duration} {locale === "en" ? "minutes" : "dakika"}</div>
+                          <div className="text-xs text-text-muted mb-1">Duration</div>
+                          <div className="font-bold">{log.duration} minutes</div>
                         </div>
                         <div>
-                          <div className="text-xs text-text-muted mb-1">{locale === "en" ? "Energy" : "Enerji"}</div>
+                          <div className="text-xs text-text-muted mb-1">Energy</div>
                           <div className="font-bold">{log.energyUsed} kWh</div>
                         </div>
                       </div>
                       <div className="mt-2 text-xs text-text-muted text-center">
-                        {locale === "en" ? "This data is immutably written to the Solana blockchain — Aviation Blackbox 🔒" : "Bu veri Solana blokzincirine değiştirilemez şekilde yazılmıştır — Havacılık Kara Kutusu 🔒"}
+                        {"This data is simulated for the hackathon demo - Aviation Blackbox 🛸"}
                       </div>
                     </div>
                   )}

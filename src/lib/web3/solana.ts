@@ -1,8 +1,9 @@
-import { Connection, PublicKey, Transaction, SystemProgram, Keypair } from "@solana/web3.js";
-import { Program, AnchorProvider, Idl, BN } from "@coral-xyz/anchor";
+import { Connection, PublicKey, SystemProgram, Keypair } from "@solana/web3.js";
+import { Program, AnchorProvider, Idl, BN, Wallet } from "@coral-xyz/anchor";
 import { NeuralAirIDL } from "./idl";
 
 // Program ID (declare_id ile aynı olmalı)
+// NOT: Bu ID şu an placeholder'dır. Anchor programı Devnet'e henüz deploy edilmemiştir. (Hackathon Demo Modu)
 export const PROGRAM_ID = new PublicKey("NeURaiRxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 
 // Bağlantı
@@ -15,8 +16,9 @@ export const getProgram = (provider: AnchorProvider) => {
 };
 
 // Frontend'den cüzdan bağlıysa uçuş kaydı atmak için fonksiyon
+// NOT YET DEPLOYED: Bu fonksiyon hackathon demosunda UI'dan doğrudan çağrılmaz, simüle edilir.
 export async function recordFlightOnChain(
-  wallet: any, // Phantom provider
+  wallet: Wallet, // Phantom provider
   droneId: string,
   gpsData: string,
   flightTime: number

@@ -5,7 +5,7 @@
   <p><b>Solana üzerinde çalışan Yüksek Performanslı, Merkeziyetsiz ve Otonom Havacılık Ağı (DAAN).</b></p>
   
   <img src="https://img.shields.io/badge/Solana-Powered-14F195?style=for-the-badge&logo=solana&logoColor=black" alt="Solana" />
-  <img src="https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js" alt="Next.js" />
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js" alt="Next.js" />
   <img src="https://img.shields.io/badge/AI_Dispatcher-Enabled-3B82F6?style=for-the-badge" alt="AI Agent" />
   <img src="https://img.shields.io/badge/DePIN-Infrastructure-10B981?style=for-the-badge" alt="DePIN" />
 </div>
@@ -74,9 +74,9 @@ Protokolümüz, donanımsal verileri kullanıcılara "Deep Blue Glassmorphism" k
 
 ## 🛠️ Teknoloji Yığını (Tech Stack)
 
-- **Frontend Core:** Next.js 14, React, Tailwind CSS (Platform için özel yazılmış estetik karanlık mod tasarımı).
+- **Frontend Core:** Next.js 16, React 19, Tailwind CSS 4 (Platform için özel yazılmış estetik karanlık mod tasarımı).
 - **Web3 Engine:** `@solana/web3.js` ve Phantom Wallet entegrasyonu.
-- **Haritalandırma & Navigasyon:** Leaflet, React-Leaflet ve MapLibre GL.
+- **Haritalandırma & Navigasyon:** MapLibre GL.
 - **Simülatör & Donanım Arayüzü:** `requestAnimationFrame` tabanlı gerçekçi uçuş simülatörü (Lerp algoritmaları, İrtifa/Hız hesaplamaları).
 - **Backend & Database:** Supabase (PostgreSQL) uçuş verilerinin, DePIN gelirlerinin ve görev loglarının tutulması için (Tamamen Offline-Safe olarak kodlanmıştır).
 
@@ -115,9 +115,17 @@ npm run dev
 
 Tarayıcınızda `http://localhost:3000` adresine gidin, Phantom cüzdanınızı bağlayın ve **Görev Pazarına** girip filonuzu izleyin!
 
+---
+
+## 🛠️ Donanım (Hardware) Entegrasyonu
+
+Bu proje sadece bir web arayüzü değildir. Fiziksel droneların Raspberry Pi/Jetson Nano uç bilgisayarları ile Solana ağına bağlanmasını sağlayan kapsamlı bir donanım planı mevcuttur.
+
+Kablolama, MAVLink iletişimi, Edge Python kod mimarisi ve DePIN donanım gereksinimleri için lütfen detaylı **[HARDWARE.md](./HARDWARE.md)** kılavuzumuzu inceleyin.
+
 <br />
 
 <div align="center">
   <h3>🏆 Geleceğin Otonom Ekosistemi</h3>
-  <p>NeuralAir, sadece ekrandaki bir simülasyon değil; gerçek donanımlarla, Solana'nın hızıyla ve yapay zekanın aklıyla kurgulanmış <b>"Yaşayan"</b> bir organizmadır.</p>
+  <p>NeuralAir, hackathon sunumu için Solana devnet üzerinde çalışan yüksek sadakatli bir DePIN <b>prototipidir</b>. Gerçek donanımlarla (Raspberry Pi & Pixhawk) birleştirilerek "Yaşayan" bir ağa dönüşmek üzere tasarlanmıştır.</p>
 </div>

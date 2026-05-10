@@ -56,7 +56,7 @@ export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <div className="flex items-center gap-2">
           <Bot className="w-4 h-4 text-accent-cyan" />
-          <span className="text-sm font-semibold text-white">Agent Aktivite</span>
+          <span className="text-sm font-semibold text-white">Agent Activity</span>
           <span
             className={`w-2 h-2 rounded-full ${
               isRunning
@@ -73,7 +73,7 @@ export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
               : "border-green-500/50 text-green-400 hover:bg-green-500/10"
           }`}
         >
-          {isRunning ? "Durdur" : "Başlat"}
+          {isRunning ? "Stop" : "Start"}
         </button>
       </div>
 
@@ -99,8 +99,8 @@ export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
         {logs.length === 0 && (
           <div className="text-center text-zinc-500 mt-8">
             <Bot className="w-8 h-8 mx-auto mb-2 opacity-30" />
-            <p>Agent'lar bekleniyor...</p>
-            <p className="text-xs mt-1 opacity-60">Başlat'a bas</p>
+            <p>Waiting for agents...</p>
+            <p className="text-xs mt-1 opacity-60">Press Start</p>
           </div>
         )}
 
@@ -128,7 +128,7 @@ export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
       {/* Alt bilgi */}
       <div className="px-4 py-2 border-t border-white/5">
         <p className="text-xs text-zinc-500 text-center">
-          {logs.length} log • {isRunning ? "Canlı" : "Durduruldu"}
+          {logs.length} logs • {isRunning ? "Live" : "Stopped"}
         </p>
       </div>
     </div>

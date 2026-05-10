@@ -16,14 +16,15 @@ interface PhantomProvider {
   isConnected: boolean;
   connect: (opts?: { onlyIfTrusted?: boolean }) => Promise<{ publicKey: { toString: () => string } }>;
   disconnect: () => Promise<void>;
-  on: (event: string, callback: (...args: any[]) => void) => void;
-  off: (event: string, callback: (...args: any[]) => void) => void;
+  on: (event: string, callback: (...args: unknown[]) => void) => void;
+  off: (event: string, callback: (...args: unknown[]) => void) => void;
 }
 
 function getPhantom(): PhantomProvider | null {
   if (typeof window === "undefined") return null;
-  const phantom = (window as any)?.phantom?.solana ?? (window as any)?.solana;
-  if (phantom?.isPhantom) return phantom as PhantomProvider;
+  const win = window as { phantom?: { solana?: PhantomProvider }, solana?: PhantomProvider };
+  const phantom = win.phantom?.solana ?? win.solana;
+  if (phantom?.isPhantom) return phantom;
   return null;
 }
 
@@ -62,7 +63,7 @@ interface WalletState {
 interface WalletContextType extends WalletState {
   connect: () => Promise<void>;
   disconnect: () => void;
-  switchToMonad: () => Promise<void>;
+
   sendTransaction: (to: string, amount: string) => Promise<string | null>;
   deductBalance: (amount: number) => void;
 }
@@ -111,13 +112,14 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           error: null,
           walletType: "phantom",
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
+        const error = err as Error;
         setState((prev) => ({
           ...prev,
           isConnecting: false,
-          error: err.message === "User rejected the request."
+          error: error.message === "User rejected the request."
             ? "Bağlantı iptal edildi"
-            : err.message || "Phantom bağlantı hatası",
+            : error.message || "Phantom bağlantı hatası",
         }));
       }
       return;
@@ -156,14 +158,11 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     });
   }, [state.walletType]);
 
-  const switchToMonad = useCallback(async () => {
-    setState((prev) => ({ ...prev, isCorrectChain: true }));
-  }, []);
-
-  const sendTransaction = useCallback(async (to: string, amount: string): Promise<string | null> => {
+  const sendTransaction = useCallback(async (_to: string, _amount: string): Promise<string | null> => {
     // Demo modda fake TX
     const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    return Array.from({ length: 44 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    const fakeHash = "DEMO_" + Array.from({ length: 39 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+    return fakeHash;
   }, []);
 
   const deductBalance = useCallback((amount: number) => {
@@ -201,8 +200,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
 
   return (
     <WalletContext.Provider value={{
-      ...state, connect, disconnect,
-      switchToMonad, sendTransaction, deductBalance,
+      ...state, connect, disconnect, sendTransaction, deductBalance,
     }}>
       {children}
     </WalletContext.Provider>

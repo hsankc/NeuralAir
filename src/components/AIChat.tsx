@@ -15,8 +15,6 @@ import {
 } from "lucide-react";
 import type { ParsedCommand } from "@/lib/ai/dispatcher";
 import { randomTxHash, initialDrones } from "@/lib/data";
-import { useLanguage, tx } from "@/lib/LanguageContext";
-import { t as i18n, Locale } from "@/lib/i18n";
 
 // Drone isimlerini metinde bul ve tıklanabilir yap
 const DRONE_NAMES = initialDrones.map(d => d.name);
@@ -57,11 +55,11 @@ interface ChatMessage {
 }
 
 const exampleCommands = [
-  "En yakın dronu Alsancak'a gönder",
-  "Kaç drone şarjda?",
-  "Yangın bölgesine 2 drone yolla",
-  "Ege-01'i kalkışa geçir",
-  "Filo batarya durumunu göster",
+  "Send nearest drone to Alsancak",
+  "How many drones are charging?",
+  "Deploy 2 drones to fire zone",
+  "Launch Ege-01",
+  "Show fleet battery status",
 ];
 
 function actionIcon(action: string) {
@@ -73,25 +71,24 @@ function actionIcon(action: string) {
   }
 }
 
-function actionLabel(action: string, locale: Locale) {
+function actionLabel(action: string) {
   switch (action) {
-    case "createMission": return tx(i18n.aiChat.actions.createMission, locale);
-    case "selectDrone": return tx(i18n.aiChat.actions.selectDrone, locale);
-    case "sendCommand": return tx(i18n.aiChat.actions.sendCommand, locale);
-    case "queryStatus": return tx(i18n.aiChat.actions.queryStatus, locale);
-    case "deploySwarm": return tx(i18n.aiChat.actions.deploySwarm, locale);
-    case "chargeDrone": return tx(i18n.aiChat.actions.chargeDrone, locale);
+    case "createMission": return "Create Mission";
+    case "selectDrone": return "Select Agent";
+    case "sendCommand": return "Send Command";
+    case "queryStatus": return "Status Check";
+    case "deploySwarm": return "Deploy Swarm";
+    case "chargeDrone": return "Charge Agent";
     default: return action;
   }
 }
 
 export default function AIChat() {
-  const { locale } = useLanguage();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: "welcome",
       role: "system",
-      content: tx(i18n.aiChat.welcome, locale),
+      content: "NeuralAir AI Dispatcher online. How can I assist your fleet?",
       timestamp: new Date(),
     },
   ]);
@@ -140,7 +137,7 @@ export default function AIChat() {
         const aiMsg: ChatMessage = {
           id: (Date.now() + 1).toString(),
           role: "ai",
-          content: data.parsed.explanation || tx(i18n.aiChat.processed, locale),
+          content: data.parsed.explanation || "Command processed successfully.",
           parsed: data.parsed,
           txHash: randomTxHash(),
           timestamp: new Date(),
@@ -152,7 +149,7 @@ export default function AIChat() {
           {
             id: (Date.now() + 1).toString(),
             role: "system",
-            content: data.error || tx(i18n.aiChat.error, locale),
+            content: data.error || "I couldn't process this request.",
             timestamp: new Date(),
           },
         ]);
@@ -163,7 +160,7 @@ export default function AIChat() {
         {
           id: (Date.now() + 1).toString(),
           role: "system",
-          content: tx(i18n.aiChat.offline, locale),
+          content: "System offline. Please try again later.",
           timestamp: new Date(),
         },
       ]);
@@ -194,9 +191,9 @@ export default function AIChat() {
             <Brain className="w-5 h-5 text-white" />
           </div>
           <div>
-            <div className="font-bold text-sm text-white tracking-wide">{tx(i18n.aiChat.dispatcher, locale)}</div>
+            <div className="font-bold text-sm text-white tracking-wide">AI Dispatcher</div>
             <div className="text-xs text-success flex items-center gap-1.5 font-medium">
-              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> {tx(i18n.aiChat.active, locale)}
+              <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" /> Active
             </div>
           </div>
         </div>
@@ -233,7 +230,7 @@ export default function AIChat() {
                       return <Icon className="w-4 h-4 text-accent-cyan drop-shadow-[0_0_5px_rgba(0,240,255,0.5)]" />;
                     })()}
                     <span className="text-xs font-semibold text-accent-cyan tracking-wide uppercase">
-                      {actionLabel(msg.parsed.action, locale)}
+                      {actionLabel(msg.parsed.action)}
                     </span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-success/20 text-success font-bold border border-success/20 ml-auto">
                       %{Math.round((msg.parsed.confidence || 0.8) * 100)}
@@ -264,7 +261,7 @@ export default function AIChat() {
         {loading && (
           <div className="flex items-center gap-2.5 text-accent-cyan text-sm font-medium bg-accent-cyan/10 px-4 py-2.5 rounded-xl w-max border border-accent-cyan/20">
             <Loader2 className="w-4 h-4 animate-spin" />
-            {tx(i18n.aiChat.scanning, locale)}
+            Scanning neural network...
           </div>
         )}
       </div>
@@ -292,7 +289,7 @@ export default function AIChat() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-              placeholder={tx(i18n.aiChat.placeholder, locale)}
+              placeholder="Send command to fleet (e.g., 'Deploy swarm to Alsancak')"
               className="w-full bg-white/5 border border-border rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none focus:border-accent-cyan transition-colors"
               disabled={loading}
             />

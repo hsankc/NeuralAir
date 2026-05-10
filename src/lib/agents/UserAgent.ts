@@ -79,8 +79,8 @@ export const UserAgent = {
         `${persona.emoji} Yeni görev açıldı / New mission: "${template.title}" — ${template.payment} SOL`
       );
 
-    } catch (err: any) {
-      emit("UserAgent", "error", `❌ Hata: ${err.message}`);
+    } catch (err: unknown) {
+      emit("UserAgent_Zeynep", "error", `❌ Dispatcher hatası: ${(err as Error).message}`);
     }
   },
 };

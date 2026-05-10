@@ -4,33 +4,41 @@
 
 @theme {
   /* ── Backgrounds (Koyu gri, saf siyah değil) ── */
-  --color-bg-primary:    #08090C;   /* Solana dark */
-  --color-bg-secondary:  #0D0E14;   /* Card base */
-  --color-bg-tertiary:   #13151F;   /* Interactive */
-  --color-bg-elevated:   #181A26;   /* Hover states */
+  --color-bg-primary: #08090C;
+  /* Solana dark */
+  --color-bg-secondary: #0D0E14;
+  /* Card base */
+  --color-bg-tertiary: #13151F;
+  /* Interactive */
+  --color-bg-elevated: #181A26;
+  /* Hover states */
 
   /* ── Borders ── */
-  --color-border:        rgba(255,255,255,0.07);
-  --color-border-hover:  rgba(255,255,255,0.14);
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-hover: rgba(255, 255, 255, 0.14);
 
   /* ── Text ── */
-  --color-text-primary:  #F0F0F5;
-  --color-text-secondary:#9B9BB4;
-  --color-text-muted:    #5C5C7A;
+  --color-text-primary: #F0F0F5;
+  --color-text-secondary: #9B9BB4;
+  --color-text-muted: #5C5C7A;
 
   /* ── Solana Accent Palette ── */
-  --color-accent-cyan:   #14F195;   /* Solana neon green */
-  --color-accent-purple: #9945FF;   /* Solana purple */
-  --color-accent-blue:   #60A5FA;   /* Info blue */
-  --color-accent-violet: #A78BFA;   /* Light violet */
+  --color-accent-cyan: #14F195;
+  /* Solana neon green */
+  --color-accent-purple: #9945FF;
+  /* Solana purple */
+  --color-accent-blue: #60A5FA;
+  /* Info blue */
+  --color-accent-violet: #A78BFA;
+  /* Light violet */
 
   /* ── Semantic ── */
   --color-success: #14F195;
   --color-warning: #FFB443;
-  --color-danger:  #FF4D6A;
+  --color-danger: #FF4D6A;
 
   /* ── Glow Colors ── */
-  --glow-green:  rgba(20, 241, 149, 0.15);
+  --glow-green: rgba(20, 241, 149, 0.15);
   --glow-purple: rgba(153, 69, 255, 0.15);
 
   /* ── Fonts ── */
@@ -40,9 +48,16 @@
 
 /* =================== Base =================== */
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-html { scroll-behavior: smooth; color-scheme: dark; }
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
 
 body {
   background: var(--color-bg-primary);
@@ -56,10 +71,23 @@ body {
 
 /* =================== Scrollbar =================== */
 
-::-webkit-scrollbar { width: 3px; height: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
 /* =================== Glass & Cards =================== */
 
@@ -67,26 +95,26 @@ body {
   background: rgba(13, 14, 20, 0.7);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .glass-card {
   background: rgba(13, 14, 20, 0.6);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 14px;
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(255,255,255,0.13);
+  border-color: rgba(255, 255, 255, 0.13);
 }
 
 /* Premium stat card */
 .stat-card {
   background: rgba(13, 14, 20, 0.8);
-  border: 1px solid rgba(255,255,255,0.07);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   border-radius: 12px;
   padding: 16px 20px;
   transition: all 0.25s ease;
@@ -143,67 +171,135 @@ body {
   font-weight: 600;
   padding: 10px 24px;
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
   font-size: 14px;
   transition: all 0.2s ease;
 }
 
 .btn-secondary:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* =================== Backgrounds =================== */
 
 .bg-grid {
   background-image:
-    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
 .bg-dots {
-  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
 /* =================== Animations =================== */
 
 @keyframes fade-in-up {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes glow-pulse {
-  0%, 100% { opacity: 0.4; }
-  50%       { opacity: 1; }
-}
-@keyframes scanline {
-  0%   { transform: translateY(-100%); }
-  100% { transform: translateY(100vh); }
-}
-@keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(16px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes typing-cursor {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.animate-fade-in-up       { animation: fade-in-up 0.5s ease-out forwards; }
-.animate-delay-100        { animation-delay: 100ms; }
-.animate-delay-200        { animation-delay: 200ms; }
-.animate-delay-300        { animation-delay: 300ms; }
-.animate-glow-pulse       { animation: glow-pulse 3s ease-in-out infinite; }
-.animate-scanline         { animation: scanline 10s linear infinite; }
-.animate-slide-in-right   { animation: slide-in-right 0.25s ease-out forwards; }
-.animate-typing-cursor    { animation: typing-cursor 1s step-end infinite; }
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes typing-cursor {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.5s ease-out forwards;
+}
+
+.animate-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animate-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animate-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+.animate-scanline {
+  animation: scanline 10s linear infinite;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.25s ease-out forwards;
+}
+
+.animate-typing-cursor {
+  animation: typing-cursor 1s step-end infinite;
+}
 
 @keyframes loading-bar {
-  0%   { width: 0%; }
-  50%  { width: 70%; }
-  100% { width: 100%; }
+  0% {
+    width: 0%;
+  }
+
+  50% {
+    width: 70%;
+  }
+
+  100% {
+    width: 100%;
+  }
 }
 
 /* =================== Terminal =================== */
@@ -211,7 +307,7 @@ body {
 .terminal {
   background: #050608;
   color: #9B9BB4;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 12px;
   font-family: var(--font-mono);
   font-size: 11.5px;
@@ -225,7 +321,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .terminal-dot {
@@ -242,9 +338,11 @@ body {
 
 .terminal-scanline {
   position: absolute;
-  top: 0; left: 0; right: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(20,241,149,0.06), transparent);
+  background: linear-gradient(90deg, transparent, rgba(20, 241, 149, 0.06), transparent);
   animation: scanline 8s linear infinite;
   pointer-events: none;
 }
@@ -259,10 +357,26 @@ body {
   flex-shrink: 0;
 }
 
-.status-active    { background: #14F195; box-shadow: 0 0 8px #14F195; animation: glow-pulse 2s ease-in-out infinite; }
-.status-charging  { background: #FFB443; box-shadow: 0 0 8px #FFB443; }
-.status-emergency { background: #FF4D6A; box-shadow: 0 0 8px #FF4D6A; animation: glow-pulse 1s ease-in-out infinite; }
-.status-idle      { background: #5C5C7A; }
+.status-active {
+  background: #14F195;
+  box-shadow: 0 0 8px #14F195;
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.status-charging {
+  background: #FFB443;
+  box-shadow: 0 0 8px #FFB443;
+}
+
+.status-emergency {
+  background: #FF4D6A;
+  box-shadow: 0 0 8px #FF4D6A;
+  animation: glow-pulse 1s ease-in-out infinite;
+}
+
+.status-idle {
+  background: #5C5C7A;
+}
 
 /* =================== Map =================== */
 
@@ -270,26 +384,40 @@ body {
   background: #080911 !important;
   border-radius: 12px;
 }
+
 .leaflet-control-zoom a {
   background: #0D0E14 !important;
   color: #9B9BB4 !important;
-  border-color: rgba(255,255,255,0.07) !important;
+  border-color: rgba(255, 255, 255, 0.07) !important;
   border-radius: 6px !important;
 }
+
 .leaflet-popup-content-wrapper {
-  background: rgba(13,14,20,0.92) !important;
+  background: rgba(13, 14, 20, 0.92) !important;
   color: #F0F0F5 !important;
-  border: 1px solid rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 10px !important;
   backdrop-filter: blur(16px);
 }
-.leaflet-popup-tip { background: #0D0E14 !important; }
+
+.leaflet-popup-tip {
+  background: #0D0E14 !important;
+}
 
 /* =================== Utilities =================== */
 
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-.tabular-nums { font-variant-numeric: tabular-nums; }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
 
 ::selection {
   background: rgba(20, 241, 149, 0.15);
