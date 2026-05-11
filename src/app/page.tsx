@@ -85,13 +85,13 @@ function Header() {
         </div>
       </div>
 
-        <div className="lg:hidden bg-[#0F1523] border-b border-white/[0.05] px-4 py-4 space-y-2 backdrop-blur-2xl">
-          <a href="#nasil-calisir" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Architecture</a>
-          <a href="#donanim" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Hardware</a>
-          <a href="#filo" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Fleet</a>
-          <a href="#moduller" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Modules</a>
-          <Link href="/dashboard" className="block px-4 py-3 text-[#14F195] font-bold bg-[#14F195]/10 rounded-lg text-center mt-4">Launch Panel</Link>
-        </div>
+      <div className="lg:hidden bg-[#0F1523] border-b border-white/[0.05] px-4 py-4 space-y-2 backdrop-blur-2xl">
+        <a href="#nasil-calisir" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Architecture</a>
+        <a href="#donanim" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Hardware</a>
+        <a href="#filo" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Fleet</a>
+        <a href="#moduller" onClick={() => setMobileOpen(false)} className="block px-4 py-3 text-[#EDEDED] font-medium bg-white/[0.03] rounded-lg">Modules</a>
+        <Link href="/dashboard" className="block px-4 py-3 text-[#14F195] font-bold bg-[#14F195]/10 rounded-lg text-center mt-4">Launch Panel</Link>
+      </div>
     </header>
   );
 }

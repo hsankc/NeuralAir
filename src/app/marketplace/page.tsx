@@ -34,6 +34,7 @@ import {
 import { pickRandomMission, generateInitialOpenMissions } from "@/lib/missions";
 import { logMissionToSupabase, logAgentDecisionToSupabase } from "@/lib/supabase";
 import { useWallet } from "@/lib/web3/WalletContext";
+import { useDroneFleet } from "@/lib/DroneFleetContext";
 import dynamic from "next/dynamic";
 
 const AreaSelectMap = dynamic(() => import("@/components/AreaSelectMap"), { ssr: false });
@@ -497,10 +498,11 @@ function CreateMissionModal({ onClose, onCreate }: CreateMissionModalProps) {
 }
 
 /* ─── MISSION CARD ─── */
-function MissionCard({ mission, onTake }: { mission: Mission; onTake?: (id: number) => void }) {
+function MissionCard({ mission, onTake, liveDrones }: { mission: Mission; onTake?: (id: number) => void; liveDrones?: typeof initialDrones }) {
   const MissionIcon = typeIcon(mission.type);
+  const dronePool = liveDrones || initialDrones;
   const drone = mission.droneId
-    ? initialDrones.find((d) => d.id === mission.droneId)
+    ? dronePool.find((d) => d.id === mission.droneId)
     : null;
 
   return (
@@ -567,6 +569,7 @@ export default function MarketplacePage() {
   const [showCreate, setShowCreate] = useState(false);
   const [missions, setMissions] = useState<Mission[]>(() => generateInitialOpenMissions());
   const { balance, isConnected } = useWallet();
+  const { drones: liveDrones } = useDroneFleet();
 
   // Agent Decision Log
   const [agentLog, setAgentLog] = useState<{ time: string; msg: string }[]>([]);
@@ -606,7 +609,7 @@ export default function MarketplacePage() {
             const randomMission = openMissions[Math.floor(Math.random() * openMissions.length)];
             
             // Tip uyumlu drone bul
-            const candidates = initialDrones.filter(d => 
+            const candidates = liveDrones.filter(d => 
               d.battery > 20 && 
               ((d.type === "cargo" && randomMission.type === "cargo") ||
                (d.type === "emergency" && randomMission.type === "fire") ||
@@ -616,7 +619,7 @@ export default function MarketplacePage() {
             
             const bestDrone = candidates.length > 0 
               ? candidates[Math.floor(Math.random() * candidates.length)]
-              : initialDrones[Math.floor(Math.random() * initialDrones.length)];
+              : liveDrones[Math.floor(Math.random() * liveDrones.length)];
 
             newMissions = newMissions.map(x => x.id === randomMission.id ? { ...x, status: "in-progress", droneId: bestDrone.id } : x);
             setAgentLog(l => [...l.slice(-6), { time: now, msg: `[FleetAgent] "${randomMission.title}" → assigned to ${bestDrone.name} (Type: ${bestDrone.type})` }]);
@@ -640,7 +643,7 @@ export default function MarketplacePage() {
     const now = new Date().toLocaleTimeString("tr-TR");
     setAgentLog(prev => [...prev.slice(-6), {
       time: now,
-      msg: `[UserAgent] Yeni görev oluşturuldu: "${newM.title}" — ${newM.payment} SOL`
+      msg: `[UserAgent] New mission created: "${newM.title}" — ${newM.payment} SOL`
     }]);
 
     // Supabase Offline-Safe Logging
@@ -664,19 +667,19 @@ export default function MarketplacePage() {
     const mission = missions.find(m => m.id === id);
     if (!mission) return;
 
-    // En uygun drone'u bul
-    const best = initialDrones
+    // Find the best available drone from live fleet
+    const best = liveDrones
       .filter(d => d.battery > 25)
       .sort((a, b) => b.battery - a.battery)[0];
 
     setMissions((prev) =>
-      prev.map((m) => m.id === id ? { ...m, status: "in-progress" as const, droneId: best?.id || initialDrones[0].id } : m)
+      prev.map((m) => m.id === id ? { ...m, status: "in-progress" as const, droneId: best?.id || liveDrones[0].id } : m)
     );
 
     const now = new Date().toLocaleTimeString("tr-TR");
     setAgentLog(prev => [...prev.slice(-6), {
       time: now,
-      msg: `[FleetAgent] Manuel atama: "${mission.title}" → ${best?.name || initialDrones[0].name} (kullanıcı onayı) ✓`
+      msg: `[FleetAgent] Manual assignment: "${mission.title}" → ${best?.name || liveDrones[0].name} (user confirmed) ✓`
     }]);
   };
 
@@ -736,7 +739,7 @@ export default function MarketplacePage() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filtered.map((m) => (
-            <MissionCard key={m.id} mission={m} onTake={handleTakeMission} />
+            <MissionCard key={m.id} mission={m} onTake={handleTakeMission} liveDrones={liveDrones} />
           ))}
         </div>
 

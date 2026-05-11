@@ -21,7 +21,7 @@ import {
   Activity,
   Plane,
 } from "lucide-react";
-import { initialPods, initialDrones, ChargingPod } from "@/lib/data";
+import { initialPods, ChargingPod } from "@/lib/data";
 
 /* ─── LIVE CHARGING SESSION ─── */
 interface ChargingSession {

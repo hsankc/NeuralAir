@@ -3,26 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import {
-  Clock,
-  ArrowLeft,
-  ChevronRight,
-  Cpu,
-  Search,
-  Filter,
-  Plane,
-  MapPin,
-  Battery,
-  ExternalLink,
-  Package,
-  Tractor,
-  Flame,
-  Eye,
-  ArrowUpRight,
-  Download,
-  Radio,
-  Activity,
+  Clock, ArrowLeft, ChevronRight, Cpu, Search, Filter,
+  Plane, MapPin, Battery, ExternalLink, Package, Tractor,
+  Flame, Eye, ArrowUpRight, Download, Radio, Activity,
 } from "lucide-react";
-import { initialFlightLogs, initialDrones, FlightLog, MissionType, missionTypeLabels } from "@/lib/data";
+import { initialFlightLogs, FlightLog, MissionType, missionTypeLabels } from "@/lib/data";
+import { useDroneFleet } from "@/lib/DroneFleetContext";
 
 function typeIcon(t: MissionType) {
   switch (t) {
@@ -113,15 +99,17 @@ function LiveAgentFeed() {
 }
 
 export default function FlightLogsPage() {
+  const [logs, setLogs] = useState<FlightLog[]>(initialFlightLogs);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<MissionType | "all">("all");
   const [expanded, setExpanded] = useState<number | null>(null);
-  const [logs, setLogs] = useState(initialFlightLogs);
+  const { drones: liveDrones } = useDroneFleet();
 
   // Simülasyon: her 15 saniyede bir yeni uçuş kaydı ekle
   useEffect(() => {
     const iv = setInterval(() => {
-      const drone = initialDrones[Math.floor(Math.random() * initialDrones.length)];
+      if (liveDrones.length === 0) return;
+      const drone = liveDrones[Math.floor(Math.random() * liveDrones.length)];
       const types: MissionType[] = ["cargo", "agricultural", "fire", "traffic"];
       const missionType = types[Math.floor(Math.random() * types.length)];
       const newLog: FlightLog = {
@@ -141,25 +129,24 @@ export default function FlightLogsPage() {
       setLogs(prev => [newLog, ...prev].slice(0, 30));
     }, 15000);
     return () => clearInterval(iv);
-  }, []);
+  }, [liveDrones]);
 
   // Gerçek görev tamamlama eventlerini dinle
   useEffect(() => {
     const handler = ((e: CustomEvent) => {
       const { droneId, droneName, missionTitle } = e.detail;
-      const drone = initialDrones.find(d => d.id === droneId);
-      if (!drone) return;
+      const drone = liveDrones.find(d => d.id === droneId);
       const completedLog: FlightLog = {
         id: Date.now() + Math.random(),
         droneId: String(droneId),
         droneName,
-        startLat: drone.lat,
-        startLng: drone.lng,
-        endLat: drone.lat + (Math.random() - 0.5) * 0.08,
-        endLng: drone.lng + (Math.random() - 0.5) * 0.08,
+        startLat: drone?.lat || 0,
+        startLng: drone?.lng || 0,
+        endLat: (drone?.lat || 0) + (Math.random() - 0.5) * 0.08,
+        endLng: (drone?.lng || 0) + (Math.random() - 0.5) * 0.08,
         duration: Math.floor(Math.random() * 30 + 10),
         energyUsed: parseFloat((Math.random() * 15 + 5).toFixed(1)),
-        missionType: drone.type === "cargo" ? "cargo" : drone.type === "agricultural" ? "agricultural" : drone.type === "emergency" ? "fire" : "traffic",
+        missionType: drone?.type === "cargo" ? "cargo" : drone?.type === "agricultural" ? "agricultural" : drone?.type === "emergency" ? "fire" : "traffic",
         txHash: `sol_${Math.random().toString(36).slice(2, 8)}...${Math.random().toString(36).slice(2, 6)}`,
         timestamp: new Date(),
       };
@@ -167,7 +154,7 @@ export default function FlightLogsPage() {
     }) as EventListener;
     window.addEventListener("mission-complete", handler);
     return () => window.removeEventListener("mission-complete", handler);
-  }, []);
+  }, [liveDrones]);
 
   // CSV Export
   const handleExport = () => {
