@@ -1,21 +1,21 @@
-// İzmir merkezli gerçek drone verileri — NeuralAir SkyAgent Protocol
+// Real Izmir-based drone data — NeuralAir SkyAgent Protocol
 export type DroneStatus = "idle" | "in-flight" | "charging" | "emergency" | "mission";
 export type DroneType = "cargo" | "agricultural" | "surveillance" | "emergency";
 export type MissionType = "cargo" | "agricultural" | "fire" | "traffic";
 
 export interface DroneSpecs {
-  model: string;           // Gerçek üretici model adı
-  manufacturer: string;    // Üretici firma
-  maxSpeed: number;        // km/h — üretici datası
-  maxAltitude: number;     // metre — yasal/teknik max
+  model: string;           // Real manufacturer model name
+  manufacturer: string;    // Manufacturer
+  maxSpeed: number;        // km/h — from manufacturer specs
+  maxAltitude: number;     // meters — legal/technical max
   batteryCapacity: number; // mAh
-  weightEmpty: number;     // gram — boş ağırlık (MTOW değil)
-  maxPayload: number;      // gram — taşıyabileceği max yük
-  maxFlightTime: number;   // dakika — yüksüz ideal uçuş
-  chargeTime: number;      // dakika — 0→100% şarj
-  pricePerKm: number;      // SOL — km başına görev ücreti
-  license: string;         // SHGM uçuş izin kategorisi
-  sensors: string[];       // Sensör donanımı
+  weightEmpty: number;     // grams — empty weight (not MTOW)
+  maxPayload: number;      // grams — max carryable payload
+  maxFlightTime: number;   // minutes — ideal unloaded flight
+  chargeTime: number;      // minutes — 0→100% charging
+  pricePerKm: number;      // SOL — mission rate per km
+  license: string;         // Flight authority category
+  sensors: string[];       // Sensor hardware
 }
 
 export interface DroneAgent {
@@ -82,10 +82,10 @@ export interface FlightLog {
 }
 
 // ═══════════════════════════════════════════════════════════
-// 15 GERÇEK AGENT DRONE — Her biri bağımsız otonom ajan
+// 15 REAL AGENT DRONES — each one an independent autonomous agent
 // ═══════════════════════════════════════════════════════════
 export const initialDrones: DroneAgent[] = [
-  // ── AKTİF UÇUŞTA (5 drone) ──
+  // ── ACTIVELY IN FLIGHT (5 drones) ──
   {
     id: 1, name: "Ege-01", type: "cargo",
     lat: 38.4237, lng: 27.1428, altitude: 20, battery: 87, speed: 45, heading: 45,
@@ -289,7 +289,7 @@ export const initialDrones: DroneAgent[] = [
   },
 ];
 
-// ── ŞARJ PODLARI ──
+// ── CHARGING PODS ──
 export const initialPods: ChargingPod[] = [
   { id: 1, name: "Alsancak Hub", owner: "0x7a3F...b8eD", lat: 38.4350, lng: 27.1420, rate: 0.05, available: true, totalEnergy: 1250, totalEarned: 62.5, activeSessions: 0 },
   { id: 2, name: "Bornova Tech", owner: "0x9dE3...c7B2", lat: 38.4650, lng: 27.2100, rate: 0.055, available: true, totalEnergy: 1540, totalEarned: 84.7, activeSessions: 0 },
@@ -298,7 +298,7 @@ export const initialPods: ChargingPod[] = [
   { id: 5, name: "Urla Garden", owner: "0x3aF7...d2E8", lat: 38.3250, lng: 26.7700, rate: 0.05, available: true, totalEnergy: 620, totalEarned: 31, activeSessions: 0 },
 ];
 
-// ── GÖREVLER ──
+// ── MISSIONS ──
 export const initialMissions: Mission[] = [
   { id: 1, type: "cargo", title: "Alsancak → Bornova Package", description: "3.2kg e-commerce delivery", fromLat: 38.4350, fromLng: 27.1420, toLat: 38.4700, toLng: 27.2200, payment: 2.5, status: "in-progress", droneId: 1, createdAt: new Date(), priority: false },
   { id: 2, type: "cargo", title: "Urla → Karsiyaka Meds", description: "Emergency medical delivery — pharmacy order", fromLat: 38.3220, fromLng: 26.7650, toLat: 38.4560, toLng: 27.1100, payment: 5.8, status: "in-progress", droneId: 4, createdAt: new Date(), priority: true },
@@ -307,7 +307,7 @@ export const initialMissions: Mission[] = [
   { id: 5, type: "agricultural", title: "Cesme Vineyard Spraying", description: "Pest control spraying for 25 acre vineyard", fromLat: 38.3230, fromLng: 26.3050, toLat: 38.3280, toLng: 26.3150, payment: 8.5, status: "in-progress", droneId: 3, createdAt: new Date(), priority: false },
 ];
 
-// ── UÇUŞ KAYITLARI ──
+// ── FLIGHT LOGS ──
 export const initialFlightLogs: FlightLog[] = [
   { id: 1, droneId: "1", droneName: "Ege-01", startLat: 38.4237, startLng: 27.1428, endLat: 38.4700, endLng: 27.2200, duration: 12, energyUsed: 8.5, missionType: "cargo", txHash: "0xabc1...def1", timestamp: new Date(Date.now() - 3600000) },
   { id: 2, droneId: "2", droneName: "Bayraklı-02", startLat: 38.4600, startLng: 27.1650, endLat: 38.5200, endLng: 27.1000, duration: 15, energyUsed: 12.1, missionType: "fire", txHash: "0xabc2...def2", timestamp: new Date(Date.now() - 7200000) },
@@ -316,10 +316,10 @@ export const initialFlightLogs: FlightLog[] = [
   { id: 5, droneId: "5", droneName: "Sentinel-05", startLat: 38.5000, startLng: 27.0200, endLat: 38.5300, endLng: 27.0500, duration: 25, energyUsed: 15.6, missionType: "fire", txHash: "0xabc5...def5", timestamp: new Date(Date.now() - 18000000) },
 ];
 
-// ── agentMessages — eski, artık simulation.ts motoru kullanılıyor ──
+// ── agentMessages — legacy, simulation.ts engine is now used ──
 export const agentMessages: { droneId: number; level: "info" | "success" | "warning" | "error"; msg: string }[] = [];
 
-// ── Util: Rastgele TX hash üret ──
+// ── Util: Generate a random TX hash ──
 export function randomTxHash(): string {
   const chars = "0123456789abcdef";
   let h = "0x";
@@ -359,7 +359,7 @@ export const missionStatusLabels = (locale: string = "en"): Record<string, strin
   cancelled: "Cancelled",
 });
 
-// ═══ HAVA SAHASI ENGELLERİ ═══
+// ═══ AIRSPACE OBSTACLES ═══
 export type ObstacleType = "bird_flock" | "balloon" | "drone_traffic" | "no_fly_zone" | "weather" | "paraglider";
 
 export interface AirspaceObstacle {
@@ -368,15 +368,15 @@ export interface AirspaceObstacle {
   name: string;
   lat: number;
   lng: number;
-  radius: number;      // metre — etki yarıçapı
-  altitude: number;    // metre
-  altitudeMax: number;  // metre — max yükseklik
+  radius: number;      // meters — area of effect radius
+  altitude: number;    // meters
+  altitudeMax: number;  // meters — max altitude
   severity: "low" | "medium" | "high";
-  moving: boolean;     // hareket ediyor mu
-  speedKmh: number;    // hareket hızı
-  heading: number;     // hareket yönü
+  moving: boolean;     // is it moving
+  speedKmh: number;    // movement speed
+  heading: number;     // movement heading
   description: string;
-  detectedBy?: number; // hangi drone tespit etti (id)
+  detectedBy?: number; // id of detecting drone
 }
 
 export const obstacleTypeLabels: Record<ObstacleType, string> = {

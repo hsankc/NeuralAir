@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
   Zap,
   ArrowLeft,
   ChevronRight,
-  Cpu,
   Plus,
   MapPin,
   TrendingUp,
@@ -129,7 +129,7 @@ function LiveChargingPanel() {
       }]);
       // 3 saniye sonra şarj oturumu başlat
       setTimeout(() => {
-        const pods = ["Alsancak Hub", "Bornova-01", "Konak Pod", "Karşıyaka İst.", "Bayraklı Merkez"];
+        const pods = ["Alsancak Hub", "Bornova-01", "Konak Pod", "Karşıyaka Station", "Bayraklı Center"];
         const podName = pods[Math.floor(Math.random() * pods.length)];
         setSessions(prev => [...prev, {
           droneId: e.detail.droneId,
@@ -386,7 +386,7 @@ function PodCard({ pod, activeSessions }: { pod: ChargingPod; activeSessions: nu
 /* ─── EARNINGS CHART (simulated) ─── */
 function EarningsChart() {
   const months = ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar"];
-  const data = [28.5, 34.2, 31.8, 42.6, 38.9, 52.3, 48.7, 61.4, 55.2, 72.8, 68.5, 84.3];
+  const data = [42.7, 58.4, 47.9, 76.2, 63.5, 91.8, 84.1, 112.6, 98.3, 126.9, 119.4, 148.2];
   const max = Math.max(...data);
   const total = data.reduce((a, b) => a + b, 0);
   const growth = ((data[11] - data[0]) / data[0] * 100).toFixed(0);
@@ -419,14 +419,14 @@ function EarningsChart() {
 
       <div className="flex items-end gap-1.5 h-52">
         {data.map((d, i) => (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1.5 group">
+          <div key={i} className="flex-1 h-full flex flex-col items-center justify-end gap-1.5 group">
             {/* Value on hover */}
-            <span className="text-[10px] font-bold text-accent-cyan opacity-0 group-hover:opacity-100 transition-opacity tabular-nums">
+            <span className="text-[10px] font-bold text-accent-cyan opacity-70 group-hover:opacity-100 transition-opacity tabular-nums">
               {d.toFixed(0)}
             </span>
             <div
-              className="w-full rounded-t-lg bg-gradient-to-t from-blue-500/70 to-indigo-500/70 transition-all duration-500 group-hover:from-blue-500 group-hover:to-indigo-500 cursor-pointer relative"
-              style={{ height: `${(d / max) * 100}%`, minHeight: 8 }}
+              className="w-full rounded-t-lg bg-gradient-to-t from-blue-500/80 via-cyan-400/65 to-emerald-400/80 shadow-[0_0_18px_rgba(34,211,238,0.18)] transition-all duration-500 group-hover:from-blue-500 group-hover:to-emerald-300 cursor-pointer relative"
+              style={{ height: `${Math.max(24, (d / max) * 168)}px` }}
             />
             <span className="text-[10px] text-text-muted font-medium">
               {months[i]}
@@ -458,8 +458,8 @@ export default function SkyChargePage() {
               </Link>
               <div className="flex items-center gap-2">
                 <Link href="/" className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-                    <Cpu className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-white/10 shrink-0">
+                    <BrandLogo size={32} className="rounded-lg" />
                   </div>
                   <span className="font-bold gradient-text">NeuralAir</span>
                 </Link>

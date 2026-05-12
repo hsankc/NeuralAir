@@ -1,10 +1,10 @@
 "use client";
 
 // ── EmergencyAgent ────────────────────────────────────────────
-// Her 5 saniyede çalışır.
-// Bataryası kritik seviyeye (%20 altı) düşen, uçuşta olan
-// drone'ları tespit eder ve en yakın Sky-Charge pod'una yönlendirir.
-// ElevenLabs (veya browser TTS) ile sesli uyarı verir.
+// Runs every 5 seconds.
+// Detects in-flight drones whose battery dropped to a critical level (<20%)
+// and reroutes them to the nearest Sky-Charge pod.
+// Plays a voice alert via ElevenLabs (or browser TTS).
 
 import { supabase } from "@/lib/supabase";
 import type { DroneAgent, ChargingPod } from "@/lib/data";
@@ -15,10 +15,10 @@ type EmitFn = (agent: string, level: AgentLog["level"], message: string) => void
 type GetDronesFn = () => DroneAgent[];
 type UpdateDroneFn = (id: number, updates: Partial<DroneAgent>) => void;
 
-// Daha önce uyarıldığı drone'ları tekrar uyarma (spam önleyici)
+// Avoid warning the same drone twice (anti-spam)
 const alreadyWarned = new Set<number>();
 
-// Haversine mesafe hesabı
+// Haversine distance
 function dist(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -31,7 +31,7 @@ function dist(lat1: number, lng1: number, lat2: number, lng2: number): number {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// En yakın müsait pod'u bul
+// Find the nearest available pod
 function findNearestPod(drone: DroneAgent): ChargingPod | null {
   let nearest: ChargingPod | null = null;
   let minDist = Infinity;
@@ -48,15 +48,15 @@ function findNearestPod(drone: DroneAgent): ChargingPod | null {
   return nearest;
 }
 
-// Browser TTS (ElevenLabs yoksa)
+// Browser TTS (when ElevenLabs is unavailable)
 function speak(text: string) {
   if (typeof window === "undefined") return;
   if ("speechSynthesis" in window) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-US";
     utterance.rate = 0.95;
-    utterance.pitch = 0.8; // Biraz robotik ses
-    window.speechSynthesis.cancel(); // Önceki sesi kes
+    utterance.pitch = 0.8; // Slightly robotic voice
+    window.speechSynthesis.cancel(); // Cancel any prior speech
     window.speechSynthesis.speak(utterance);
   }
 }
@@ -65,7 +65,7 @@ export const EmergencyAgent = {
   async tick(emit: EmitFn, getDrones: GetDronesFn, updateDrone: UpdateDroneFn) {
     const drones = getDrones();
 
-    // Kritik bataryalı + uçuşta olan drone'ları bul
+    // Find in-flight drones with critical battery
     const criticalDrones = drones.filter(
       (d) =>
         d.battery < 20 &&
@@ -78,11 +78,11 @@ export const EmergencyAgent = {
 
       const nearestPod = findNearestPod(drone);
       if (!nearestPod) {
-        emit("EmergencyAgent", "error", `🚨 ${drone.name}: Batarya kritik / Battery critical! Müsait pod bulunamadı / No available pod found!`);
+        emit("EmergencyAgent", "error", `🚨 ${drone.name}: Battery critical! No available pod found!`);
         continue;
       }
 
-      // Drone'u pod'a yönlendir
+      // Redirect drone to the pod
       updateDrone(drone.id, {
         status: "emergency",
         targetLat: nearestPod.lat,
@@ -90,7 +90,7 @@ export const EmergencyAgent = {
         missionId: null,
       });
 
-      // Eğer görevi varsa, görevi iptal et / serbest bırak
+      // If the drone has a mission, cancel/release it
       if (drone.missionId) {
         await supabase
           .from("missions")
@@ -98,15 +98,15 @@ export const EmergencyAgent = {
           .eq("id", drone.missionId);
       }
 
-      // Agent kararını kaydet
+      // Record agent decision
       await supabase.from("agent_decisions").insert({
         agent_name: "EmergencyAgent",
-        decision: `${drone.name} acil iniş / emergency landing → ${nearestPod.name}`,
-        reasoning: `Batarya / Battery %${Math.round(drone.battery)} (kritik eşik / critical threshold: %20)`,
+        decision: `${drone.name} emergency landing → ${nearestPod.name}`,
+        reasoning: `Battery ${Math.round(drone.battery)}% (critical threshold: 20%)`,
         affected: `drone:${drone.id}, pod:${nearestPod.id}`,
       });
 
-      // Sesli uyarı (ElevenLabs veya browser TTS)
+      // Voice alert (ElevenLabs or browser TTS)
       speak(
         `Emergency! ${drone.name} battery critical at ${Math.round(drone.battery)} percent. ` +
           `Redirecting to ${nearestPod.name} charging station.`
@@ -115,20 +115,20 @@ export const EmergencyAgent = {
       emit(
         "EmergencyAgent",
         "error",
-        `🚨 ACİL / EMERGENCY! ${drone.name} batarya / battery %${Math.round(drone.battery)} → ${nearestPod.name}'e yönlendiriliyor / redirecting`
+        `🚨 EMERGENCY! ${drone.name} battery ${Math.round(drone.battery)}% → redirecting to ${nearestPod.name}`
       );
     }
 
-    // Şarj tamamlanan drone'ları tekrar normal moda al
+    // Return fully-charged drones to normal mode
     const recharged = drones.filter(
       (d) => d.status === "charging" && d.battery >= 85 && alreadyWarned.has(d.id)
     );
 
     for (const drone of recharged) {
-      alreadyWarned.delete(drone.id); // Tekrar uyarılabilir olsun
+      alreadyWarned.delete(drone.id); // Allow future warnings again
       updateDrone(drone.id, { status: "idle" });
       speak(`${drone.name} charging complete. Ready for next mission.`);
-      emit("EmergencyAgent", "success", `🔋 ${drone.name} şarj tamamlandı / charging complete, hazır / ready`);
+      emit("EmergencyAgent", "success", `🔋 ${drone.name} charging complete, ready`);
     }
   },
 };

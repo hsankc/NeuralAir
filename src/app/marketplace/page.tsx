@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
   ShoppingCart,
   Package,
@@ -14,7 +15,6 @@ import {
   ArrowLeft,
   Clock,
   MapPin,
-  Cpu,
   X,
   ChevronRight,
   Zap,
@@ -274,7 +274,7 @@ function CreateMissionModal({ onClose, onCreate }: CreateMissionModalProps) {
                       </div>
                       <div>
                         <label className="text-[10px] text-text-muted block mb-1">{"Chemical / Fertilizer Type"}</label>
-                        <input type="text" placeholder="Kükürt bazlı" className="w-full bg-[#050505] border border-[#222222] rounded-lg px-3 py-2 text-xs text-[#EDEDED] focus:border-accent-cyan outline-none" />
+                        <input type="text" placeholder="Sulfur-based" className="w-full bg-[#050505] border border-[#222222] rounded-lg px-3 py-2 text-xs text-[#EDEDED] focus:border-accent-cyan outline-none" />
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
@@ -433,7 +433,9 @@ function CreateMissionModal({ onClose, onCreate }: CreateMissionModalProps) {
             <div className="text-center py-6 space-y-5 animate-fade-in-up">
               <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto transition-all duration-700 bg-white/5 border border-white/10`}>
                 {isAccepted ? (
-                  <Cpu className="w-10 h-10 text-accent-cyan animate-pulse shadow-[0_0_20px_rgba(34,211,238,0.4)]" />
+                  <div className="animate-pulse shadow-[0_0_20px_rgba(34,211,238,0.35)] rounded-full p-1 ring-2 ring-accent-cyan/40">
+                    <BrandLogo size={56} className="rounded-full" />
+                  </div>
                 ) : (
                   <div className="relative">
                      <CheckCircle2 className="w-10 h-10 text-success" />
@@ -487,8 +489,8 @@ function CreateMissionModal({ onClose, onCreate }: CreateMissionModalProps) {
                  </div>
               </div>
               <div className="text-center space-y-1">
-                 <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">Phantom Onayı Lazım</h2>
-                 <p className="text-xs text-text-muted px-10">Lütfen Phantom cüzdanınızdan işlemi onaylayın ve imzalayın.</p>
+                 <h2 className="text-xl font-black text-white italic tracking-tighter uppercase">Phantom Approval Required</h2>
+                 <p className="text-xs text-text-muted px-10">Please approve and sign the transaction in your Phantom wallet.</p>
               </div>
            </div>
         </div>

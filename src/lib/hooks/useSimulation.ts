@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { initialDrones, initialMissions, initialObstacles, DroneAgent, Mission } from "@/lib/data";
 import { pickRandomMission, generateInitialOpenMissions, missionToDroneType } from "@/lib/missions";
 import { FlightSimulator } from "@/lib/simulation";
+import { buildFieldSweepPath } from "@/lib/agriculturalSweep";
 
 export function useDroneSimulator() {
   const [drones, setDrones] = useState(initialDrones);
@@ -13,6 +14,9 @@ export function useDroneSimulator() {
   // ═══ REF: Simülasyon closure'ına güncel mission verisini ver ═══
   const missionsRef = useRef<Mission[]>(liveMissions);
   useEffect(() => { missionsRef.current = liveMissions; }, [liveMissions]);
+
+  /** Ziraat lawnmower waypoint index — droneId + missionId */
+  const agSweepRef = useRef<Map<string, { index: number; path: [number, number][] }>>(new Map());
 
   // Görev tamamlama event'i — diğer bileşenler dinleyebilir
   const emitMissionComplete = useCallback((droneId: number, missionId: number, droneName: string, missionTitle: string) => {
@@ -113,6 +117,15 @@ export function useDroneSimulator() {
   useEffect(() => {
     const iv = setInterval(() => {
       setDrones((prevDrones) => {
+        const validAgSweepKeys = new Set(
+          prevDrones
+            .filter((x) => x.type === "agricultural" && x.status === "mission" && x.missionId != null)
+            .map((x) => `${x.id}-${x.missionId}`),
+        );
+        for (const k of [...agSweepRef.current.keys()]) {
+          if (!validAgSweepKeys.has(k)) agSweepRef.current.delete(k);
+        }
+
         return prevDrones.map((d) => {
           // ── ŞARJ ──
           if (d.status === "charging") {
@@ -140,32 +153,65 @@ export function useDroneSimulator() {
             ? allMissions.find(m => m.id === d.missionId)
             : allMissions.find(m => m.droneId === d.id && (m.status === "in-progress" || m.status === "accepted"));
 
-          // 1. Ziraat Tarama Mantığı — mission varsa hedefe git, yoksa tarama yap
+          // 1. Ziraat — görev dikdörtgeninde lawnmower waypoint takibi
           if (d.type === "agricultural" && d.status === "mission") {
-            if (mission) {
-              // Hedef alanına git
+            if (mission?.type === "agricultural") {
+              const sweepKey = `${d.id}-${mission.id}`;
+              let sweep = agSweepRef.current.get(sweepKey);
+              if (!sweep) {
+                sweep = { index: 0, path: buildFieldSweepPath(mission) };
+                agSweepRef.current.set(sweepKey, sweep);
+              }
+
+              let idx = sweep.index;
+              while (idx < sweep.path.length) {
+                const [wLat, wLng] = sweep.path[idx];
+                const wx = wLat - d.lat;
+                const wy = wLng - d.lng;
+                if (Math.hypot(wx, wy) < 0.0002) idx += 1;
+                else break;
+              }
+              sweep.index = idx;
+              agSweepRef.current.set(sweepKey, sweep);
+
+              if (idx >= sweep.path.length) {
+                emitMissionComplete(d.id, mission.id, d.name, mission.title);
+                setLiveMissions((prev) =>
+                  prev.map((m) => (m.id === mission.id ? { ...m, status: "completed" as const } : m)),
+                );
+                agSweepRef.current.delete(sweepKey);
+                return {
+                  ...d,
+                  status: "idle" as const,
+                  missionId: null,
+                  targetLat: undefined,
+                  targetLng: undefined,
+                  altitude: 35,
+                  speed: 0,
+                };
+              }
+
+              const [tLat, tLng] = sweep.path[idx];
+              const dx = tLat - d.lat;
+              const dy = tLng - d.lng;
+              const dist = Math.hypot(dx, dy) || 1e-9;
+              moveSpeed = 0.00034;
+              newLat = d.lat + (dx / dist) * moveSpeed;
+              newLng = d.lng + (dy / dist) * moveSpeed;
+              newHeading = (Math.atan2(dy, dx) * 180) / Math.PI;
+            } else if (mission) {
               const dx = mission.toLat - d.lat;
               const dy = mission.toLng - d.lng;
-              const dist = Math.sqrt(dx * dx + dy * dy);
-
-              if (dist < 0.003) {
-                // Tarla alanında — zig-zag tarama yap
-                moveSpeed = 0.0002;
-                newHeading = d.heading + (Math.random() > 0.3 ? 90 : -90);
-                newLat = d.lat + Math.cos(newHeading * Math.PI / 180) * moveSpeed;
-                newLng = d.lng + Math.sin(newHeading * Math.PI / 180) * moveSpeed;
-              } else {
-                // Hedefe doğru uç
-                moveSpeed = 0.0004;
-                newLat += (dx / dist) * moveSpeed;
-                newLng += (dy / dist) * moveSpeed;
-                newHeading = Math.atan2(dy, dx) * 180 / Math.PI;
-              }
+              const dist = Math.hypot(dx, dy) || 1e-9;
+              moveSpeed = 0.0004;
+              newLat += (dx / dist) * moveSpeed;
+              newLng += (dy / dist) * moveSpeed;
+              newHeading = (Math.atan2(dy, dx) * 180) / Math.PI;
             } else {
-              moveSpeed = 0.0002;
-              newHeading = d.heading + (Math.random() > 0.3 ? 90 : -90);
-              newLat = d.lat + Math.cos(newHeading * Math.PI / 180) * moveSpeed;
-              newLng = d.lng + Math.sin(newHeading * Math.PI / 180) * moveSpeed;
+              const rad = (d.heading * Math.PI) / 180;
+              moveSpeed = 0.00025;
+              newLat = d.lat + Math.cos(rad) * moveSpeed;
+              newLng = d.lng + Math.sin(rad) * moveSpeed;
             }
           }
           // 2. Görev Hedefine Uçuş

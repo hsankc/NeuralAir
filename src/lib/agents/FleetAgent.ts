@@ -1,9 +1,9 @@
 "use client";
 
 // ── FleetAgent ────────────────────────────────────────────────
-// Her 30 saniyede çalışır.
-// Supabase'deki açık görevleri alır, uygun drone'u belirler
-// ve görevi ona atar. Karar: GPT-4o-mini (veya fallback parser).
+// Runs every 30 seconds.
+// Reads open missions from Supabase, picks a suitable drone,
+// and assigns the mission. Decision: GPT-4o-mini (or fallback parser).
 
 import { supabase } from "@/lib/supabase";
 import type { DroneAgent } from "@/lib/data";
@@ -13,7 +13,7 @@ type EmitFn = (agent: string, level: AgentLog["level"], message: string) => void
 type GetDronesFn = () => DroneAgent[];
 type UpdateDroneFn = (id: number, updates: Partial<DroneAgent>) => void;
 
-// Düz mesafe hesabı (Haversine yaklaşımı)
+// Plain distance (Haversine approximation)
 function distance(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
@@ -26,7 +26,7 @@ function distance(lat1: number, lng1: number, lat2: number, lng2: number): numbe
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-// Drone tipini göreve göre puanla
+// Score drone type against mission type
 function typeFit(droneType: DroneAgent["type"], missionType: string): number {
   const fits: Record<string, string[]> = {
     fire:         ["emergency", "surveillance"],
@@ -34,10 +34,10 @@ function typeFit(droneType: DroneAgent["type"], missionType: string): number {
     cargo:        ["cargo"],
     traffic:      ["surveillance", "cargo"],
   };
-  return fits[missionType]?.includes(droneType) ? 0 : 2; // km ceza
+  return fits[missionType]?.includes(droneType) ? 0 : 2; // km penalty
 }
 
-// ── Fallback Karar Motoru (GPT olmadan) ──
+// ── Fallback Decision Engine (without GPT) ──
 function fallbackDecide(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   openMissions: any[],
@@ -45,13 +45,13 @@ function fallbackDecide(
 ): { droneId: number; missionId: number; reason: string } | null {
   if (!openMissions.length || !availableDrones.length) return null;
 
-  // Her görev için en uygun dronu bul (puan = mesafe + tip uyumsuzluk cezası)
+  // For each mission, find the best drone (score = distance + type mismatch penalty)
   let bestScore = Infinity;
   let bestPair: { droneId: number; missionId: number; reason: string } | null = null;
 
   for (const mission of openMissions.slice(0, 3)) {
     for (const drone of availableDrones) {
-      if (drone.battery < 30) continue; // Düşük bataryalı drone almaz
+      if (drone.battery < 30) continue; // Skip drones with low battery
 
       const dist = distance(drone.lat, drone.lng, mission.from_lat, mission.from_lng);
       const penalty = typeFit(drone.type, mission.type);
@@ -62,7 +62,7 @@ function fallbackDecide(
         bestPair = {
           droneId: drone.id,
           missionId: mission.id,
-          reason: `${drone.name} en yakın / closest (${dist.toFixed(1)}km) ve uygun tip / proper type`,
+          reason: `${drone.name} is the closest (${dist.toFixed(1)}km) and a proper type match`,
         };
       }
     }
@@ -71,7 +71,7 @@ function fallbackDecide(
   return bestPair;
 }
 
-// ── GPT Karar Motoru (API key varsa) ──
+// ── GPT Decision Engine (if API key is available) ──
 async function gptDecide(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   openMissions: any[],
@@ -112,10 +112,10 @@ async function gptDecide(
 
 export const FleetAgent = {
   async tick(emit: EmitFn, getDrones: GetDronesFn, updateDrone: UpdateDroneFn) {
-    emit("FleetAgent", "info", "🔄 Açık görevler taranıyor / Scanning open missions...");
+    emit("FleetAgent", "info", "🔄 Scanning open missions...");
 
     try {
-      // Supabase'den açık görevleri al
+      // Fetch open missions from Supabase
       const { data: openMissions, error } = await supabase
         .from("missions")
         .select("*")
@@ -124,27 +124,27 @@ export const FleetAgent = {
         .limit(5);
 
       if (error || !openMissions?.length) {
-        emit("FleetAgent", "info", "📭 Şu an atanacak açık görev yok / No open missions to assign");
+        emit("FleetAgent", "info", "📭 No open missions to assign right now");
         return;
       }
 
-      // Müsait drone'ları filtrele
+      // Filter available drones
       const availableDrones = getDrones().filter(
         (d) => (d.status === "idle" || d.status === "in-flight") && d.battery > 30 && !d.missionId
       );
 
       if (!availableDrones.length) {
-        emit("FleetAgent", "warning", "⚠️ Müsait drone bulunamadı, bekleniyor / No available drones, waiting...");
+        emit("FleetAgent", "warning", "⚠️ No available drones, waiting...");
         return;
       }
 
-      // Karar al: GPT varsa GPT, yoksa fallback
+      // Make decision: use GPT if available, otherwise fallback
       const decision =
         (await gptDecide(openMissions, availableDrones)) ??
         fallbackDecide(openMissions, availableDrones);
 
       if (!decision) {
-        emit("FleetAgent", "info", "🤔 Uygun eşleşme bulunamadı / No suitable match found");
+        emit("FleetAgent", "info", "🤔 No suitable match found");
         return;
       }
 
@@ -152,21 +152,21 @@ export const FleetAgent = {
       const drone = availableDrones.find((d) => d.id === decision.droneId);
       if (!mission || !drone) return;
 
-      // Supabase'de görevi güncelle
+      // Update mission in Supabase
       await supabase
         .from("missions")
         .update({ status: "accepted", drone_id: drone.id })
         .eq("id", mission.id);
 
-      // Agent kararını kaydet
+      // Record agent decision
       await supabase.from("agent_decisions").insert({
         agent_name: "FleetAgent",
-        decision: `${drone.name} → "${mission.title}" görevi kabul etti / mission accepted`,
+        decision: `${drone.name} accepted mission "${mission.title}"`,
         reasoning: decision.reason,
         affected: `drone:${drone.id}, mission:${mission.id}`,
       });
 
-      // Drone state'ini güncelle (haritada hareket başlar)
+      // Update drone state (motion begins on the map)
       updateDrone(drone.id, {
         status: "mission",
         missionId: mission.id,
@@ -180,17 +180,17 @@ export const FleetAgent = {
         `✅ ${drone.name} → "${mission.title}" (${mission.payment} SOL) | ${decision.reason}`
       );
 
-      // Simüle TX hash göster
+      // Show simulated TX hash
       const fakeTx = generateSolanaTxHash();
       emit("FleetAgent", "info", `⛓️ Escrow TX: ${fakeTx}`);
 
     } catch (err: unknown) {
-      emit("FleetAgent", "error", `❌ FleetAgent hatası / error: ${(err as Error).message}`);
+      emit("FleetAgent", "error", `❌ FleetAgent error: ${(err as Error).message}`);
     }
   },
 };
 
-// Solana formatında simüle TX hash (44 karakter Base58)
+// Simulated Solana-format TX hash (44 Base58 characters)
 function generateSolanaTxHash(): string {
   const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
   return Array.from({ length: 44 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");

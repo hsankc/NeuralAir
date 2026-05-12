@@ -22,7 +22,7 @@ export function FleetList({
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-1 py-3 mb-2 text-lg font-bold text-[#EDEDED] uppercase tracking-wide hover:text-white transition-colors"
       >
-        <span>{""} ({drones.length})</span>
+        <span>FLEET ({drones.length})</span>
         <ChevronDown className={`w-5 h-5 text-[#A1A1AA] transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
       </button>
 

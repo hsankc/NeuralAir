@@ -1,14 +1,14 @@
 /**
- * NeuralAir — Görev Havuzu (Mission Pool)
+ * NeuralAir — Mission Pool
  * 
- * 50+ görev, 4 kategoriye ayrılmış.
- * Sistem açılınca 5 tanesi aktif, geri kalanı havuzda bekler.
- * Bir görev tamamlandığında havuzdan uygun tipte yeni görev çekilir.
+ * 50+ missions across 4 categories.
+ * On startup 5 are active, the rest wait in the pool.
+ * When a mission completes a new mission of a suitable type is pulled from the pool.
  */
 
 import { Mission, MissionType } from "./data";
 
-// İzmir bölgesi koordinatları (gerçek lokasyonlar)
+// Izmir region coordinates (real locations)
 const locations: Record<string, [number, number]> = {
   alsancak: [38.4350, 27.1420],
   bornova: [38.4700, 27.2200],
@@ -30,7 +30,7 @@ const locations: Record<string, [number, number]> = {
   kemalpasa: [38.4290, 27.4200],
   odemis: [38.2290, 27.9700],
   bergama: [39.1200, 27.1800],
-  // Kampüs & özel noktalar
+  // Campuses & special points
   egeUni: [38.4590, 27.2270],
   dokuzEylul: [38.3650, 27.2100],
   havaalani: [38.2920, 27.1560],
@@ -38,7 +38,7 @@ const locations: Record<string, [number, number]> = {
   otogar: [38.4130, 27.1580],
 };
 
-// ═══ KARGO GÖREVLERİ (15+) ═══
+// ═══ CARGO MISSIONS (15+) ═══
 const cargoMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] = [
   {
     type: "cargo", title: "Alsancak → Bornova Express",
@@ -62,21 +62,21 @@ const cargoMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] 
     payment: 1.8, priority: false,
   },
   {
-    type: "cargo", title: "Havalimanı → Alsancak Document",
+    type: "cargo", title: "Airport → Alsancak Document",
     description: "Official document delivery — signature required",
     fromLat: locations.havaalani[0], fromLng: locations.havaalani[1],
     toLat: locations.alsancak[0], toLng: locations.alsancak[1],
     payment: 3.5, priority: true,
   },
   {
-    type: "cargo", title: "Ege Üni → Bayraklı Lab",
+    type: "cargo", title: "Ege Univ → Bayraklı Lab",
     description: "Lab samples — sensitive material, 0.8kg",
     fromLat: locations.egeUni[0], fromLng: locations.egeUni[1],
     toLat: locations.bayrakli[0], toLng: locations.bayrakli[1],
     payment: 5.0, priority: true,
   },
   {
-    type: "cargo", title: "Liman → Gaziemir Warehouse",
+    type: "cargo", title: "Port → Gaziemir Warehouse",
     description: "Customs doc and sample transport — 1.2kg",
     fromLat: locations.liman[0], fromLng: locations.liman[1],
     toLat: locations.gaziemir[0], toLng: locations.gaziemir[1],
@@ -90,7 +90,7 @@ const cargoMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] 
     payment: 3.0, priority: true,
   },
   {
-    type: "cargo", title: "Torbalı → Kemalpaşa Yedek Spare Parts",
+    type: "cargo", title: "Torbalı → Kemalpaşa Spare Parts",
     description: "Industrial spare parts — 4.5kg, non-fragile",
     fromLat: locations.torbali[0], fromLng: locations.torbali[1],
     toLat: locations.kemalpasa[0], toLng: locations.kemalpasa[1],
@@ -104,7 +104,7 @@ const cargoMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] 
     payment: 1.5, priority: false,
   },
   {
-    type: "cargo", title: "Konak → Otogar Luggage",
+    type: "cargo", title: "Konak → Bus Terminal Luggage",
     description: "Passenger luggage delivery — 5kg, large package",
     fromLat: locations.konak[0], fromLng: locations.konak[1],
     toLat: locations.otogar[0], toLng: locations.otogar[1],
@@ -147,59 +147,59 @@ const cargoMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] 
   },
 ];
 
-// ═══ ZİRAAT GÖREVLERİ (12+) ═══
+// ═══ AGRICULTURE MISSIONS (12+) ═══
 const agriculturalMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] = [
   {
-    type: "agricultural", title: "Çeşme Bağ Vineyard Spraying",
+    type: "agricultural", title: "Çeşme Vineyard Spraying",
     description: "25 decares vineyard pest spraying — sulfur based",
     fromLat: 38.3230, fromLng: 26.3050,
     toLat: 38.3280, toLng: 26.3150,
     payment: 8.5, priority: false,
   },
   {
-    type: "agricultural", title: "Menemen Ova Field Irrigation",
+    type: "agricultural", title: "Menemen Plain Field Irrigation",
     description: "40 decares cotton field — drip irrigation control",
     fromLat: 38.6050, fromLng: 27.0600,
     toLat: 38.6150, toLng: 27.0800,
     payment: 6.0, priority: false,
   },
   {
-    type: "agricultural", title: "Güzelbahçe Zeytin Olive Fertilizing",
+    type: "agricultural", title: "Güzelbahçe Olive Fertilizing",
     description: "15 decares olive grove — organic fertilizer distribution",
     fromLat: 38.3700, fromLng: 26.8700,
     toLat: 38.3760, toLng: 26.8850,
     payment: 7.5, priority: false,
   },
   {
-    type: "agricultural", title: "Torbalı Sera Greenhouse Scan",
+    type: "agricultural", title: "Torbalı Greenhouse Scan",
     description: "Greenhouse multispectral mapping — disease detection",
     fromLat: 38.1500, fromLng: 27.3500,
     toLat: 38.1580, toLng: 27.3650,
     payment: 10.0, priority: false,
   },
   {
-    type: "agricultural", title: "Urla Narenciye Citrus Spraying",
+    type: "agricultural", title: "Urla Citrus Spraying",
     description: "30 decares citrus orchard — medfly spraying",
     fromLat: 38.3180, fromLng: 26.7600,
     toLat: 38.3250, toLng: 26.7720,
     payment: 9.0, priority: true,
   },
   {
-    type: "agricultural", title: "Kemalpaşa Kiraz Cherry Orchard",
+    type: "agricultural", title: "Kemalpaşa Cherry Orchard",
     description: "20 decares cherry orchard — early warning sensor scan",
     fromLat: 38.4250, fromLng: 27.4150,
     toLat: 38.4320, toLng: 27.4280,
     payment: 7.0, priority: false,
   },
   {
-    type: "agricultural", title: "Ödemiş Tütün Tobacco Field",
+    type: "agricultural", title: "Ödemiş Tobacco Field",
     description: "50 decares tobacco field — leaf quality drone scan",
     fromLat: 38.2250, fromLng: 27.9650,
     toLat: 38.2350, toLng: 27.9800,
     payment: 12.0, priority: false,
   },
   {
-    type: "agricultural", title: "Bergama Pamuk Cotton Field",
+    type: "agricultural", title: "Bergama Cotton Field",
     description: "35 decares cotton field — pre-harvest NDVI scan",
     fromLat: 39.1150, fromLng: 27.1750,
     toLat: 39.1280, toLng: 27.1900,
@@ -213,21 +213,21 @@ const agriculturalMissions: Omit<Mission, "id" | "createdAt" | "status" | "drone
     payment: 6.5, priority: false,
   },
   {
-    type: "agricultural", title: "Menemen Buğday Wheat Seeding",
+    type: "agricultural", title: "Menemen Wheat Seeding",
     description: "60 decares wheat field — seed distribution operation",
     fromLat: 38.6000, fromLng: 27.0550,
     toLat: 38.6200, toLng: 27.0850,
     payment: 15.0, priority: false,
   },
   {
-    type: "agricultural", title: "Çeşme Lavanta Lavender Field",
+    type: "agricultural", title: "Çeşme Lavender Field",
     description: "10 decares lavender — harvest time analysis and photography",
     fromLat: 38.3150, fromLng: 26.2900,
     toLat: 38.3200, toLng: 26.2980,
     payment: 5.0, priority: false,
   },
   {
-    type: "agricultural", title: "Foça Enginar Artichoke Field",
+    type: "agricultural", title: "Foça Artichoke Field",
     description: "22 decares artichoke — leaf disease detection",
     fromLat: 38.6650, fromLng: 26.7480,
     toLat: 38.6720, toLng: 26.7580,
@@ -235,87 +235,87 @@ const agriculturalMissions: Omit<Mission, "id" | "createdAt" | "status" | "drone
   },
 ];
 
-// ═══ YANGIN / ACİL DURUM GÖREVLERİ (12+) ═══
+// ═══ FIRE / EMERGENCY MISSIONS (12+) ═══
 const fireMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] = [
   {
-    type: "fire", title: "Yamanlar Yangın Fire Detection",
+    type: "fire", title: "Yamanlar Fire Detection",
     description: "Forest fire early warning — thermal scan",
     fromLat: 38.5200, fromLng: 27.1000,
     toLat: 38.5400, toLng: 27.0800,
     payment: 15.0, priority: true,
   },
   {
-    type: "fire", title: "Bornova Orman Forest Patrol",
+    type: "fire", title: "Bornova Forest Patrol",
     description: "Routine thermal patrol — high fire risk zone",
     fromLat: 38.4800, fromLng: 27.2300,
     toLat: 38.4950, toLng: 27.2100,
     payment: 8.0, priority: false,
   },
   {
-    type: "fire", title: "Nif Dağı Nif Mountain Monitoring",
+    type: "fire", title: "Nif Mountain Monitoring",
     description: "Nif Mountain — summer fire watch",
     fromLat: 38.4400, fromLng: 27.3800,
     toLat: 38.4550, toLng: 27.4000,
     payment: 10.0, priority: false,
   },
   {
-    type: "fire", title: "Çeşme Makilik Shrubland Scan",
+    type: "fire", title: "Çeşme Shrubland Scan",
     description: "Coastal shrubland — high wind risk",
     fromLat: 38.3100, fromLng: 26.2800,
     toLat: 38.3250, toLng: 26.3100,
     payment: 12.0, priority: true,
   },
   {
-    type: "fire", title: "Bayraklı Sanayi Industry Check",
+    type: "fire", title: "Bayraklı Industry Check",
     description: "Industrial zone fire risk scan — chemical plant",
     fromLat: 38.4650, fromLng: 27.1700,
     toLat: 38.4700, toLng: 27.1800,
     payment: 9.0, priority: false,
   },
   {
-    type: "fire", title: "Foça Orman Forest Protection",
+    type: "fire", title: "Foça Forest Protection",
     description: "Foça natural protected area — illegal fire detection",
     fromLat: 38.6600, fromLng: 26.7400,
     toLat: 38.6750, toLng: 26.7600,
     payment: 11.0, priority: false,
   },
   {
-    type: "fire", title: "Gaziemir Havalimanı Airport Perimeter",
+    type: "fire", title: "Gaziemir Airport Perimeter",
     description: "Smoke/fire early warning near airport",
     fromLat: 38.2900, fromLng: 27.1400,
     toLat: 38.3050, toLng: 27.1600,
     payment: 14.0, priority: true,
   },
   {
-    type: "fire", title: "Menemen Ova Anız Stubble Fire",
+    type: "fire", title: "Menemen Plain Stubble Fire",
     description: "Post-harvest stubble burning detection — environmental violation",
     fromLat: 38.5900, fromLng: 27.0500,
     toLat: 38.6100, toLng: 27.0750,
     payment: 7.0, priority: false,
   },
   {
-    type: "fire", title: "Balçova Termal Thermal Anomaly",
+    type: "fire", title: "Balçova Thermal Anomaly",
     description: "Geothermal zone thermal scan — temperature map",
     fromLat: 38.3850, fromLng: 27.0350,
     toLat: 38.3920, toLng: 27.0450,
     payment: 8.5, priority: false,
   },
   {
-    type: "fire", title: "Bergama Antik Alan Ancient Site Protection",
+    type: "fire", title: "Bergama Ancient Site Protection",
     description: "Fire monitoring around UNESCO heritage site",
     fromLat: 39.1150, fromLng: 27.1700,
     toLat: 39.1250, toLng: 27.1850,
     payment: 13.0, priority: true,
   },
   {
-    type: "fire", title: "Urla Sahil Coast Rescue",
+    type: "fire", title: "Urla Coast Rescue",
     description: "Coast search and rescue coordination",
     fromLat: 38.3150, fromLng: 26.7500,
     toLat: 38.3250, toLng: 26.7650,
     payment: 16.0, priority: true,
   },
   {
-    type: "fire", title: "Çiğli Askeri Bölge Military Zone Perimeter",
+    type: "fire", title: "Çiğli Military Zone Perimeter",
     description: "Security scan around NATO base",
     fromLat: 38.5000, fromLng: 27.0100,
     toLat: 38.5150, toLng: 27.0300,
@@ -323,24 +323,24 @@ const fireMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] =
   },
 ];
 
-// ═══ TRAFİK / GÖZETLEME GÖREVLERİ (11+) ═══
+// ═══ TRAFFIC / SURVEILLANCE MISSIONS (11+) ═══
 const trafficMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[] = [
   {
-    type: "traffic", title: "Konak Otoyol Highway Monitoring",
+    type: "traffic", title: "Konak Highway Monitoring",
     description: "Izmir-Aydin highway entrance — traffic density analysis",
     fromLat: 38.4100, fromLng: 27.1200,
     toLat: 38.3900, toLng: 27.1400,
     payment: 5.0, priority: false,
   },
   {
-    type: "traffic", title: "Bayraklı Kavşak Intersection Analysis",
+    type: "traffic", title: "Bayraklı Intersection Analysis",
     description: "Bayrakli bridge intersection — accident risk analysis",
     fromLat: 38.4580, fromLng: 27.1650,
     toLat: 38.4620, toLng: 27.1750,
     payment: 4.5, priority: false,
   },
   {
-    type: "traffic", title: "Karşıyaka Sahil Coast Guard",
+    type: "traffic", title: "Karşıyaka Coast Guard",
     description: "Kordon line — illegal fishing and maritime security",
     fromLat: 38.4520, fromLng: 27.1000,
     toLat: 38.4600, toLng: 27.1200,
@@ -354,49 +354,49 @@ const trafficMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[
     payment: 8.0, priority: true,
   },
   {
-    type: "traffic", title: "Çeşme Marina Marina Surveillance",
+    type: "traffic", title: "Çeşme Marina Surveillance",
     description: "Marina and port zone — boat traffic monitoring",
     fromLat: 38.3200, fromLng: 26.3000,
     toLat: 38.3250, toLng: 26.3100,
     payment: 5.5, priority: false,
   },
   {
-    type: "traffic", title: "Alsancak Liman Port Security",
+    type: "traffic", title: "Alsancak Port Security",
     description: "Izmir Port perimeter — customs and security scan",
     fromLat: 38.4380, fromLng: 27.1400,
     toLat: 38.4420, toLng: 27.1500,
     payment: 7.0, priority: false,
   },
   {
-    type: "traffic", title: "Gaziemir AVM Mall Inspection",
+    type: "traffic", title: "Gaziemir Mall Inspection",
     description: "Mall parking and perimeter security scan",
     fromLat: 38.3150, fromLng: 27.1300,
     toLat: 38.3200, toLng: 27.1400,
     payment: 4.0, priority: false,
   },
   {
-    type: "traffic", title: "Foça Sahil Kaçak Illegal Structure",
+    type: "traffic", title: "Foça Coast Illegal Structure",
     description: "Natural protected area — illegal construction detection",
     fromLat: 38.6650, fromLng: 26.7450,
     toLat: 38.6750, toLng: 26.7600,
     payment: 9.0, priority: true,
   },
   {
-    type: "traffic", title: "Menemen OSB Industrial Zone",
+    type: "traffic", title: "Menemen Industrial Zone",
     description: "Organized industrial zone — environmental pollution detection",
     fromLat: 38.6050, fromLng: 27.0650,
     toLat: 38.6130, toLng: 27.0780,
     payment: 6.5, priority: false,
   },
   {
-    type: "traffic", title: "Bornova Üniversite University Campus",
+    type: "traffic", title: "Bornova University Campus",
     description: "Ege University campus security patrol",
     fromLat: 38.4550, fromLng: 27.2200,
     toLat: 38.4650, toLng: 27.2300,
     payment: 3.5, priority: false,
   },
   {
-    type: "traffic", title: "Çiğli Havalimanı Airport Perimeter",
+    type: "traffic", title: "Çiğli Airport Perimeter",
     description: "Old airport zone — unauthorized drone detection",
     fromLat: 38.5050, fromLng: 27.0150,
     toLat: 38.5150, toLng: 27.0350,
@@ -404,7 +404,7 @@ const trafficMissions: Omit<Mission, "id" | "createdAt" | "status" | "droneId">[
   },
 ];
 
-// ═══ TÜM GÖREVLERİ BİRLEŞTİR ═══
+// ═══ COMBINE ALL MISSIONS ═══
 const allMissionTemplates = [
   ...cargoMissions,
   ...agriculturalMissions,
@@ -412,7 +412,7 @@ const allMissionTemplates = [
   ...trafficMissions,
 ];
 
-// Görev tipi → uygun drone tipi eşleşmesi
+// Mission type → compatible drone type mapping
 export const missionToDroneType: Record<MissionType, string[]> = {
   cargo: ["cargo"],
   agricultural: ["agricultural"],
@@ -420,7 +420,7 @@ export const missionToDroneType: Record<MissionType, string[]> = {
   traffic: ["surveillance"],
 };
 
-// Havuzdan rastgele görev çek (belirli bir tip veya herhangi)
+// Pull a random mission from the pool (of a specific type or any)
 let missionIdCounter = 100;
 
 export function pickRandomMission(preferType?: MissionType): Mission {
@@ -440,7 +440,7 @@ export function pickRandomMission(preferType?: MissionType): Mission {
   };
 }
 
-// Başlangıçta açık olacak görevler (havuzdan 8 tane çek)
+// Missions that are open at startup (pull 8 from the pool)
 export function generateInitialOpenMissions(): Mission[] {
   const missions: Mission[] = [];
   const types: MissionType[] = ["cargo", "cargo", "agricultural", "fire", "traffic", "cargo", "agricultural", "fire"];

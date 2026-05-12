@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 // ── /api/agent-decision ───────────────────────────────────────
-// FleetAgent'ın GPT-4o-mini ile karar aldığı endpoint.
-// API key yoksa 404 döner, FleetAgent fallback'e geçer.
+// Endpoint where the FleetAgent makes decisions using GPT-4o-mini.
+// Returns 404 if no API key — FleetAgent then falls back.
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -14,26 +14,26 @@ export async function POST(req: NextRequest) {
   try {
     const { missions, drones } = await req.json();
 
-    const systemPrompt = `Sen NeuralAir'ın otonom filo yöneticisi yapay zeka ajanısın.
-Sana açık drone görevleri ve müsait drone'ların listesi verilecek.
-En optimal drone-görev eşleşmesini belirle.
+    const systemPrompt = `You are NeuralAir's autonomous fleet management AI agent.
+You will be given a list of open drone missions and available drones.
+Determine the optimal drone-mission match.
 
-Karar verirken şunları göz önünde bulundur:
-- Drone'un göreve yakınlığı (mesafe)
-- Drone'un tipi ve görev uyumluluğu (emergency → yangın, agricultural → ziraat)
-- Drone'un batarya seviyesi (düşük bataryalı drone alma)
-- Görevin ödeme miktarı (öncelik)
+Consider the following when deciding:
+- Drone proximity to the mission (distance)
+- Drone type vs mission compatibility (emergency → fire, agricultural → crop)
+- Drone battery level (do not assign a low-battery drone)
+- Mission payment amount (higher priority)
 
-Cevabını SADECE JSON formatında ver, başka hiçbir şey yazma:
-{ "droneId": <number>, "missionId": <number>, "reason": "<kısa Türkçe açıklama>" }`;
+Reply ONLY in JSON format, nothing else:
+{ "droneId": <number>, "missionId": <number>, "reason": "<brief English explanation>" }`;
 
-    const userPrompt = `Açık Görevler:
+    const userPrompt = `Open Missions:
 ${JSON.stringify(missions, null, 2)}
 
-Müsait Drone'lar:
+Available Drones:
 ${JSON.stringify(drones, null, 2)}
 
-En iyi eşleşmeyi bul.`;
+Find the best match.`;
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",

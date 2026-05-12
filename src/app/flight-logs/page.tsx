@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { BrandLogo } from "@/components/BrandLogo";
 import {
-  Clock, ArrowLeft, ChevronRight, Cpu, Search, Filter,
+  Clock, ArrowLeft, ChevronRight, Search, Filter,
   Plane, MapPin, Battery, ExternalLink, Package, Tractor,
   Flame, Eye, ArrowUpRight, Download, Radio, Activity,
 } from "lucide-react";
@@ -158,7 +159,7 @@ export default function FlightLogsPage() {
 
   // CSV Export
   const handleExport = () => {
-    const header = "ID,Drone,Tip,Süre(dk),Enerji(kWh),TX Hash,Zaman\n";
+    const header = "ID,Drone,Type,Duration(min),Energy(kWh),TX Hash,Time\n";
     const rows = logs.map(l =>
       `${l.id},${l.droneName},${l.missionType},${l.duration},${l.energyUsed},${l.txHash},${l.timestamp.toISOString()}`
     ).join("\n");
@@ -189,8 +190,8 @@ export default function FlightLogsPage() {
               </Link>
               <div className="flex items-center gap-2">
                 <Link href="/" className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg gradient-bg flex items-center justify-center">
-                    <Cpu className="w-4 h-4 text-white" />
+                  <div className="w-8 h-8 rounded-lg overflow-hidden ring-1 ring-white/10 shrink-0">
+                    <BrandLogo size={32} className="rounded-lg" />
                   </div>
                   <span className="font-bold gradient-text">NeuralAir</span>
                 </Link>

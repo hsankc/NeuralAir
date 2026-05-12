@@ -423,3 +423,236 @@ body {
   background: rgba(20, 241, 149, 0.15);
   color: #fff;
 }
+
+/* =================== Landing (full-page snap + hero) =================== */
+
+@keyframes landing-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.landing-in {
+  opacity: 0;
+  animation: landing-in 0.95s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.landing-in-d1 {
+  animation-delay: 0.06s;
+}
+
+.landing-in-d2 {
+  animation-delay: 0.14s;
+}
+
+.landing-in-d3 {
+  animation-delay: 0.22s;
+}
+
+.landing-in-d4 {
+  animation-delay: 0.3s;
+}
+
+.landing-in-d5 {
+  animation-delay: 0.38s;
+}
+
+.landing-in-d6 {
+  animation-delay: 0.46s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .landing-in,
+  .landing-in-d1,
+  .landing-in-d2,
+  .landing-in-d3,
+  .landing-in-d4,
+  .landing-in-d5,
+  .landing-in-d6 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* =================== Aurora background =================== */
+
+@keyframes aurora-pan {
+  0%, 100% {
+    transform: translate3d(-15%, -10%, 0) scale(1.05);
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    transform: translate3d(10%, 5%, 0) scale(1.15);
+    filter: hue-rotate(-15deg);
+  }
+}
+
+@keyframes aurora-pan-2 {
+  0%, 100% {
+    transform: translate3d(20%, 15%, 0) scale(1.1);
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    transform: translate3d(-12%, -8%, 0) scale(1.2);
+    filter: hue-rotate(20deg);
+  }
+}
+
+.aurora-blob {
+  animation: aurora-pan 22s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: transform, filter;
+}
+
+.aurora-blob-2 {
+  animation: aurora-pan-2 28s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: transform, filter;
+}
+
+/* =================== Border beam (Aceternity / MagicUI esinli) =================== */
+
+@property --beam-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes beam-rotate {
+  to { --beam-angle: 360deg; }
+}
+
+.border-beam {
+  position: relative;
+  isolation: isolate;
+}
+
+.border-beam::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0deg,
+    transparent 270deg,
+    rgba(20, 241, 149, 0.9) 320deg,
+    rgba(167, 139, 250, 0.85) 340deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+  animation: beam-rotate 6s linear infinite;
+  opacity: 0.9;
+}
+
+/* fallback: tarayıcı @property desteklemezse en azından ince yeşil halka */
+@supports not (background: conic-gradient(from var(--beam-angle), red, blue)) {
+  .border-beam::before {
+    background: linear-gradient(135deg, rgba(20,241,149,0.5), rgba(167,139,250,0.4));
+    animation: none;
+  }
+}
+
+/* =================== Shimmer text =================== */
+
+@keyframes text-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.text-shimmer {
+  background: linear-gradient(
+    100deg,
+    rgba(255,255,255,0.4) 30%,
+    rgba(20, 241, 149, 1) 45%,
+    rgba(167, 139, 250, 1) 55%,
+    rgba(255,255,255,0.4) 70%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  animation: text-shimmer 4s linear infinite;
+}
+
+/* =================== Marquee =================== */
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(-100% - var(--marquee-gap, 2rem))); }
+}
+
+.marquee-track {
+  display: flex;
+  gap: var(--marquee-gap, 2rem);
+  animation: marquee var(--marquee-duration, 30s) linear infinite;
+  width: max-content;
+  will-change: transform;
+}
+
+.marquee-pause:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* =================== Spotlight (mouse follow) =================== */
+
+.spotlight-wrap {
+  position: relative;
+}
+
+.spotlight-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    600px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(20, 241, 149, 0.12),
+    transparent 40%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: inherit;
+}
+
+.spotlight-wrap:hover::before {
+  opacity: 1;
+}
+
+/* =================== Grid pulse =================== */
+
+@keyframes grid-cell-pulse {
+  0%, 100% { opacity: 0.06; }
+  50% { opacity: 0.18; }
+}
+
+.grid-cell-anim {
+  animation: grid-cell-pulse 4s ease-in-out infinite;
+}
+
+/* =================== Beam line =================== */
+
+@keyframes beam-line {
+  0% { transform: translateY(-100%); opacity: 0; }
+  20% { opacity: 0.8; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.beam-line {
+  animation: beam-line 8s linear infinite;
+}

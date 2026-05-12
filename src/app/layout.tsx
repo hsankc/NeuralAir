@@ -7,16 +7,20 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
-  title: "NeuralAir — SkyAgent Protocol | Otonom Drone Ağı",
+  title: "NeuralAir — SkyAgent Protocol | Autonomous Drone Network",
   description:
-    "Solana blokzinciri üzerinde merkeziyetsiz otonom havacılık ağı. DePIN şarj, AI görev dağıtımı, gerçek zamanlı drone takibi ve on-chain uçuş kontrol.",
+    "Decentralized autonomous aviation network on the Solana blockchain. DePIN charging, AI mission dispatch, real-time drone tracking and on-chain flight control.",
+  icons: {
+    icon: "/neuralair-logo.png",
+    apple: "/neuralair-logo.png",
+  },
   keywords: [
     "drone",
     "blockchain",
     "Solana",
     "DePIN",
     "AI",
-    "otonom uçuş",
+    "autonomous flight",
     "NeuralAir",
     "SkyAgent",
   ],

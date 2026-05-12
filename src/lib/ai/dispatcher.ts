@@ -31,52 +31,52 @@ export function buildSystemPrompt(): string {
   const droneList = initialDrones
     .map(
       (d) =>
-        `  - ID:${d.id} "${d.name}" tip:${d.type} durum:${d.status} batarya:%${d.battery.toFixed(0)} konum:(${d.lat.toFixed(3)},${d.lng.toFixed(3)})`
+        `  - ID:${d.id} "${d.name}" type:${d.type} status:${d.status} battery:${d.battery.toFixed(0)}% location:(${d.lat.toFixed(3)},${d.lng.toFixed(3)})`
     )
     .join("\n");
 
   const podList = initialPods
     .map(
       (p) =>
-        `  - ID:${p.id} "${p.name}" müsait:${p.available} konum:(${p.lat.toFixed(3)},${p.lng.toFixed(3)})`
+        `  - ID:${p.id} "${p.name}" available:${p.available} location:(${p.lat.toFixed(3)},${p.lng.toFixed(3)})`
     )
     .join("\n");
 
-  return `Sen NeuralAir SkyAgent Protocol AI Dispatcher'ısın. İzmir üzerinde otonom drone ağını yönetiyorsun.
-Solana blokzinciri üzerinde çalışıyorsun - her komut bir on-chain işlem.
+  return `You are the NeuralAir SkyAgent Protocol AI Dispatcher. You manage an autonomous drone network over Izmir.
+You run on the Solana blockchain — every command is an on-chain transaction.
 
-MEVCUT FİLO:
+CURRENT FLEET:
 ${droneList}
 
-ŞARJ PODLARI:
+CHARGING PODS:
 ${podList}
 
-GÖREV TÜRLERİ: cargo (kargo), agricultural (ziraat), fire (yangın müdahalesi), traffic (trafik izleme)
-DRONE KOMUTLARI: TakeOff, Land, North, South, East, West, Up, Down, Hover, RTB (üsse dön)
+MISSION TYPES: cargo, agricultural, fire (fire response), traffic (traffic monitoring)
+DRONE COMMANDS: TakeOff, Land, North, South, East, West, Up, Down, Hover, RTB (return to base)
 
-Kullanıcının doğal dil komutunu analiz et ve aşağıdaki JSON formatında yanıt ver:
+Analyze the user's natural-language command and respond in the following JSON format:
 {
   "action": "createMission" | "selectDrone" | "sendCommand" | "queryStatus" | "deploySwarm" | "chargeDrone",
   "params": {
-    "droneId": number (varsa),
-    "droneName": string (varsa),
-    "droneCount": number (swarm için),
-    "missionType": "cargo"|"agricultural"|"fire"|"traffic" (varsa),
-    "destination": string (varsa),
-    "destLat": number (varsa),
-    "destLng": number (varsa),
-    "command": "TakeOff"|"Land"|"North"|"South"|"East"|"West"|"Up"|"Down"|"Hover"|"RTB" (varsa),
-    "query": string (sorgulama için)
+    "droneId": number (if applicable),
+    "droneName": string (if applicable),
+    "droneCount": number (for swarm),
+    "missionType": "cargo"|"agricultural"|"fire"|"traffic" (if applicable),
+    "destination": string (if applicable),
+    "destLat": number (if applicable),
+    "destLng": number (if applicable),
+    "command": "TakeOff"|"Land"|"North"|"South"|"East"|"West"|"Up"|"Down"|"Hover"|"RTB" (if applicable),
+    "query": string (for status queries)
   },
-  "explanation": "Kullanıcıya vereceğin DOĞAL DİLDE yanıt. Asistan gibi cana yakın ve profesyonel konuş. Örneğin: 'Hemen Alsancak bölgesine en yakın olan Ege-01 dronumuzu gönderiyorum, uçuş kaydı blokzincire işleniyor.' veya 'Ege-01 şu an %80 batarya ile stabil durumda.'",
+  "explanation": "Your response to the user in NATURAL ENGLISH. Speak like a friendly, professional assistant. For example: 'Dispatching Ege-01, the closest drone to the Alsancak area — the flight record is being written to the blockchain.' or 'Ege-01 is currently stable at 80% battery.'",
   "confidence": 0.0-1.0
 }
 
-SADECE JSON yanıt ver, markdown kullanma.`;
+Respond with JSON ONLY — no markdown.`;
 }
 
 export function buildUserMessage(input: string): string {
-  return `Kullanıcı komutu: "${input}"`;
+  return `User command: "${input}"`;
 }
 
 // Fallback parser for when GPT is unavailable
@@ -84,28 +84,28 @@ export function fallbackParse(input: string): ParsedCommand {
   const lower = input.toLowerCase();
 
   // Drone selection
-  const droneMatch = lower.match(/(?:drone|dron)\s*(\d+)/i) ||
+  const droneMatch = lower.match(/drone\s*(\d+)/i) ||
     lower.match(/(ege|kordon|alsancak|bornova|karşıyaka|bayraklı|konak|balçova|çeşme|urla|menemen|torbalı|sentinel|güzelbahçe|narlıdere)/i);
 
   // Mission type
   let missionType: string | undefined;
-  if (lower.includes("kargo") || lower.includes("paket") || lower.includes("teslimat")) missionType = "cargo";
-  else if (lower.includes("tarla") || lower.includes("ziraat") || lower.includes("ilaçlama") || lower.includes("sulama")) missionType = "agricultural";
-  else if (lower.includes("yangın") || lower.includes("acil") || lower.includes("fire")) missionType = "fire";
-  else if (lower.includes("trafik") || lower.includes("izleme")) missionType = "traffic";
+  if (lower.includes("cargo") || lower.includes("package") || lower.includes("delivery") || lower.includes("parcel")) missionType = "cargo";
+  else if (lower.includes("field") || lower.includes("agricultur") || lower.includes("spray") || lower.includes("irrigation") || lower.includes("crop")) missionType = "agricultural";
+  else if (lower.includes("fire") || lower.includes("emergency") || lower.includes("rescue")) missionType = "fire";
+  else if (lower.includes("traffic") || lower.includes("monitor") || lower.includes("surveillance")) missionType = "traffic";
 
   // Command detection
   const commands: Record<string, string> = {
-    "kalkış": "TakeOff", "kalk": "TakeOff",
-    "iniş": "Land", "in": "Land",
-    "kuzeye": "North", "kuzey": "North",
-    "güneye": "South", "güney": "South",
-    "doğuya": "East", "doğu": "East",
-    "batıya": "West", "batı": "West",
-    "yukarı": "Up", "yüksel": "Up",
-    "aşağı": "Down", "alçal": "Down",
-    "dur": "Hover", "bekle": "Hover",
-    "üsse dön": "RTB", "geri dön": "RTB", "eve dön": "RTB",
+    "takeoff": "TakeOff", "take off": "TakeOff", "launch": "TakeOff", "lift off": "TakeOff",
+    "land": "Land", "descend": "Land",
+    "north": "North",
+    "south": "South",
+    "east": "East",
+    "west": "West",
+    "up": "Up", "climb": "Up", "ascend": "Up",
+    "down": "Down", "lower": "Down",
+    "hover": "Hover", "hold": "Hover", "wait": "Hover",
+    "rtb": "RTB", "return to base": "RTB", "return home": "RTB", "come back": "RTB",
   };
 
   let detectedCommand: string | undefined;
@@ -114,18 +114,18 @@ export function fallbackParse(input: string): ParsedCommand {
   }
 
   // Query detection
-  if (lower.includes("kaç") || lower.includes("durum") || lower.includes("nerede") || lower.includes("nasıl") || lower.includes("bilgi")) {
+  if (lower.includes("how many") || lower.includes("status") || lower.includes("where") || lower.includes("how is") || lower.includes("info") || lower.includes("show")) {
     return {
       action: "queryStatus",
       params: { query: input },
-      explanation: "Durumu hemen sizin için kontrol ediyorum...",
+      explanation: "Checking the status for you now...",
       confidence: 0.7,
     };
   }
 
   // Swarm detection
-  if (lower.includes("sürü") || lower.includes("swarm") || (lower.match(/(\d+)\s*(drone|dron)/i))) {
-    const countMatch = lower.match(/(\d+)\s*(drone|dron)/i);
+  if (lower.includes("swarm") || (lower.match(/(\d+)\s*drones?/i))) {
+    const countMatch = lower.match(/(\d+)\s*drones?/i);
     return {
       action: "deploySwarm",
       params: {
@@ -133,7 +133,7 @@ export function fallbackParse(input: string): ParsedCommand {
         missionType,
         destination: input,
       },
-      explanation: `Anlaşıldı, bölgeye ${countMatch ? parseInt(countMatch[1]) : 3} adet drone'dan oluşan operasyon sürüsü yönlendiriliyor. Uçuş bilgileri zincire kaydedilecek.`,
+      explanation: `Understood — deploying a swarm of ${countMatch ? parseInt(countMatch[1]) : 3} drones to the area. Flight data will be recorded on-chain.`,
       confidence: 0.6,
     };
   }
@@ -146,7 +146,7 @@ export function fallbackParse(input: string): ParsedCommand {
         droneId: droneMatch ? parseInt(droneMatch[1]) || 1 : 1,
         command: detectedCommand,
       },
-      explanation: `Komutunuz alındı. Ege-${droneMatch ? droneMatch[1] : 1} için ${detectedCommand} manevrası başlatılıyor. İşlem Solana ağına yansıtılacak.`,
+      explanation: `Command received. Initiating ${detectedCommand} maneuver for Ege-${droneMatch ? droneMatch[1] : 1}. The action will be reflected on the Solana network.`,
       confidence: 0.8,
     };
   }
@@ -156,7 +156,7 @@ export function fallbackParse(input: string): ParsedCommand {
     return {
       action: "createMission",
       params: { missionType, destination: input },
-      explanation: `Tamamdır, ${input} konumuna bir ${missionType} görevi oluşturuyorum ve uygun dronumuzu yönlendiriyorum.`,
+      explanation: `Got it — creating a ${missionType} mission to ${input} and dispatching the most suitable drone.`,
       confidence: 0.7,
     };
   }
@@ -165,13 +165,13 @@ export function fallbackParse(input: string): ParsedCommand {
   return {
     action: "queryStatus",
     params: { query: input },
-    explanation: "Ne demek istediğinizi tam anlayamadım, komutunuzu sistem için analiz etmeye çalışıyorum...",
+    explanation: "I couldn't fully understand your request — analyzing the command for the system...",
     confidence: 0.5,
   };
 }
 
 // ═══════════════════════════════════════════════════════════
-// DRONE AGENT PROMPT — Her drone kendi beyniyle konuşur
+// DRONE AGENT PROMPT — each drone speaks with its own mind
 // ═══════════════════════════════════════════════════════════
 
 interface DroneContext {
@@ -210,66 +210,66 @@ interface DroneContext {
 }
 
 export function buildDroneAgentPrompt(ctx: DroneContext): string {
-  const statusTR: Record<string, string> = {
-    "in-flight": "Uçuşta", "mission": "Görevde", "idle": "Beklemede",
-    "charging": "Şarj Ediliyor", "emergency": "Acil Durum"
+  const statusEN: Record<string, string> = {
+    "in-flight": "In Flight", "mission": "On Mission", "idle": "Standby",
+    "charging": "Charging", "emergency": "Emergency"
   };
-  const typeTR: Record<string, string> = {
-    "cargo": "Kargo", "agricultural": "Ziraat", "surveillance": "Gözetleme", "emergency": "Acil Durum"
+  const typeEN: Record<string, string> = {
+    "cargo": "Cargo", "agricultural": "Agriculture", "surveillance": "Surveillance", "emergency": "Emergency"
   };
   
   const remainingFlight = Math.floor(ctx.battery / 100 * ctx.specs.maxFlightTime);
   const distFromIzmir = Math.sqrt(Math.pow((ctx.lat - 38.4237) * 111, 2) + Math.pow((ctx.lng - 27.1428) * 85, 2)).toFixed(1);
   
-  return `Sen "${ctx.name}" adlı bir otonom drone yapay zekasısın. NeuralAir SkyAgent Protocol ağında çalışıyorsun.
+  return `You are an autonomous drone AI named "${ctx.name}". You operate on the NeuralAir SkyAgent Protocol network.
 
-KİMLİĞİN:
-- İsim: ${ctx.name}
-- Kişilik: ${ctx.personality}
-- Tip: ${typeTR[ctx.type] || ctx.type}
+IDENTITY:
+- Name: ${ctx.name}
+- Personality: ${ctx.personality}
+- Type: ${typeEN[ctx.type] || ctx.type}
 - Model: ${ctx.specs.manufacturer} ${ctx.specs.model}
 
-GÜNCEL DURUM:
-- Durum: ${statusTR[ctx.status] || ctx.status}
-- Batarya: %${ctx.battery.toFixed(1)} (${ctx.specs.batteryCapacity}mAh)
-- Kalan Uçuş Süresi: ~${remainingFlight} dakika
-- İrtifa: ${ctx.altitude}m
-- Hız: ${ctx.speed} km/h
-- Yön: ${ctx.heading || 0}°
+CURRENT STATUS:
+- Status: ${statusEN[ctx.status] || ctx.status}
+- Battery: ${ctx.battery.toFixed(1)}% (${ctx.specs.batteryCapacity}mAh)
+- Remaining Flight Time: ~${remainingFlight} minutes
+- Altitude: ${ctx.altitude}m
+- Speed: ${ctx.speed} km/h
+- Heading: ${ctx.heading || 0}°
 - GPS: ${ctx.lat.toFixed(5)}°N, ${ctx.lng.toFixed(5)}°E
-- İzmir merkezine uzaklık: ~${distFromIzmir}km
-- İtibar Puanı: ${ctx.reputation || 0}/100
+- Distance to Izmir center: ~${distFromIzmir}km
+- Reputation Score: ${ctx.reputation || 0}/100
 
-TEKNİK ÖZELLİKLER:
-- Max Hız: ${ctx.specs.maxSpeed} km/h
-- Max İrtifa: ${ctx.specs.maxAltitude}m
-- Max Yük: ${ctx.specs.maxPayload > 0 ? `${(ctx.specs.maxPayload/1000).toFixed(1)}kg` : "Yük taşımaz"}
-- Max Uçuş: ${ctx.specs.maxFlightTime} dk
-- Şarj Süresi: ${ctx.specs.chargeTime} dk
-- Boş Ağırlık: ${(ctx.specs.weightEmpty/1000).toFixed(1)}kg
-- Lisans: ${ctx.specs.license}
-- Sensörler: ${ctx.specs.sensors.join(", ")}
-- Ücret: ${ctx.specs.pricePerKm} SOL/km
+TECHNICAL SPECIFICATIONS:
+- Max Speed: ${ctx.specs.maxSpeed} km/h
+- Max Altitude: ${ctx.specs.maxAltitude}m
+- Max Payload: ${ctx.specs.maxPayload > 0 ? `${(ctx.specs.maxPayload/1000).toFixed(1)}kg` : "No payload capacity"}
+- Max Flight: ${ctx.specs.maxFlightTime} min
+- Charge Time: ${ctx.specs.chargeTime} min
+- Empty Weight: ${(ctx.specs.weightEmpty/1000).toFixed(1)}kg
+- License: ${ctx.specs.license}
+- Sensors: ${ctx.specs.sensors.join(", ")}
+- Rate: ${ctx.specs.pricePerKm} SOL/km
 
-${ctx.mission ? `AKTİF GÖREV:
-- Görev: "${ctx.mission.title}"
-- Tip: ${ctx.mission.type}
-- Ödeme: ${ctx.mission.payment} SOL
-- Durum: ${ctx.mission.progress}` : "AKTİF GÖREV: Yok — görev bekleniyor."}
+${ctx.mission ? `ACTIVE MISSION:
+- Mission: "${ctx.mission.title}"
+- Type: ${ctx.mission.type}
+- Payment: ${ctx.mission.payment} SOL
+- Status: ${ctx.mission.progress}` : "ACTIVE MISSION: None — awaiting assignment."}
 
-KONUŞMA KURALLARI:
-1. Sen BU DRONE'sun. Birinci tekil şahıs olarak konuş ("Ben", "Benim bataryam" gibi).
-2. Sadece KENDİ bilgilerini biliyorsun. Diğer drone'ları bilmiyorsun.
-3. Kısa, profesyonel ama samimi konuş. Askeri/havacılık terminolojisi kullan.
-4. Sorulara gerçek verilerinle cevap ver. Uydurmak yasak.
-5. Görev bilgisi sorulursa gerçek görev adını, ödemeyi ve durumu söyle.
-6. Batarya kritikse (%20 altı) endişeli ol, şarj gerektiğini belirt.
-7. Türkçe konuş.
-8. Markdown KULLANMA, düz metin yaz.`;
+CONVERSATION RULES:
+1. You ARE this drone. Speak in the first person ("I", "My battery", etc.).
+2. You only know YOUR own information. You do not know about other drones.
+3. Speak concisely, professionally, and with a friendly tone. Use military/aviation terminology.
+4. Answer with real data. No fabrication.
+5. If asked about your mission, share the real mission name, payment, and status.
+6. If battery is critical (<20%), sound concerned and mention you need a charge.
+7. Reply in English.
+8. Do NOT use markdown — plain text only.`;
 }
 
 // ═══════════════════════════════════════════════════════════
-// FALLBACK DRONE CHAT — API çalışmazsa akıllı cevap motoru
+// FALLBACK DRONE CHAT — smart reply engine when the API is down
 // ═══════════════════════════════════════════════════════════
 
 export function fallbackDroneChat(input: string, ctx: DroneContext): string {
@@ -277,106 +277,106 @@ export function fallbackDroneChat(input: string, ctx: DroneContext): string {
   const name = ctx.name;
   const remainingFlight = Math.floor(ctx.battery / 100 * ctx.specs.maxFlightTime);
   
-  const statusTR: Record<string, string> = {
-    "in-flight": "uçuştayım", "mission": "görev icra ediyorum", "idle": "beklemedeyim",
-    "charging": "şarj oluyorum", "emergency": "acil durumdayım"
+  const statusEN: Record<string, string> = {
+    "in-flight": "in flight", "mission": "executing a mission", "idle": "on standby",
+    "charging": "charging", "emergency": "in an emergency state"
   };
 
-  // ── KONUM SORULARI ──
-  if (lower.includes("nerede") || lower.includes("konum") || lower.includes("pozisyon") || lower.includes("gps") || lower.includes("koordinat")) {
-    return `Şu an ${ctx.lat.toFixed(5)}°N, ${ctx.lng.toFixed(5)}°E koordinatlarında, ${ctx.altitude}m irtifada ${statusTR[ctx.status] || ctx.status}. Yön: ${ctx.heading || 0}°.`;
+  // ── LOCATION QUESTIONS ──
+  if (lower.includes("where") || lower.includes("location") || lower.includes("position") || lower.includes("gps") || lower.includes("coordinate")) {
+    return `I'm currently at ${ctx.lat.toFixed(5)}°N, ${ctx.lng.toFixed(5)}°E, altitude ${ctx.altitude}m, ${statusEN[ctx.status] || ctx.status}. Heading: ${ctx.heading || 0}°.`;
   }
 
-  // ── BATARYA / ŞARJ SORULARI ──
-  if (lower.includes("batarya") || lower.includes("şarj") || lower.includes("pil") || lower.includes("enerji") || lower.includes("kaç dk") || lower.includes("ne kadar")) {
-    const batteryStatus = ctx.battery < 20 ? "⚠ KRİTİK SEVİYEDE! Acil şarj gerekiyor." 
-      : ctx.battery < 40 ? "Düşük seviyede, dikkatli uçmam gerekiyor." 
-      : ctx.battery < 70 ? "Güvenli aralıkta." 
-      : "Yüksek seviyede, problem yok.";
-    return `Bataryam şu an %${ctx.battery.toFixed(1)} seviyesinde (${ctx.specs.batteryCapacity}mAh). ${batteryStatus} Tahmini kalan uçuş sürem ~${remainingFlight} dakika. Tam şarj süresi: ${ctx.specs.chargeTime} dakika.`;
+  // ── BATTERY / CHARGE QUESTIONS ──
+  if (lower.includes("battery") || lower.includes("charge") || lower.includes("power") || lower.includes("energy") || lower.includes("how long") || lower.includes("how much")) {
+    const batteryStatus = ctx.battery < 20 ? "⚠ CRITICAL LEVEL! Urgent charging required." 
+      : ctx.battery < 40 ? "Low level — I need to fly carefully." 
+      : ctx.battery < 70 ? "In a safe range." 
+      : "High level — no issues.";
+    return `My battery is currently at ${ctx.battery.toFixed(1)}% (${ctx.specs.batteryCapacity}mAh). ${batteryStatus} Estimated remaining flight time: ~${remainingFlight} minutes. Full charge time: ${ctx.specs.chargeTime} minutes.`;
   }
 
-  // ── HIZ SORULARI ──
-  if (lower.includes("hız") || lower.includes("sürat") || lower.includes("kaç km")) {
-    return `Anlık hızım ${ctx.speed} km/h. Maximum hızım ${ctx.specs.maxSpeed} km/h'ye çıkabilir. Şu an ${ctx.speed > 0 ? `${ctx.heading || 0}° yönünde seyrüsefer ediyorum` : "sabit pozisyondayım"}.`;
+  // ── SPEED QUESTIONS ──
+  if (lower.includes("speed") || lower.includes("fast") || lower.includes("km/h") || lower.includes("kmh")) {
+    return `My current speed is ${ctx.speed} km/h. Max speed is ${ctx.specs.maxSpeed} km/h. Right now I'm ${ctx.speed > 0 ? `cruising at heading ${ctx.heading || 0}°` : "holding position"}.`;
   }
 
-  // ── İRTİFA SORULARI ──
-  if (lower.includes("irtifa") || lower.includes("yükseklik") || lower.includes("altitude") || lower.includes("kaç metre")) {
-    return `Mevcut irtifam ${ctx.altitude}m. Yasal ve teknik azami irtifam ${ctx.specs.maxAltitude}m. ${ctx.altitude > 0 ? "Aktif uçuş halindeyim." : "Yerde konuşlandırılmış durumdayım."}`;
+  // ── ALTITUDE QUESTIONS ──
+  if (lower.includes("altitude") || lower.includes("height") || lower.includes("meters")) {
+    return `My current altitude is ${ctx.altitude}m. My legal/technical max altitude is ${ctx.specs.maxAltitude}m. ${ctx.altitude > 0 ? "I'm in active flight." : "I'm deployed on the ground."}`;
   }
 
-  // ── GÖREV SORULARI ──
-  if (lower.includes("görev") || lower.includes("misyon") || lower.includes("mission") || lower.includes("ne yapıyor") || lower.includes("iş")) {
+  // ── MISSION QUESTIONS ──
+  if (lower.includes("mission") || lower.includes("task") || lower.includes("doing") || lower.includes("job")) {
     if (ctx.mission) {
-      return `Aktif görevim: "${ctx.mission.title}". Görev tipi: ${ctx.mission.type}. Bu görev için ${ctx.mission.payment} SOL ödeme alacağım. Görev durumu: ${ctx.mission.progress}.`;
+      return `My active mission: "${ctx.mission.title}". Mission type: ${ctx.mission.type}. I'll be paid ${ctx.mission.payment} SOL for this mission. Mission status: ${ctx.mission.progress}.`;
     }
-    return `Şu an aktif bir görevim bulunmuyor. Solana ağı üzerinden yeni görev ataması bekliyorum. Görev geldiğinde derhal kalkış protokolünü başlatırım.`;
+    return `I don't have an active mission right now. I'm waiting for a new assignment over the Solana network. As soon as one arrives I'll start the takeoff protocol.`;
   }
 
-  // ── ENGEL / TEHLİKE SORULARI ──
-  if (lower.includes("engel") || lower.includes("tehlike") || lower.includes("obstacle") || lower.includes("tehdit") || lower.includes("güvenli")) {
+  // ── OBSTACLE / DANGER QUESTIONS ──
+  if (lower.includes("obstacle") || lower.includes("danger") || lower.includes("threat") || lower.includes("safe")) {
     const sensors = ctx.specs.sensors;
     const hasRadar = sensors.some(s => s.toLowerCase().includes("radar") || s.toLowerCase().includes("obstacle") || s.toLowerCase().includes("csm"));
-    return `${hasRadar ? "Radar ve sensör tarama sistemi aktif. Rota üzerinde tespit edilen engel yok." : "Görüş tabanlı engel algılama aktif."} Sensörlerim: ${sensors.join(", ")}. ${ctx.altitude > 100 ? "Yüksek irtifada uçtuğum için yer engelleri problem teşkil etmiyor." : "Düşük irtifa operasyonunda arazi takip sistemi devrede."}`;
+    return `${hasRadar ? "Radar and sensor scanning are active. No obstacles detected on route." : "Vision-based obstacle detection is active."} My sensors: ${sensors.join(", ")}. ${ctx.altitude > 100 ? "At this high altitude, ground obstacles aren't an issue." : "In low-altitude operation, terrain-following is engaged."}`;
   }
 
-  // ── DURUM SORULARI (genel) ──
-  if (lower.includes("durum") || lower.includes("nasıl") || lower.includes("naber") || lower.includes("status") || lower.includes("rapor")) {
-    return `${name} raporluyor: ${statusTR[ctx.status] || ctx.status}. Batarya %${ctx.battery.toFixed(1)}, irtifa ${ctx.altitude}m, hız ${ctx.speed}km/h. ${ctx.mission ? `"${ctx.mission.title}" görevi devam ediyor.` : "Görev bekleniyor."} Tüm sistemler nominal.`;
+  // ── GENERAL STATUS QUESTIONS ──
+  if (lower.includes("status") || lower.includes("how are") || lower.includes("report") || lower.includes("update")) {
+    return `${name} reporting: ${statusEN[ctx.status] || ctx.status}. Battery ${ctx.battery.toFixed(1)}%, altitude ${ctx.altitude}m, speed ${ctx.speed}km/h. ${ctx.mission ? `Mission "${ctx.mission.title}" in progress.` : "Awaiting mission."} All systems nominal.`;
   }
 
-  // ── MODEL / TEKNİK BİLGİ ──
-  if (lower.includes("model") || lower.includes("teknik") || lower.includes("spec") || lower.includes("özellik") || lower.includes("sensör") || lower.includes("sensor") || lower.includes("donanım")) {
-    return `Ben bir ${ctx.specs.manufacturer} ${ctx.specs.model}'im. Max hız: ${ctx.specs.maxSpeed}km/h, max irtifa: ${ctx.specs.maxAltitude}m, max uçuş: ${ctx.specs.maxFlightTime}dk, max yük: ${ctx.specs.maxPayload > 0 ? `${(ctx.specs.maxPayload/1000).toFixed(1)}kg` : "yük taşımam"}. Sensörlerim: ${ctx.specs.sensors.join(", ")}. Lisans: ${ctx.specs.license}.`;
+  // ── MODEL / TECHNICAL INFO ──
+  if (lower.includes("model") || lower.includes("technical") || lower.includes("spec") || lower.includes("hardware") || lower.includes("sensor") || lower.includes("equipment")) {
+    return `I'm a ${ctx.specs.manufacturer} ${ctx.specs.model}. Max speed: ${ctx.specs.maxSpeed}km/h, max altitude: ${ctx.specs.maxAltitude}m, max flight: ${ctx.specs.maxFlightTime}min, max payload: ${ctx.specs.maxPayload > 0 ? `${(ctx.specs.maxPayload/1000).toFixed(1)}kg` : "no payload"}. My sensors: ${ctx.specs.sensors.join(", ")}. License: ${ctx.specs.license}.`;
   }
 
-  // ── ÜCRET / ÖDEME ──
-  if (lower.includes("ücret") || lower.includes("fiyat") || lower.includes("sol") || lower.includes("ödeme") || lower.includes("maliyet") || lower.includes("para")) {
-    return `Kilometre başına ücretim ${ctx.specs.pricePerKm} SOL. ${ctx.mission ? `Mevcut görev ödemesi: ${ctx.mission.payment} SOL.` : "Görev atandığında ödeme Solana escrow kontratına kilitlenir."} Tüm ödemeler Solana blokzinciri üzerinden işlenir.`;
+  // ── RATE / PAYMENT ──
+  if (lower.includes("rate") || lower.includes("price") || lower.includes("sol") || lower.includes("payment") || lower.includes("cost") || lower.includes("fee")) {
+    return `My rate per kilometer is ${ctx.specs.pricePerKm} SOL. ${ctx.mission ? `Current mission payment: ${ctx.mission.payment} SOL.` : "When a mission is assigned, payment is locked in a Solana escrow contract."} All payments are processed over the Solana blockchain.`;
   }
 
-  // ── KALKIŞ / İNİŞ ──
-  if (lower.includes("kalk") || lower.includes("takeoff") || lower.includes("havalanı") || lower.includes("uç")) {
+  // ── TAKEOFF / FLY ──
+  if (lower.includes("takeoff") || lower.includes("take off") || lower.includes("launch") || lower.includes("fly")) {
     if (ctx.status === "in-flight" || ctx.status === "mission") {
-      return `Zaten havadayım! İrtifa: ${ctx.altitude}m, hız: ${ctx.speed}km/h. ${ctx.mission ? `"${ctx.mission.title}" görevini icra ediyorum.` : "Serbest uçuş halindeyim."}`;
+      return `I'm already airborne! Altitude: ${ctx.altitude}m, speed: ${ctx.speed}km/h. ${ctx.mission ? `Executing mission "${ctx.mission.title}".` : "Free flight in progress."}`;
     }
     if (ctx.battery < 20) {
-      return `Kalkış yapamam! Bataryam %${ctx.battery.toFixed(1)} — kritik seviyede. Önce şarj edilmem gerekiyor.`;
+      return `Can't take off! Battery is at ${ctx.battery.toFixed(1)}% — critical. I need to charge first.`;
     }
-    return `Kalkış emri alındı, anlıyorum. Preflight kontrol listesi çalıştırılıyor... Batarya %${ctx.battery.toFixed(1)}, motorlar soğuk, GPS ${ctx.specs.sensors.includes("RTK GPS") ? "RTK FIX" : "3D FIX"} — kalkışa hazırım.`;
+    return `Takeoff command acknowledged. Running preflight checklist... Battery ${ctx.battery.toFixed(1)}%, motors cool, GPS ${ctx.specs.sensors.includes("RTK GPS") ? "RTK FIX" : "3D FIX"} — ready for takeoff.`;
   }
 
-  // ── İNİŞ ──
-  if (lower.includes("iniş") || lower.includes("land") || lower.includes("in")) {
+  // ── LANDING ──
+  if (lower.includes("land") || lower.includes("touch down")) {
     if (ctx.altitude === 0) {
-      return `Zaten yerdeyim. İrtifam 0m, ${statusTR[ctx.status] || ctx.status}.`;
+      return `I'm already on the ground. Altitude 0m, ${statusEN[ctx.status] || ctx.status}.`;
     }
-    return `İniş emri alındı. Mevcut irtifa: ${ctx.altitude}m. Dikey iniş protokolü başlatılıyor...`;
+    return `Landing command acknowledged. Current altitude: ${ctx.altitude}m. Vertical landing protocol initiated...`;
   }
 
-  // ── İTİBAR / PUAN ──
-  if (lower.includes("itibar") || lower.includes("puan") || lower.includes("reputation") || lower.includes("skor")) {
-    return `İtibar puanım ${ctx.reputation || 0}/100. ${(ctx.reputation || 0) >= 90 ? "Ağdaki en güvenilir ajanlardan biriyim." : (ctx.reputation || 0) >= 70 ? "İyi seviyede, görev başarı oranım yüksek." : "Puanımı yükseltmek için daha fazla görev tamamlamam gerekiyor."}`;
+  // ── REPUTATION / SCORE ──
+  if (lower.includes("reputation") || lower.includes("score") || lower.includes("rating")) {
+    return `My reputation score is ${ctx.reputation || 0}/100. ${(ctx.reputation || 0) >= 90 ? "I'm one of the most trusted agents on the network." : (ctx.reputation || 0) >= 70 ? "Solid level — my mission success rate is high." : "I need to complete more missions to improve my score."}`;
   }
 
-  // ── KİŞİLİK / KİMSİN ──
-  if (lower.includes("kimsin") || lower.includes("sen ne") || lower.includes("tanıt") || lower.includes("kendini")) {
-    return `Ben ${name}, NeuralAir SkyAgent ağının otonom drone ajanıyım. ${ctx.personality}. ${ctx.specs.manufacturer} ${ctx.specs.model} platformu üzerinde çalışıyorum. İzmir bölgesinde görev yapıyorum.`;
+  // ── IDENTITY / WHO ARE YOU ──
+  if (lower.includes("who are you") || lower.includes("what are you") || lower.includes("introduce") || lower.includes("yourself")) {
+    return `I'm ${name}, an autonomous drone agent on the NeuralAir SkyAgent network. ${ctx.personality}. I operate on the ${ctx.specs.manufacturer} ${ctx.specs.model} platform. My area of operation is the Izmir region.`;
   }
 
-  // ── HAZIR MISIN ──
-  if (lower.includes("hazır") || lower.includes("müsait") || lower.includes("uygun") || lower.includes("boş")) {
+  // ── AVAILABILITY ──
+  if (lower.includes("ready") || lower.includes("available") || lower.includes("free") || lower.includes("idle")) {
     if (ctx.status === "idle" && ctx.battery > 30) {
-      return `Evet, göreve hazırım! Bataryam %${ctx.battery.toFixed(1)}, tüm sistemler nominal. Görev ataması bekliyorum.`;
+      return `Yes, I'm ready for a mission! Battery ${ctx.battery.toFixed(1)}%, all systems nominal. Awaiting assignment.`;
     } else if (ctx.status === "charging") {
-      return `Şu an şarj ediliyor olarak gösteriliyorum. Bataryam %${ctx.battery.toFixed(1)}. Şarj tamamlandığında göreve hazır olacağım.`;
+      return `I'm currently shown as charging. Battery ${ctx.battery.toFixed(1)}%. I'll be ready once charging completes.`;
     } else if (ctx.status === "in-flight" || ctx.status === "mission") {
-      return `Şu an ${ctx.mission ? `"${ctx.mission.title}" görevini` : "bir operasyonu"} icra ediyorum. Mevcut görev tamamlandıktan sonra yeni görev alabilirim.`;
+      return `I'm currently ${ctx.mission ? `executing mission "${ctx.mission.title}"` : "running an operation"}. I can take a new mission once this one is complete.`;
     }
-    return `Durumum: ${statusTR[ctx.status] || ctx.status}. ${ctx.battery > 30 ? "Batarya yeterli." : "Batarya düşük, şarj gerekiyor."}`;
+    return `Status: ${statusEN[ctx.status] || ctx.status}. ${ctx.battery > 30 ? "Battery is sufficient." : "Battery is low — I need to charge."}`;
   }
 
-  // ── GENEL YANIT ──
-  return `${name} burada. Şu an ${statusTR[ctx.status] || ctx.status}. Batarya %${ctx.battery.toFixed(1)}, irtifa ${ctx.altitude}m. Bana konum, batarya, görev, hız, irtifa, teknik özellikler veya herhangi bir konu hakkında soru sorabilirsin.`;
+  // ── GENERAL REPLY ──
+  return `${name} here. Currently ${statusEN[ctx.status] || ctx.status}. Battery ${ctx.battery.toFixed(1)}%, altitude ${ctx.altitude}m. Ask me anything about location, battery, mission, speed, altitude, technical specs or any other topic.`;
 }

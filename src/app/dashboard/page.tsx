@@ -3,9 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
-  Map as MapIcon, Activity, Cpu, Crosshair, Radio, Menu, X,
+  Map as MapIcon, Activity, Crosshair, Radio, Menu, X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
+import { BrandLogo } from "@/components/BrandLogo";
 import { DroneAgent, DroneType, initialPods, initialObstacles } from "@/lib/data";
 import { useDroneFleet } from "@/lib/DroneFleetContext";
 import {
@@ -51,8 +52,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-[#030303] flex flex-col items-center justify-center gap-8">
         <div className="relative">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#14F195] to-[#9945FF] flex items-center justify-center animate-pulse">
-            <Cpu className="w-10 h-10 text-white" />
+          <div className="w-20 h-20 rounded-2xl overflow-hidden ring-2 ring-[#14F195]/30 flex items-center justify-center animate-pulse">
+            <BrandLogo size={80} className="rounded-2xl" priority />
           </div>
           <div className="absolute -inset-4 border border-[#14F195]/20 rounded-3xl animate-spin" style={{animationDuration: '3s'}} />
         </div>
@@ -80,8 +81,8 @@ export default function DashboardPage() {
       >
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center shadow-sm">
-              <Cpu className="w-4.5 h-4.5 text-white" />
+            <div className="w-9 h-9 rounded-xl overflow-hidden ring-1 ring-white/10 shadow-sm shrink-0">
+              <BrandLogo size={36} className="rounded-xl" />
             </div>
             <span className="text-lg font-bold gradient-text">NeuralAir</span>
           </Link>

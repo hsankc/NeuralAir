@@ -9,14 +9,14 @@ export async function POST(request: NextRequest) {
 
     if (!message || typeof message !== "string") {
       return Response.json(
-        { error: "Geçerli bir komut giriniz." },
+        { error: "Please enter a valid command." },
         { status: 400 }
       );
     }
 
     const apiKey = process.env.OPENAI_API_KEY || "";
 
-    // ═══ DRONE AGENT MODE: Bireysel drone ile sohbet ═══
+    // ═══ DRONE AGENT MODE: chat with an individual drone ═══
     if (droneContext) {
       const systemPrompt = buildDroneAgentPrompt(droneContext);
 
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
           source: "gpt-drone-agent",
         });
       } catch (aiError) {
-        // Fallback: Drone'un kendi verisiyle akıllı cevap üret
+        // Fallback: build a smart reply from the drone's own data
         const fallbackResponse = fallbackDroneChat(message, droneContext);
         return Response.json({
           success: true,
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ═══ FLEET DISPATCHER MODE: Genel filo yönetimi ═══
+    // ═══ FLEET DISPATCHER MODE: general fleet management ═══
     try {
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",

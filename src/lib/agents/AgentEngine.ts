@@ -1,8 +1,8 @@
 "use client";
 
 // ── Agent Engine ──────────────────────────────────────────────
-// Tüm AI agent'ları başlatan/durduran merkezi kontrol sistemi.
-// Sayfa açıldığında Dashboard'dan çağrılır.
+// Central control system that starts/stops all AI agents.
+// Called from the Dashboard when the page loads.
 
 import { UserAgent } from "./UserAgent";
 import { FleetAgent } from "./FleetAgent";
@@ -29,7 +29,7 @@ class AgentEngineClass {
   private getDrones: DroneStateCallback | null = null;
   private updateDrone: DroneUpdateCallback | null = null;
 
-  /** Dashboard'dan çağrılır: callback'leri ve drone state erişimini bağlar */
+  /** Called from the Dashboard: binds callbacks and drone state access */
   init(
     onLog: LogCallback,
     getDronesState: DroneStateCallback,
@@ -40,20 +40,20 @@ class AgentEngineClass {
     this.updateDrone = updateDroneState;
   }
 
-  /** Tüm agent'ları başlat */
+  /** Start all agents */
   start() {
     if (this.running) return;
     this.running = true;
 
-    this.log("AgentEngine", "info", "🚀 NeuralAir Agent Engine başlatılıyor / starting...");
-    this.log("AgentEngine", "success", "✅ FleetAgent, EmergencyAgent, UserAgent, ChargingAgent aktif / active");
+    this.log("AgentEngine", "info", "🚀 NeuralAir Agent Engine starting...");
+    this.log("AgentEngine", "success", "✅ FleetAgent, EmergencyAgent, UserAgent, ChargingAgent active");
 
-    // UserAgent: Her 40 saniyede yeni görev açar
+    // UserAgent: opens a new mission every 40 seconds
     this.intervals.push(
       setInterval(() => UserAgent.tick(this.emit.bind(this)), 40_000)
     );
 
-    // FleetAgent: Her 30 saniyede drone-görev eşleştirmesi yapar
+    // FleetAgent: matches drones to missions every 30 seconds
     this.intervals.push(
       setInterval(
         () => FleetAgent.tick(this.emit.bind(this), this.getDrones!, this.updateDrone!),
@@ -61,7 +61,7 @@ class AgentEngineClass {
       )
     );
 
-    // EmergencyAgent: Her 5 saniyede kritik batarya kontrolü
+    // EmergencyAgent: critical battery check every 5 seconds
     this.intervals.push(
       setInterval(
         () => EmergencyAgent.tick(this.emit.bind(this), this.getDrones!, this.updateDrone!),
@@ -69,7 +69,7 @@ class AgentEngineClass {
       )
     );
 
-    // ChargingAgent: Her 3 saniyede şarj oturumlarını işler
+    // ChargingAgent: processes charging sessions every 3 seconds
     this.intervals.push(
       setInterval(
         () => ChargingAgent.tick(this.emit.bind(this), this.getDrones!),
@@ -77,7 +77,7 @@ class AgentEngineClass {
       )
     );
 
-    // İlk tick'leri gecikmeyle tetikle (sayfa yüklenmesi beklenir)
+    // Trigger first ticks after a delay (wait for the page to load)
     setTimeout(() => UserAgent.tick(this.emit.bind(this)), 8_000);
     setTimeout(
       () => FleetAgent.tick(this.emit.bind(this), this.getDrones!, this.updateDrone!),
@@ -85,19 +85,19 @@ class AgentEngineClass {
     );
   }
 
-  /** Tüm agent'ları durdur */
+  /** Stop all agents */
   stop() {
     this.intervals.forEach(clearInterval);
     this.intervals = [];
     this.running = false;
-    this.log("AgentEngine", "warning", "⏹ Agent Engine durduruldu / stopped");
+    this.log("AgentEngine", "warning", "⏹ Agent Engine stopped");
   }
 
   isRunning() {
     return this.running;
   }
 
-  /** Agent log'u yayınla (Dashboard paneline ve Supabase'e) */
+  /** Emit an agent log (to the Dashboard panel and Supabase) */
   emit(agent: string, level: AgentLog["level"], message: string) {
     const log: AgentLog = {
       id: `${Date.now()}-${Math.random()}`,
@@ -114,5 +114,5 @@ class AgentEngineClass {
   }
 }
 
-// Singleton instance — uygulama boyunca tek bir engine çalışır
+// Singleton instance — only one engine runs for the entire app
 export const AgentEngine = new AgentEngineClass();

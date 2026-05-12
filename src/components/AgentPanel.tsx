@@ -1,8 +1,8 @@
 "use client";
 
 // ── AgentPanel ────────────────────────────────────────────────
-// Dashboard'un sağ kısmında gösterilen canlı agent aktivite feed'i.
-// Agent'ların kararlarını, loglarını ve durumunu gösterir.
+// Live agent activity feed shown on the right side of the dashboard.
+// Displays agents' decisions, logs and status.
 
 import { useEffect, useRef } from "react";
 import { Bot, Zap, AlertTriangle, CheckCircle, Info, X } from "lucide-react";
@@ -39,13 +39,13 @@ const LEVEL_BG: Record<AgentLog["level"], string> = {
 };
 
 function formatTime(date: Date): string {
-  return date.toLocaleTimeString("tr-TR", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
 }
 
 export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Yeni log gelince otomatik scroll
+  // Auto-scroll when new log arrives
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [logs]);
@@ -77,7 +77,7 @@ export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
         </button>
       </div>
 
-      {/* Agent durum özeti */}
+      {/* Agent status summary */}
       <div className="flex gap-2 px-4 py-2 border-b border-white/5 flex-wrap">
         {[
           { name: "Fleet", color: "blue" },
@@ -94,7 +94,7 @@ export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
         ))}
       </div>
 
-      {/* Log listesi */}
+      {/* Log list */}
       <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1 font-mono text-xs">
         {logs.length === 0 && (
           <div className="text-center text-zinc-500 mt-8">
@@ -125,7 +125,7 @@ export function AgentPanel({ logs, isRunning, onToggle }: AgentPanelProps) {
         <div ref={bottomRef} />
       </div>
 
-      {/* Alt bilgi */}
+      {/* Footer info */}
       <div className="px-4 py-2 border-t border-white/5">
         <p className="text-xs text-zinc-500 text-center">
           {logs.length} logs • {isRunning ? "Live" : "Stopped"}

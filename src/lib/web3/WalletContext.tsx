@@ -118,8 +118,8 @@ export function WalletProvider({ children }: { children: ReactNode }) {
           ...prev,
           isConnecting: false,
           error: error.message === "User rejected the request."
-            ? "Bağlantı iptal edildi"
-            : error.message || "Phantom bağlantı hatası",
+            ? "Connection cancelled"
+            : error.message || "Phantom connection error",
         }));
       }
       return;

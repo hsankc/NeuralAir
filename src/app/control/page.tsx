@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Radio, Crosshair, Cpu, MapPin, Navigation, TrendingUp, ChevronDown, Battery } from "lucide-react";
+import { ArrowLeft, Radio, Crosshair, MapPin, Navigation, TrendingUp, ChevronDown, Battery } from "lucide-react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { initialDrones } from "@/lib/data";

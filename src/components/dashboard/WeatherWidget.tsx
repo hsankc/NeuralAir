@@ -24,7 +24,7 @@ export function WeatherWidget() {
         <Wind className="w-5 h-5 text-accent-cyan" />
         <div>
           <div className="text-sm font-medium">{weather.condition}</div>
-          <div className="text-xs text-text-muted">{""}</div>
+          <div className="text-xs text-text-muted">Izmir</div>
         </div>
       </div>
       <div className="flex items-center gap-4 text-sm">

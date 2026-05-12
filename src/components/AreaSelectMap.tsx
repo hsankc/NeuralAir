@@ -11,8 +11,8 @@ interface AreaSelectMapProps {
 }
 
 /**
- * Tarla alanı seçim haritası — Kullanıcı haritada tıklayarak dikdörtgen alan çizer.
- * İlk tıklama = köşe 1, ikinci tıklama = karşı köşe → alan hesaplanır.
+ * Field area selection map — User draws a rectangle by clicking on the map.
+ * First click = corner 1, second click = opposite corner → area is computed.
  */
 export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38.42] }: AreaSelectMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -23,7 +23,7 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
   const [areaSize, setAreaSize] = useState<number>(0);
   const markersRef = useRef<maplibregl.Marker[]>([]);
 
-  // Harita başlat
+  // Initialize map
   useEffect(() => {
     if (!mapContainer.current) return;
 
@@ -39,20 +39,20 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
 
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
-    // Haritaya tıklama — alan seçimi
+    // Map click — area selection
     map.on("click", (e) => {
       const lngLat: [number, number] = [e.lngLat.lng, e.lngLat.lat];
 
       setCorner1((prev) => {
         if (!prev) {
-          // İlk köşe
+          // First corner
           const marker = new maplibregl.Marker({ color: "#14F195" })
             .setLngLat(lngLat)
             .addTo(map);
           markersRef.current.push(marker);
           return lngLat;
         } else {
-          // İkinci köşe — dikdörtgeni çiz
+          // Second corner — draw rectangle
           setCorner2(lngLat);
           setIsDrawing(false);
 
@@ -61,7 +61,7 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
             .addTo(map);
           markersRef.current.push(marker);
 
-          // Dikdörtgen çiz
+          // Draw rectangle
           const nw: [number, number] = [
             Math.min(prev[0], lngLat[0]),
             Math.max(prev[1], lngLat[1]),
@@ -86,14 +86,14 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
             },
           };
 
-          // Alan hesapla (yaklaşık — dönüm cinsinden)
+          // Compute area (approximate — in decares)
           const widthKm = Math.abs(se[0] - nw[0]) * 85; // ~85km per degree lng at this latitude
           const heightKm = Math.abs(nw[1] - se[1]) * 111; // ~111km per degree lat
-          const areaHectar = widthKm * heightKm * 100; // km² → hektar
-          const areaDonm = areaHectar * 10; // hektar → dönüm
+          const areaHectar = widthKm * heightKm * 100; // km² → hectares
+          const areaDonm = areaHectar * 10; // hectares → decares
           setAreaSize(areaDonm);
 
-          // Haritaya polygon ekle
+          // Add polygon to map
           if (map.getSource("area-polygon")) {
             (map.getSource("area-polygon") as maplibregl.GeoJSONSource).setData(polygon);
           } else {
@@ -122,7 +122,7 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
           // Callback
           onAreaSelect({ nw, se, area: Math.round(areaDonm) });
 
-          return prev; // corner1 değişmez
+          return prev; // corner1 unchanged
         }
       });
     });
@@ -133,7 +133,7 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
     };
   }, []);
 
-  // Alanı sıfırla
+  // Reset selected area
   const resetArea = useCallback(() => {
     setCorner1(null);
     setCorner2(null);
@@ -153,7 +153,7 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
     <div className="space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-[10px] font-bold text-[#34D399] uppercase tracking-widest flex items-center gap-1">
-          <MapPin className="w-3 h-3" /> Tarla Alanı Seçimi
+          <MapPin className="w-3 h-3" /> Field Area Selection
         </label>
         {corner2 && (
           <button
@@ -161,32 +161,32 @@ export default function AreaSelectMap({ onAreaSelect, initialCenter = [27.15, 38
             onClick={resetArea}
             className="text-[10px] text-[#F87171] flex items-center gap-1 hover:underline"
           >
-            <Trash2 className="w-3 h-3" /> Sıfırla
+            <Trash2 className="w-3 h-3" /> Reset
           </button>
         )}
       </div>
 
-      {/* Harita */}
+      {/* Map */}
       <div className="relative rounded-xl overflow-hidden border border-[#1a1a1a]" style={{ height: 200 }}>
         <div ref={mapContainer} className="w-full h-full" />
 
-        {/* Overlay durumu */}
+        {/* Overlay state */}
         {isDrawing && (
           <div className="absolute bottom-2 left-2 right-2 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-2 text-center">
             <p className="text-[10px] text-[#A1A1AA]">
               {!corner1
-                ? "📍 Tarla alanının ilk köşesine tıklayın"
-                : "📍 Karşı köşeye tıklayarak alanı tamamlayın"}
+                ? "📍 Click the first corner of the field area"
+                : "📍 Click the opposite corner to complete the area"}
             </p>
           </div>
         )}
 
-        {/* Alan bilgisi */}
+        {/* Area info */}
         {!isDrawing && areaSize > 0 && (
           <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center gap-2">
             <Maximize2 className="w-3 h-3 text-[#14F195]" />
             <span className="text-[11px] font-bold text-[#14F195]">
-              {areaSize < 10 ? areaSize.toFixed(1) : Math.round(areaSize)} dönüm
+              {areaSize < 10 ? areaSize.toFixed(1) : Math.round(areaSize)} decares
             </span>
           </div>
         )}

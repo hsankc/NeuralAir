@@ -16,11 +16,11 @@ import {
 import type { ParsedCommand } from "@/lib/ai/dispatcher";
 import { randomTxHash, initialDrones } from "@/lib/data";
 
-// Drone isimlerini metinde bul ve tıklanabilir yap
+// Find drone names in text and make them clickable
 const DRONE_NAMES = initialDrones.map(d => d.name);
 
 function renderWithDroneLinks(text: string) {
-  // Drone isimlerini regex ile bul
+  // Find drone names with regex
   const pattern = new RegExp(`(${DRONE_NAMES.join("|")})`, "g");
   const parts = text.split(pattern);
   
@@ -252,7 +252,7 @@ export default function AIChat() {
               )}
 
               <div className={`text-[10px] mt-2 flex items-center gap-1 ${msg.role === "user" ? "text-white/70 justify-end" : "text-text-muted"}`}>
-                {msg.timestamp.toLocaleTimeString("tr-TR", { hour: '2-digit', minute: '2-digit' })}
+                {msg.timestamp.toLocaleTimeString("en-US", { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
           </div>

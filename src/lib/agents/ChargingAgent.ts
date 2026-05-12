@@ -1,9 +1,9 @@
 "use client";
 
 // ── ChargingAgent ─────────────────────────────────────────────
-// Her 3 saniyede çalışır.
-// Şarj olmakta olan drone'lar için mikro SOL kazanç sayacını
-// günceller ve Sky-Charge sayfasındaki pod gelirini artırır.
+// Runs every 3 seconds.
+// For each charging drone, increments the micro SOL earnings counter
+// and grows the pod revenue shown on the Sky-Charge page.
 
 import { supabase } from "@/lib/supabase";
 import type { DroneAgent } from "@/lib/data";
@@ -12,19 +12,19 @@ import type { AgentLog } from "./AgentEngine";
 type EmitFn = (agent: string, level: AgentLog["level"], message: string) => void;
 type GetDronesFn = () => DroneAgent[];
 
-// Her şarj oturumunda kazanılan SOL miktarı (3 saniyede bir)
+// SOL earned per charging session tick (every 3 seconds)
 const SOL_PER_TICK = 0.000012;
 
-// Şarj olan pod'ların toplam kazancını takip et
+// Track total earnings per charging pod
 const podEarnings: Record<number, number> = {};
 
-// Sürpriz TX hash üretici (Solana format)
+// Surprise TX hash generator (Solana format)
 function fakeSolanaTx(): string {
   const chars = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
   return Array.from({ length: 44 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 }
 
-// Throttle: Her 15 saniyede bir Supabase'e yazılsın (çok fazla write olmasın)
+// Throttle: write to Supabase at most every 15 seconds (avoid excessive writes)
 let lastDbWrite = 0;
 
 export const ChargingAgent = {
@@ -34,13 +34,13 @@ export const ChargingAgent = {
 
     if (!chargingDrones.length) return;
 
-    // Her şarjda olan drone için pod kazancı hesapla
+    // Compute pod earnings for every charging drone
     for (const drone of chargingDrones) {
-      // En yakın pod'u simüle olarak bul (id modulo 8)
+      // Find nearest pod by simulation (id modulo 8)
       const podId = (drone.id % 8) + 1;
       podEarnings[podId] = (podEarnings[podId] ?? 0) + SOL_PER_TICK;
 
-      // Her 5 tickte bir (15sn) terminal'e log bas
+      // Roughly every 5th tick (15s) print a terminal log
       if (Math.random() < 0.2) {
         const tx = fakeSolanaTx();
         emit(
@@ -51,7 +51,7 @@ export const ChargingAgent = {
       }
     }
 
-    // Her 15 saniyede bir Supabase'deki pod kazancını güncelle
+    // Update pod earnings in Supabase every 15 seconds
     const now = Date.now();
     if (now - lastDbWrite > 15_000) {
       lastDbWrite = now;
@@ -60,7 +60,7 @@ export const ChargingAgent = {
         if (earned <= 0) continue;
 
         try {
-          // Direkt update ile pod kazancını artır
+          // Directly increment pod earnings via update
           const { data: pod } = await supabase
             .from("charging_pods")
             .select("total_earned")
@@ -74,10 +74,10 @@ export const ChargingAgent = {
               .eq("id", parseInt(podId));
           }
         } catch {
-          // Supabase yazma hatası — sessizce geç
+          // Supabase write error — silently ignore
         }
 
-        podEarnings[parseInt(podId)] = 0; // Sıfırla, tekrar birikmesi için
+        podEarnings[parseInt(podId)] = 0; // Reset so it can accumulate again
       }
     }
   },

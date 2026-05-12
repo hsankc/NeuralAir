@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { DroneAgent, ChargingPod, Mission, AirspaceObstacle, DroneType } from "@/lib/data";
+import { buildFieldSweepPath } from "@/lib/agriculturalSweep";
 
 interface SkyMapProps {
   drones: DroneAgent[];
@@ -109,6 +110,7 @@ export default function SkyMap({
   const routeLayersRef = useRef<Map<number, L.LayerGroup>>(new Map());
   const obstacleLayersRef = useRef<Map<number, L.LayerGroup>>(new Map());
   const agriculturalScanRef = useRef<Map<number, L.LayerGroup>>(new Map());
+  const agScanMissionIdRef = useRef<Map<number, number>>(new Map());
 
   // Initialize map
   useEffect(() => {
@@ -136,6 +138,7 @@ export default function SkyMap({
       routeLayersRef.current.clear();
       obstacleLayersRef.current.clear();
       agriculturalScanRef.current.clear();
+      agScanMissionIdRef.current.clear();
     };
   }, []);
 
@@ -227,10 +230,11 @@ export default function SkyMap({
     });
 
     agriculturalScanRef.current.forEach((layerGroup, droneId) => {
-      const drone = drones.find(d => d.id === droneId);
+      const drone = drones.find((d) => d.id === droneId);
       if (!drone || drone.type !== "agricultural" || drone.status !== "mission") {
         layerGroup.remove();
         agriculturalScanRef.current.delete(droneId);
+        agScanMissionIdRef.current.delete(droneId);
       }
     });
 
@@ -280,6 +284,7 @@ export default function SkyMap({
         if (agriculturalScanRef.current.has(drone.id)) {
           agriculturalScanRef.current.get(drone.id)!.remove();
           agriculturalScanRef.current.delete(drone.id);
+          agScanMissionIdRef.current.delete(drone.id);
         }
         return;
       }
@@ -291,29 +296,35 @@ export default function SkyMap({
       const color = getDroneColor(drone.type, drone.status);
       const progress = calcRouteProgress(drone, mission);
 
-      // --- AGRICULTURAL SCAN PATTERN ---
-      if (drone.type === "agricultural") {
-        if (!agriculturalScanRef.current.has(drone.id)) {
-          const scanLayer = L.layerGroup().addTo(map);
-          // Draw a simulated field area
-          const bounds: L.LatLngBoundsLiteral = [
-            [toLat - 0.005, toLng - 0.005],
-            [toLat + 0.005, toLng + 0.005]
-          ];
-          L.rectangle(bounds, { color: color, weight: 1, fillOpacity: 0.1, dashArray: "4 4" }).addTo(scanLayer);
-          
-          // Draw scan lines (zig-zag)
-          const scanPoints: [number, number][] = [];
-          for(let i=0; i<5; i++) {
-            const lat = bounds[0][0] + (i * 0.0025);
-            scanPoints.push([lat, bounds[0][1]]);
-            scanPoints.push([lat, bounds[1][1]]);
+      // --- AGRICULTURAL SCAN PATTERN (mission field bounds = sim path) ---
+      if (drone.type === "agricultural" && mission.type === "agricultural") {
+        const lastMid = agScanMissionIdRef.current.get(drone.id);
+        const mustRebuild = !agriculturalScanRef.current.has(drone.id) || lastMid !== mission.id;
+        if (mustRebuild) {
+          if (agriculturalScanRef.current.has(drone.id)) {
+            agriculturalScanRef.current.get(drone.id)!.remove();
+            agriculturalScanRef.current.delete(drone.id);
           }
-          L.polyline(scanPoints, { color: color, weight: 2, opacity: 0.4 }).addTo(scanLayer);
-          
-          scanLayer.bindTooltip("İlaçlama/Sulama Tarama Alanı", { direction: "top", className: "route-tooltip" });
+          agScanMissionIdRef.current.set(drone.id, mission.id);
+          const scanLayer = L.layerGroup().addTo(map);
+          const minLat = Math.min(mission.fromLat, mission.toLat);
+          const maxLat = Math.max(mission.fromLat, mission.toLat);
+          const minLng = Math.min(mission.fromLng, mission.toLng);
+          const maxLng = Math.max(mission.fromLng, mission.toLng);
+          const bounds: L.LatLngBoundsLiteral = [
+            [minLat, minLng],
+            [maxLat, maxLng],
+          ];
+          L.rectangle(bounds, { color, weight: 1, fillOpacity: 0.1, dashArray: "4 4" }).addTo(scanLayer);
+          const scanPoints = buildFieldSweepPath(mission);
+          L.polyline(scanPoints, { color, weight: 2, opacity: 0.45 }).addTo(scanLayer);
+          scanLayer.bindTooltip("Field scan / spray pattern", { direction: "top", className: "route-tooltip" });
           agriculturalScanRef.current.set(drone.id, scanLayer);
         }
+      } else if (agriculturalScanRef.current.has(drone.id)) {
+        agriculturalScanRef.current.get(drone.id)!.remove();
+        agriculturalScanRef.current.delete(drone.id);
+        agScanMissionIdRef.current.delete(drone.id);
       }
 
       // --- STANDARD ROUTE ARCS ---
