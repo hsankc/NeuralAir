@@ -291,7 +291,7 @@ const glassBase =
 function HeroSection() {
   return (
     <Section id="hero" className="flex min-h-[100dvh] flex-col items-center text-center">
-      <div className="relative z-[10] mx-auto flex w-full max-w-4xl flex-col items-center px-5 pb-16 pt-[max(7.5rem,calc(env(safe-area-inset-top,0px)+5.5rem))] sm:pb-24 sm:pt-[8.5rem] md:pt-40 lg:pt-44">
+      <div style={{ paddingTop: '120px' }} className="relative z-[10] mx-auto flex w-full max-w-4xl flex-col items-center px-5 pb-16 sm:pb-24">
         {/* Üst rozet */}
         <div className="landing-in landing-in-d1 group inline-flex cursor-default items-center gap-2 rounded-full border border-emerald-400/25 bg-gradient-to-r from-emerald-500/[0.1] via-emerald-500/[0.06] to-violet-500/[0.08] px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-200/95 shadow-[0_0_28px_-8px_rgba(52,211,153,0.4)]">
           <span className="relative flex h-1.5 w-1.5">
@@ -302,7 +302,7 @@ function HeroSection() {
         </div>
 
         {/* Ana başlık */}
-        <h1 className="mt-10 text-balance text-5xl font-black leading-[0.98] tracking-[-0.04em] text-white sm:text-7xl md:text-[5.5rem] md:leading-[0.92] lg:text-[6.25rem]">
+        <h1 className="mt-10 text-balance text-[2.4rem] font-black leading-[1.05] tracking-[-0.04em] text-white sm:text-[3.5rem] md:text-[4.25rem] md:leading-[1] lg:text-[4.75rem]">
           <span className="landing-in landing-in-d2 block">Autonomous Drone Network.</span>
           <span className="landing-in landing-in-d3 mt-2 block">
             On a Single <span className="text-shimmer">Protocol</span>.
