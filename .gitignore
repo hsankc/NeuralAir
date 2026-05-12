@@ -30,7 +30,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files
 .env*
 
 # vercel
@@ -40,31 +40,30 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# ═══ PRIVATE / INTERNAL — GitHub'a kesinlikle gitmeyecek dosyalar ═══
+# ═══ PROJECT-SPECIFIC ═══
 
-# AI Coding Assistant config (jüri görürse "AI yazmış" der)
+# AI assistant configs
 CLAUDE.md
 AGENTS.md
 
-# Hackathon planlama / sunum notları (iç strateji belgeleri)
-HACKATHON_SUNUM.md
-neuralair_audit.md
-changelogs/
+# Lint output dumps
+eslint_out.txt
+lint_out.txt
 
-# Eski hackathon kalıntıları (Monad/Solidity artıkları)
-Cloude kodları/
-Hackathon izmir/
+# Legacy scripts & content
+remove_locale.js
+LANDING_CONTENT.md
 
-# Boş Anchor / Rust scaffold (derlenmez, amatör durur)
+# Media with non-English names
+fotoğraflar/
+
+# Anchor / Rust scaffold (not compiled)
 Anchor.toml
 Cargo.toml
 programs/
 
-# DB şema dosyası (güvenlik — credential sızıntı riski)
+# Database schema (security)
 supabase_setup.sql
 
-# Donanım dokümantasyonu (README yeterli, ekstra MD gereksiz)
-HARDWARE.md
-
-# Ar�iv klas�rleri
+# Internal docs
 docs/archive/
