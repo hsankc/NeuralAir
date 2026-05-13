@@ -66,11 +66,11 @@ Sidebar on dashboard mirrors the same destinations (Dashboard, Marketplace, Sky-
 
 ## Visual guide (each screenshot explained)
 
-Below, every image sits **beside** a structured reference: what you are looking at, how to drive it in the live app, and which UI blocks matter for demos or extension work. Asset files live in **`docs/screenshots/`**.
+Below, every image sits **beside** a structured reference: what you are looking at, how to drive it in the live app, and which UI blocks matter for demos or extension work. Asset files live in **`Documentation/screenshots/`**.
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/01-landing.png" alt="Landing page" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/01-landing.png" alt="Landing page" width="100%" /></td>
 <td valign="top">
 <p><strong>01 · Landing</strong> — route <code>/</code></p>
 <p><em>Role.</em> Single-page marketing surface: positioning, metrics, and deep sections without leaving the site.</p>
@@ -90,7 +90,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/02-dashboard.png" alt="Dashboard" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/02-dashboard.png" alt="Dashboard" width="100%" /></td>
 <td valign="top">
 <p><strong>02 · Operations dashboard</strong> — route <code>/dashboard</code></p>
 <p><em>Role.</em> Primary command center: KPIs + map + mission feed + live agent log + global wallet state.</p>
@@ -112,7 +112,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/03-live-operations.png" alt="Live operations" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/03-live-operations.png" alt="Live operations" width="100%" /></td>
 <td valign="top">
 <p><strong>03 · Live operations (map focus)</strong> — still <code>/dashboard</code></p>
 <p><em>Role.</em> Highlights geospatial density: multiple tracks, district labels, and simultaneous mission pressure.</p>
@@ -130,7 +130,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/04-drone-ai-chat.png" alt="Drone AI chat" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/04-drone-ai-chat.png" alt="Drone AI chat" width="100%" /></td>
 <td valign="top">
 <p><strong>04 · Per-drone AI chat</strong> — <code>/dashboard</code> with a selected unit</p>
 <p><em>Role.</em> “Digital twin lite”: operator talks to a specific aircraft context.</p>
@@ -148,7 +148,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/05-control-sky-sync.png" alt="Control Sky-Sync" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/05-control-sky-sync.png" alt="Control Sky-Sync" width="100%" /></td>
 <td valign="top">
 <p><strong>05 · Sky-Sync control surface</strong> — route <code>/control</code></p>
 <p><em>Role.</em> Cinematic <strong>FPV + digital twin</strong> view: MapLibre 3D extrusions, neon styling, and a <strong>simulated</strong> Solana transaction stream for “command → commit” storytelling.</p>
@@ -169,7 +169,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/06-sky-charge.png" alt="Sky-Charge" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/06-sky-charge.png" alt="Sky-Charge" width="100%" /></td>
 <td valign="top">
 <p><strong>06 · Sky-Charge DePIN</strong> — route <code>/sky-charge</code></p>
 <p><em>Role.</em> Economics + infrastructure page: pods as revenue-generating edge assets.</p>
@@ -190,7 +190,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/07-flight-logs.png" alt="Flight logs" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/07-flight-logs.png" alt="Flight logs" width="100%" /></td>
 <td valign="top">
 <p><strong>07 · Flight logs (audit / black-box)</strong> — route <code>/flight-logs</code></p>
 <p><em>Role.</em> Compliance-oriented view: immutable-style records + live agent commentary.</p>
@@ -210,7 +210,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/08-ai-dispatcher.png" alt="AI Dispatcher" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/08-ai-dispatcher.png" alt="AI Dispatcher" width="100%" /></td>
 <td valign="top">
 <p><strong>08 · Global AI Dispatcher</strong> — floating overlay (available from dashboard contexts)</p>
 <p><em>Role.</em> Fleet-wide natural language control plane: converts text → structured intent → (demo) chain fingerprint.</p>
@@ -231,7 +231,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/09-product-modules.png" alt="Product modules diagram" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/09-product-modules.png" alt="Product modules diagram" width="100%" /></td>
 <td valign="top">
 <p><strong>09 · Product module map (diagram)</strong></p>
 <p><em>Role.</em> One-glance mapping between <strong>product pillars</strong> and <strong>routes</strong> you can open in the demo.</p>
@@ -253,7 +253,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/10-parallel-flows.png" alt="Parallel flows diagram" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/10-parallel-flows.png" alt="Parallel flows diagram" width="100%" /></td>
 <td valign="top">
 <p><strong>10 · Parallel runtime flows (diagram)</strong></p>
 <p><em>Role.</em> Explains <strong>why</strong> the UI is modular: three concurrent loops coordinated by Solana + agents.</p>
@@ -271,7 +271,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/11-fleet-hardware-categories.png" alt="Fleet hardware categories" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/11-fleet-hardware-categories.png" alt="Fleet hardware categories" width="100%" /></td>
 <td valign="top">
 <p><strong>11 · Reference fleet hardware (diagram)</strong></p>
 <p><em>Role.</em> Ties each <strong>mission vertical</strong> to a credible airframe example (payload, sensors, endurance).</p>
@@ -288,7 +288,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/12-edge-hardware-architecture.png" alt="Edge hardware architecture" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/12-edge-hardware-architecture.png" alt="Edge hardware architecture" width="100%" /></td>
 <td valign="top">
 <p><strong>12 · Edge + chain architecture (diagram)</strong></p>
 <p><em>Role.</em> Field deployment story: what sits on the aircraft / ground node before traffic hits Solana RPC.</p>
@@ -309,7 +309,7 @@ Below, every image sits **beside** a structured reference: what you are looking 
 
 <table>
 <tr>
-<td width="44%" valign="top"><img src="./docs/screenshots/13-tech-stack.png" alt="Tech stack diagram" width="100%" /></td>
+<td width="44%" valign="top"><img src="./Documentation/screenshots/13-tech-stack.png" alt="Tech stack diagram" width="100%" /></td>
 <td valign="top">
 <p><strong>13 · Engineering stack ribbon (diagram)</strong></p>
 <p><em>Role.</em> Single slide for CTO-style questions: frameworks, chain client, maps, data plane, AI agents, robotics adjacency.</p>
